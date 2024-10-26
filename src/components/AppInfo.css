@@ -1,0 +1,56 @@
+.app-info {
+    padding: 50px;
+    background-color: #f8f9fa; /* Jasne tło dla kontrastu */
+    color: #333;
+    margin: 70px 10px 20px 40px; /* Marginesy od góry/dół i boków */
+    border-radius: 12px; /* Zaokrąglone boki */
+    float: right; /* Przesunięcie komponentu na prawą stronę */
+    width: calc(100% - 60px); /* Szerokość z uwzględnieniem marginesów */
+    box-sizing: border-box; /* Aby padding i marginesy nie wpływały na szerokość */
+    /* Dodatkowe ustawienia: */
+    min-height: 200px; /* Ustaw minimalną wysokość */
+}
+
+
+.app-info h2 {
+    font-size: 2.2rem;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.app-info p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.feature-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feature-item i {
+    font-size: 2.5rem;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.feature-item h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.feature-item p {
+    font-size: 1rem;
+    color: #666;
+}
