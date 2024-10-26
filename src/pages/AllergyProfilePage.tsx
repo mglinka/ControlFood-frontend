@@ -12,8 +12,8 @@ interface SelectedAllergy {
     intensity: string;
 }
 
-const AllergyProfilePage: React.FC<{ accountId: string }> = () => {
-    const accountId = "4c90f86a-0d82-4c51-b72c-80e20949a3b9"; // Placeholder for account ID
+const AllergyProfilePage: React.FC<{ accountId: string }> = (props) => {
+
     const [allergies, setAllergies] = useState<Allergy[]>([]);
     const [selectedAllergies, setSelectedAllergies] = useState<SelectedAllergy[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -48,7 +48,7 @@ const AllergyProfilePage: React.FC<{ accountId: string }> = () => {
     const handleSaveProfile = async () => {
         try {
             const requestBody = {
-                accountId: accountId,
+                accountId: props.accountId,
                 allergens: selectedAllergies.map(selected => ({
                     allergenId: selected.allergy.allergen_id,
                     intensity: selected.intensity,

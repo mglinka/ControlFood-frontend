@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getAllProducts } from '../api';
+import {components} from "../controlfood-backend-schema";
 
 const ProductsPage: React.FC = () => {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState<components["schemas"]["GetProductDTO"][]>([]);
 
     useEffect(() => {
         const fetchProducts = async () => {

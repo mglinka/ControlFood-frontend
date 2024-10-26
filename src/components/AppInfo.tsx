@@ -1,5 +1,4 @@
-import React from 'react';
-import './AppInfo.css'; // Stylizujesz komponent osobnym plikiem CSS
+import './AppInfo.css';
 
 const AppInfo = () => {
     return (

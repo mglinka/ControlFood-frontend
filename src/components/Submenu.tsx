@@ -1,7 +1,7 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { SidebarItem } from '../../../../../Downloads/reactjs-typscript-sidebar-vi-v1-master/reactjs-typscript-sidebar-vi-v1-master/src/models/SidebarItem.ts';
+import { SidebarItem } from '../models/SidebarItem.ts';
 
 type SidebarLinkProps = {
     item: SidebarItem;
@@ -42,7 +42,7 @@ const DropdownLink = styled(Link)`
     }
 `;
 
-const Submenu: FC<SidebarLinkProps> = ({ item }) => {
+const Submenu: React.FC<SidebarLinkProps> = ({ item }) => {
     const [subnav, setSubnav] = useState(false);
     const showSubnav = () => setSubnav(!subnav);
 

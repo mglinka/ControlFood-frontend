@@ -1,8 +1,6 @@
 import {
     AiFillCaretDown,
     AiFillCaretUp,
-    AiOutlineHistory,
-    AiOutlineHome,
     AiOutlineMoneyCollect,
     AiOutlineUser,
     AiOutlineFolder,

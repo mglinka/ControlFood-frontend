@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { registerUser } from "../api.ts";
 import axios from "axios";
 import MainHeader from "../MainHeader.tsx";
-import {LoginForm} from "../forms/LoginForm.tsx";
 import {RegisterForm} from "../forms/RegisterForm.tsx";
 
 const RegisterPage: React.FC = () => {
@@ -11,9 +10,11 @@ const RegisterPage: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
+    //@ts-ignore
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
+            //@ts-ignore
             const data = await registerUser(firstName, lastName, email, password);
             setFirstName("");
             setLastName("");
