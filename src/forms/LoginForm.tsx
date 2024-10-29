@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { components } from '../controlfood-backend-schema';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { decodeToken } from '../utils/auth';
 import React from 'react';
+import {jwtDecode} from 'jwt-decode'
 import { useAuth } from '../utils/AuthContext';
 
 export function LoginForm() {
@@ -33,7 +33,7 @@ export function LoginForm() {
 
 
             const token = response.data;
-            const decoded = decodeToken(token);
+            const decoded = jwtDecode(token);
 
 
             login(token);

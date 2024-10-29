@@ -38,8 +38,7 @@ const MyAccountPage: React.FC = () => {
                 <h2 className="text-2xl font-semibold mb-4">Account Information</h2>
                 <p className="mb-2"><strong>Username:</strong> {user?.sub}</p>
                 <p className="mb-2"><strong>Email:</strong> {email}</p>
-                <p className="mb-2"><strong>Account Status:</strong> {accountStatus}</p>
-                <p className="mb-2"><strong>Subscription Level:</strong> {subscriptionLevel}</p>
+
             </div>
 
             {/* Profile Settings Section */}

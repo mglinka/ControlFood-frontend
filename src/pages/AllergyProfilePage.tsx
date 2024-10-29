@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AllergySelector from './AllergySelector';
-import { useAuth } from "../utils/AuthContext.tsx";
 import { components } from "../controlfood-backend-schema";
 
-type AllergenIntensityDTO = components["schemas"]["AllergenIntensityDTO"];
+
 type CreateAllergyProfileDTO = components["schemas"]["CreateAllergyProfileDTO"];
 
 interface Allergy {
@@ -25,7 +24,7 @@ const AllergyProfilePage: React.FC<{ accountId: string }> = () => {
     const [error, setError] = useState<string | null>(null);
     const [saveError, setSaveError] = useState<string | null>(null);
 
-    const { user } = useAuth();
+
 
     const fetchAllergies = async () => {
         setLoading(true);
@@ -62,7 +61,7 @@ const AllergyProfilePage: React.FC<{ accountId: string }> = () => {
     const handleSaveProfile = async () => {
         try {
             const requestBody: CreateAllergyProfileDTO = {
-                accountId: user?.jti || '',
+                accountId: "1111",
                 allergens: selectedAllergies.map(({ allergenId, intensity }) => ({ allergenId, intensity })),
             };
 
