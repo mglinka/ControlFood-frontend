@@ -14,11 +14,11 @@ const BarcodeScannerPage: React.FC = () => {
         const productData = await getProductByEan(ean);
         console.log("Received product data:", productData);
 
-        // Update state
+
         setProduct(productData);
     };
 
-    // Log the product whenever it changes
+
     useEffect(() => {
         console.log("Product state updated:", product);
     }, [product]); // This effect runs whenever product changes

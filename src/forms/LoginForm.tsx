@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import React from 'react';
 import {jwtDecode} from 'jwt-decode'
-import { useAuth } from '../utils/AuthContext';
+import {authService} from "../utils/authService.ts";
 
 export function LoginForm() {
     const navigate = useNavigate();
@@ -16,7 +16,7 @@ export function LoginForm() {
         email: '',
         password: ''
     });
-    const { login } = useAuth();
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -36,7 +36,7 @@ export function LoginForm() {
             const decoded = jwtDecode(token);
 
 
-            login(token);
+            authService.login(token);
 
             console.log('Decoded Token:', decoded);
             navigate('/profile');

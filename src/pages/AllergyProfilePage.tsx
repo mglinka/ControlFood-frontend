@@ -13,7 +13,7 @@ interface Allergy {
 
 interface SelectedAllergy {
     allergenId: string;
-    name: string; // Ensure we have name here
+    name: string;
     intensity: string;
 }
 

@@ -10,7 +10,7 @@ const MyAccountPage: React.FC = () => {
 
     const [message, setMessage] = useState('');
 
-    const {user} = useAuth();
+    const {role} = useAuth();
     const handleUpdateProfile = () => {
         // Logic to update profile (e.g., call an API)
         console.log('Updating profile:', { username, email });
@@ -36,7 +36,7 @@ const MyAccountPage: React.FC = () => {
             {/* Account Information Section */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-2xl font-semibold mb-4">Account Information</h2>
-                <p className="mb-2"><strong>Username:</strong> {user?.sub}</p>
+                <p className="mb-2"><strong>Username:</strong> {role}</p>
                 <p className="mb-2"><strong>Email:</strong> {email}</p>
 
             </div>

@@ -5,4 +5,5 @@ export interface SidebarItem {
     iconOpened?: any;
     iconClosed?: any;
     subnav?: SidebarItem[];
+    role: string[];
 }
