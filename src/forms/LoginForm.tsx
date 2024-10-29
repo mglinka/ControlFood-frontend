@@ -3,10 +3,10 @@ import { faKey } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { components } from '../controlfood-backend-schema';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import React from 'react';
 import {jwtDecode} from 'jwt-decode'
 import {authService} from "../utils/authService.ts";
+import axiosInstance from "../api/axiosConfig.ts";
 
 export function LoginForm() {
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ export function LoginForm() {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8080/api/v1/auth/authenticate', authenticationRequest);
+            const response = await axiosInstance.post('/auth/authenticate', authenticationRequest);
             console.log(response.data);
 
 

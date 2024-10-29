@@ -3,7 +3,7 @@ import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {components} from "../controlfood-backend-schema";
-import axios from "axios";
+import axiosInstance from "../api/axiosConfig.ts";
 
 export function RegisterForm() {
 
@@ -28,7 +28,7 @@ export function RegisterForm() {
 
         try {
             // Make the API request to register the user
-            await axios.post('http://localhost:8080/api/v1/auth/register', registerRequest);
+            await axiosInstance.post('/auth/register', registerRequest);
             navigate('/login'); // Navigate to login page upon successful registration
         } catch (error: any) {
             // Handle error appropriately

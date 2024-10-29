@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import AllergySelector from './AllergySelector';
 import { components } from "../controlfood-backend-schema";
+import axiosInstance from "../api/axiosConfig.ts";
 
 
 type CreateAllergyProfileDTO = components["schemas"]["CreateAllergyProfileDTO"];
@@ -29,7 +30,7 @@ const AllergyProfilePage: React.FC<{ accountId: string }> = () => {
     const fetchAllergies = async () => {
         setLoading(true);
         try {
-            const response = await axios.get<Allergy[]>('http://localhost:8080/api/v1/allergens');
+            const response = await axiosInstance.get<Allergy[]>('/allergens');
             setAllergies(response.data);
             setLoading(false);
         } catch (err) {
@@ -65,7 +66,7 @@ const AllergyProfilePage: React.FC<{ accountId: string }> = () => {
                 allergens: selectedAllergies.map(({ allergenId, intensity }) => ({ allergenId, intensity })),
             };
 
-            await axios.post('http://localhost:8080/api/v1/allergy-profiles/create', requestBody);
+            await axiosInstance.post('/allergy-profiles/create', requestBody);
             alert('Allergy profile saved successfully!');
             setSelectedAllergies([]);
         } catch (err) {
