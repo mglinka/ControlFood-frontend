@@ -1,7 +1,44 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import {useNavigate} from "react-router-dom";
+import {useState} from "react";
+import {components} from "../controlfood-backend-schema";
+import axios from "axios";
 
 export function RegisterForm() {
+
+    const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [registerRequest, setRegisterRequest] = useState<components["schemas"]["RegisterRequest"]>({firstName: '',
+        lastName: '',
+        email: '',
+        password: ''
+    })
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setRegisterRequest((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Prevent default form submission
+        setLoading(true); // Set loading state to true
+
+        try {
+            // Make the API request to register the user
+            await axios.post('http://localhost:8080/api/v1/auth/register', registerRequest);
+            navigate('/login'); // Navigate to login page upon successful registration
+        } catch (error: any) {
+            // Handle error appropriately
+            setErrorMessage(error.response?.data?.message || 'Registration failed. Please try again.');
+            console.error('Registration error:', error);
+        } finally {
+            setLoading(false); // Reset loading state
+        }
+    };
+
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-lg">
@@ -13,8 +50,12 @@ export function RegisterForm() {
                         Create an account
                     </h2>
 
+                    {errorMessage && (
+                        <div className="mt-2 text-red-600 text-center">{errorMessage}</div>
+                    )}
+
                     <div className="mt-10">
-                        <form action="#" method="POST" className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
                                     First Name
@@ -26,6 +67,7 @@ export function RegisterForm() {
                                         type="text"
                                         required
                                         autoComplete="given-name"
+                                        onChange={handleChange}
                                         className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -42,6 +84,7 @@ export function RegisterForm() {
                                         type="text"
                                         required
                                         autoComplete="family-name"
+                                        onChange={handleChange}
                                         className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -58,6 +101,7 @@ export function RegisterForm() {
                                         type="email"
                                         required
                                         autoComplete="email"
+                                        onChange={handleChange}
                                         className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -74,6 +118,7 @@ export function RegisterForm() {
                                         type="password"
                                         required
                                         autoComplete="new-password"
+                                        onChange={handleChange}
                                         className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -82,9 +127,10 @@ export function RegisterForm() {
                             <div>
                                 <button
                                     type="submit"
-                                    className="flex w-full justify-center rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
+                                    disabled={loading} // Disable button while loading
+                                    className={`flex w-full justify-center rounded-md ${loading ? 'bg-gray-500' : 'bg-orange-600'} px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600`}
                                 >
-                                    Create Account
+                                    {loading ? 'Creating Account...' : 'Create Account'}
                                 </button>
                             </div>
                         </form>
