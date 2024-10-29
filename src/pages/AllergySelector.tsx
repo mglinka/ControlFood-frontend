@@ -6,8 +6,8 @@ interface Allergy {
 }
 
 interface SelectedAllergy {
-    allergy: Allergy;
-    intensity: string;
+    allergenId: string;
+    intensity?: string;
 }
 
 interface AllergySelectorProps {
@@ -17,7 +17,7 @@ interface AllergySelectorProps {
 }
 
 const AllergySelector: React.FC<AllergySelectorProps> = ({ allergies, onAddAllergy, selectedAllergies }) => {
-    const [intensities, setIntensities] = useState<{ [key: string]: string }>({});
+    const [intensities, setIntensities] = useState<Record<string, string>>({});
 
     const handleIntensityChange = (id: string, value: string) => {
         setIntensities((prev) => ({
@@ -45,7 +45,7 @@ const AllergySelector: React.FC<AllergySelectorProps> = ({ allergies, onAddAller
                         <button
                             onClick={() => onAddAllergy(allergy, intensities[allergy.allergen_id] || 'Low')}
                             className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
-                            disabled={selectedAllergies.some(selected => selected.allergy.allergen_id === allergy.allergen_id)}
+                            disabled={selectedAllergies.some(selected => selected.allergenId === allergy.allergen_id)}
                         >
                             Add
                         </button>

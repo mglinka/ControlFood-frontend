@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllProducts } from '../api';
+import { getAllProducts } from '../api/api.ts';
 import {components} from "../controlfood-backend-schema";
 
 const ProductsPage: React.FC = () => {
