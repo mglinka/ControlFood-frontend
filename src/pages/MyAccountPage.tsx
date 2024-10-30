@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import {useAuth} from "../utils/AuthContext.tsx";
 
 const MyAccountPage: React.FC = () => {
-    const [username, setUsername] = useState('JohnDoe'); // Replace with actual user data
-    const [email, setEmail] = useState('johndoe@example.com'); // Replace with actual user data
+    const [username, setUsername] = useState('JohnDoe');
+    const [email, setEmail] = useState('johndoe@example.com');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -12,13 +12,11 @@ const MyAccountPage: React.FC = () => {
 
     const {role} = useAuth();
     const handleUpdateProfile = () => {
-        // Logic to update profile (e.g., call an API)
         console.log('Updating profile:', { username, email });
         setMessage('Profile updated successfully!');
     };
 
     const handleChangePassword = () => {
-        // Logic to change password (e.g., call an API)
         if (newPassword !== confirmPassword) {
             setMessage('Passwords do not match!');
             return;
@@ -33,7 +31,6 @@ const MyAccountPage: React.FC = () => {
         <div className="p-10 bg-gray-100 rounded-lg shadow-lg max-w-4xl mx-auto">
             <h1 className="text-4xl font-bold text-gray-800 text-center mb-6">My Account</h1>
 
-            {/* Account Information Section */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-2xl font-semibold mb-4">Account Information</h2>
                 <p className="mb-2"><strong>Username:</strong> {role}</p>
@@ -70,7 +67,6 @@ const MyAccountPage: React.FC = () => {
                 </button>
             </div>
 
-            {/* Change Password Section */}
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
                 <div className="mb-4">

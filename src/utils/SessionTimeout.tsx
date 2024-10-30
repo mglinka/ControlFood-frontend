@@ -1,30 +1,40 @@
-// SessionTimeout.tsx
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SessionTimeout: React.FC = () => {
     const { token, refreshToken, logout } = useAuth();
     const [showWarning, setShowWarning] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (!token ) return;
+        if (!token) return;
 
         const decodedToken = JSON.parse(atob(token.split('.')[1]));
         const tokenExpiration = decodedToken.exp * 1000;
         const warningTime = tokenExpiration - 14 * 60 * 1000; // 14 minutes before expiration
 
         const warningTimer = setTimeout(() => setShowWarning(true), warningTime - Date.now());
-        const timeoutTimer = setTimeout(logout, tokenExpiration - Date.now());
+        const timeoutTimer = setTimeout(() => {
+            logout();
+            navigate("/login");
+        }, tokenExpiration - Date.now());
 
         return () => {
             clearTimeout(warningTimer);
             clearTimeout(timeoutTimer);
         };
-    }, [token, logout]);
+    }, [token, logout, navigate]);
 
     const handleRefresh = async () => {
         await refreshToken();
         setShowWarning(false);
+    };
+
+    const handleLogout = () => {
+        setShowWarning(false);
+        logout();
+        navigate("/login");
     };
 
     return (
@@ -41,7 +51,7 @@ const SessionTimeout: React.FC = () => {
                             Refresh Session
                         </button>
                         <button
-                            onClick={logout}
+                            onClick={handleLogout}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
                         >
                             Logout

@@ -1,6 +1,7 @@
-// AuthContext.tsx
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from './authService'; // Adjust the path as needed
+import { authService } from './authService';
+
 
 interface AuthContextType {
     token: string | null;
@@ -27,9 +28,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = (token: string) => {
         const decoded = authService.decodeToken(token);
+        console.log("Martaola" , role );
         if (decoded) {
             setRole(decoded.role[0]);
         }
+        console.log("Martaola", role)
         setToken(token);
         localStorage.setItem('token', token);
     };
@@ -45,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return null;
         } catch (error) {
             console.error("Failed to refresh token:", error);
-            logout(); // Optionally log out on refresh failure
+            logout();
             return null;
         }
     };
@@ -53,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         setRole(null);
         localStorage.removeItem('token');
+
     };
 
 

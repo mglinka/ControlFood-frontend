@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {components} from "../controlfood-backend-schema";
 import axiosInstance from "../api/axiosConfig.ts";
@@ -23,19 +23,18 @@ export function RegisterForm() {
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent default form submission
-        setLoading(true); // Set loading state to true
+        e.preventDefault();
+        setLoading(true);
 
         try {
-            // Make the API request to register the user
             await axiosInstance.post('/auth/register', registerRequest);
-            navigate('/login'); // Navigate to login page upon successful registration
+            navigate('/login');
         } catch (error: any) {
             // Handle error appropriately
             setErrorMessage(error.response?.data?.message || 'Registration failed. Please try again.');
             console.error('Registration error:', error);
         } finally {
-            setLoading(false); // Reset loading state
+            setLoading(false);
         }
     };
 
@@ -127,7 +126,7 @@ export function RegisterForm() {
                             <div>
                                 <button
                                     type="submit"
-                                    disabled={loading} // Disable button while loading
+                                    disabled={loading}
                                     className={`flex w-full justify-center rounded-md ${loading ? 'bg-gray-500' : 'bg-orange-600'} px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600`}
                                 >
                                     {loading ? 'Creating Account...' : 'Create Account'}
@@ -137,9 +136,7 @@ export function RegisterForm() {
 
                         <p className="mt-10 text-center text-sm text-gray-500">
                             Already have an account?{' '}
-                            <a href="/login" className="font-semibold leading-6 text-orange-600 hover:text-orange-500">
-                                Sign in
-                            </a>
+                            <Link to="/login" className="font-semibold leading-6 text-orange-600 hover:text-orange-500">Sign in</Link>
                         </p>
                     </div>
                 </div>

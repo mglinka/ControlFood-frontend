@@ -27,16 +27,16 @@ const AllergySelector: React.FC<AllergySelectorProps> = ({ allergies, onAddAller
     };
 
     return (
-        <div className="w-1/2 bg-gray-50 p-6 rounded-lg shadow-lg">
+        <div className="w-full md:w-1/2 bg-gray-50 p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">Select Allergens</h2>
             <ul>
                 {allergies.map((allergy) => (
-                    <li key={allergy.allergen_id} className="flex justify-between items-center bg-white p-4 mb-4 rounded-lg shadow">
+                    <li key={allergy.allergen_id} className="flex flex-col md:flex-row justify-between items-center bg-white p-4 mb-4 rounded-lg shadow">
                         <span>{allergy.name}</span>
                         <select
                             value={intensities[allergy.allergen_id] || 'Low'}
                             onChange={(e) => handleIntensityChange(allergy.allergen_id, e.target.value)}
-                            className="bg-gray-100 border border-gray-300 rounded-lg px-3 py-1 text-gray-700"
+                            className="mt-2 md:mt-0 bg-gray-100 border border-gray-300 rounded-lg px-3 py-1 text-gray-700"
                         >
                             <option value="Low">Low</option>
                             <option value="Medium">Medium</option>
@@ -44,7 +44,7 @@ const AllergySelector: React.FC<AllergySelectorProps> = ({ allergies, onAddAller
                         </select>
                         <button
                             onClick={() => onAddAllergy(allergy, intensities[allergy.allergen_id] || 'Low')}
-                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
+                            className="mt-2 md:mt-0 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
                             disabled={selectedAllergies.some(selected => selected.allergenId === allergy.allergen_id)}
                         >
                             Add

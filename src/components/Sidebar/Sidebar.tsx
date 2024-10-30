@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose, AiOutlineUser } from 'react-icons/ai';
 import { SidebarData } from './SidebarData.tsx';
 import Submenu from './Submenu.tsx';
 import { useAuth } from "../../utils/AuthContext.tsx";
 
+
+const getSidebarColor = (role: string | null) => {
+    switch (role) {
+        case 'ROLE_ADMIN':
+            return 'bg-[#ef4444]';
+        case 'ROLE_SPECIALIST':
+            return 'bg-[#f97316]';
+        case 'ROLE_USER':
+            return 'bg-black';
+        default:
+            return 'bg-gray-800';
+    }
+};
 
 const Sidebar: React.FC = () => {
     const [sidebar, setSidebar] = useState(false);
@@ -22,25 +35,21 @@ const Sidebar: React.FC = () => {
         setAccountMenu(!accountMenu);
     };
 
-    // Function to close the sidebar
     const closeSidebar = () => {
         setSidebar(false);
     };
 
     if (!showSidebar) return null;
 
-    // Filter sidebar data based on the user's role
-    const filteredSidebarData = SidebarData.filter(item => item.role.includes(role as string ));
+    const filteredSidebarData = SidebarData.filter(item => item.role.includes(role as string));
 
     const handleLogout = () => {
         logout();
-
     };
 
     return (
         <>
-
-            <div className="fixed top-0 left-0 w-full bg-black text-white h-16 flex items-center justify-between px-4 shadow-md z-50">
+            <div className={`fixed top-0 left-0 w-full ${getSidebarColor(role)} text-white h-16 flex items-center justify-between px-4 shadow-md z-50`}>
                 <div className="flex items-center">
                     <button onClick={toggleSidebar} className="text-2xl">
                         {sidebar ? <AiOutlineClose /> : <AiOutlineMenu />}
@@ -64,14 +73,13 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div
-                className={`fixed top-0 left-0 w-64 h-full bg-black z-40 transition-transform ${sidebar ? 'translate-x-0' : '-translate-x-full'} duration-300`}>
+                className={`fixed top-0 left-0 w-64 h-full ${getSidebarColor(role)} z-40 transition-transform ${sidebar ? 'translate-x-0' : '-translate-x-full'} duration-300`}>
                 <ul className="pt-16">
                     {filteredSidebarData.map((item, index) => (
                         <Submenu item={item} key={index} onItemClick={closeSidebar}/>
                     ))}
                 </ul>
             </div>
-
 
             {sidebar && (
                 <div onClick={toggleSidebar} className="fixed inset-0 bg-black opacity-50 z-30"></div>

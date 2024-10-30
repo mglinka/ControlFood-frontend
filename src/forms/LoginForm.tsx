@@ -2,11 +2,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { components } from '../controlfood-backend-schema';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import React from 'react';
 import {jwtDecode} from 'jwt-decode'
-import {authService} from "../utils/authService.ts";
 import axiosInstance from "../api/axiosConfig.ts";
+import {useAuth} from "../utils/AuthContext.tsx";
 
 export function LoginForm() {
     const navigate = useNavigate();
@@ -16,6 +16,7 @@ export function LoginForm() {
         email: '',
         password: ''
     });
+    const {login} =useAuth();
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +37,7 @@ export function LoginForm() {
             const decoded = jwtDecode(token);
 
 
-            authService.login(token);
+            login(token);
 
             console.log('Decoded Token:', decoded);
             navigate('/profile');
@@ -119,9 +120,7 @@ export function LoginForm() {
 
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Register if you don't have an account{' '}
-                    <a href="/register" className="font-semibold leading-6 text-red-600 hover:text-red-500">
-                        Sign up here
-                    </a>
+                    <Link to="/register" className="font-semibold leading-6 text-red-600 hover:text-red-500">Sign up here</Link>
                 </p>
             </div>
         </div>

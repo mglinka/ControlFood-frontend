@@ -84,7 +84,7 @@ export function CreateProductForm() {
     const handlePortionUnitChange = (e:any) => {
         const selectedUnitId = e.target.value;
         const unit = units.find(unit => unit.id === selectedUnitId);
-        setSelectedPortionUnit(unit ? unit.name : ''); // Update selected portion unit state
+        setSelectedPortionUnit(unit ? unit.name : '');
         setCreateProduct(prev => ({
             ...prev,
             portionDTO: {
@@ -99,7 +99,7 @@ export function CreateProductForm() {
     const handleSubmit = (e:any) => {
         e.preventDefault();
         console.log("Product Created: ", createProduct);
-        // Here you can add the logic to send createProduct to your API.
+
     };
 
     return (
@@ -207,7 +207,7 @@ export function CreateProductForm() {
                 />
             </div>
 
-            {/* Combined Unit Selection and Display */}
+
             <div>
                 <label className="block mb-1">Unit:</label>
                 <select
