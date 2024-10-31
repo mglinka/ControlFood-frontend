@@ -19,7 +19,7 @@ const ProductsPage: React.FC = () => {
                 const data = await getAllProducts(page, size);
                 console.log('Fetched Data:', data);
 
-                const sortedProducts = data.sort((a, b) => {
+                const sortedProducts = data.sort((a:any, b:any) => {
                     const aHasImage = a.labelDTO?.image ? 1 : 0;
                     const bHasImage = b.labelDTO?.image ? 1 : 0;
                     return bHasImage - aHasImage;
