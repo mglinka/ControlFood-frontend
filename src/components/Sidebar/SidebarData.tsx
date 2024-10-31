@@ -37,6 +37,12 @@ export const SidebarData: SidebarItem[] = [
         role:['ROLE_SPECIALIST']
     },
     {
+        title: 'Create allergen',
+        path: '/create-allergen',
+        icon:<FaOpencart/>,
+        role:['ROLE_SPECIALIST']
+    },
+    {
         title: 'Accounts',
         path: '/accounts',
         icon:<FaOpencart/>,

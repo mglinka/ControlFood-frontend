@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/register": {
         parameters: {
             query?: never;
@@ -145,7 +161,23 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["changePassword"];
+        patch: operations["changePassword_1"];
+        trace?: never;
+    };
+    "/api/v1/units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllUnits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/products": {
@@ -220,6 +252,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["verifyAccount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/refresh-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["refreshToken"];
         put?: never;
         post?: never;
         delete?: never;
@@ -510,6 +558,11 @@ export interface components {
             unitId: string;
             labelDTO?: components["schemas"]["LabelDTO"];
         };
+        RequestChangePassword: {
+            currentPassword?: string;
+            newPassword?: string;
+            confirmationPassword?: string;
+        };
         RegisterRequest: {
             firstName?: string;
             lastName?: string;
@@ -533,11 +586,6 @@ export interface components {
         };
         CreateAllergenDTO: {
             name?: string;
-        };
-        RequestChangePassword: {
-            currentPassword?: string;
-            newPassword?: string;
-            confirmationPassword?: string;
         };
         GetAccountDTO: {
             /** Format: uuid */
@@ -627,6 +675,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetProductDTO"];
+                };
+            };
+        };
+    };
+    changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestChangePassword"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
@@ -747,7 +819,7 @@ export interface operations {
             };
         };
     };
-    changePassword: {
+    changePassword_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -767,6 +839,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    getAllUnits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UnitDTO"][];
                 };
             };
         };
@@ -873,6 +965,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    refreshToken: {
+        parameters: {
+            query?: never;
+            header: {
+                Authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };

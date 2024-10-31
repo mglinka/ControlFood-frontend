@@ -1,4 +1,4 @@
-import axios from './axiosConfig.ts';
+
 import axiosInstance from "./axiosConfig.ts";
 
 
@@ -41,9 +41,14 @@ export const loginUser = async (email?: string , password?: string ) => {
 };
 
 export const getAllProducts = async () => {
-    const response = await axios.get('/products/withLabels');
+    const response = await axiosInstance.get('/products/withLabels');
     return response.data;
 };
+
+export const getAllUnits = async () =>{
+    const response = await axiosInstance.get('/units');
+    return response.data;
+}
 
 export const getProductByEan = async (ean: string) => {
     const response = await axiosInstance.get(`/products/by-ean/${ean}`);

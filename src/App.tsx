@@ -9,6 +9,8 @@ import {AuthProvider} from "./utils/AuthContext.tsx";
 import BarcodeScannerPage from "./pages/BarcodeScannerPage.tsx";
 import SessionTimeout from "./utils/SessionTimeout.tsx";
 import MyAccountPage from "./pages/MyAccountPage.tsx";
+import CreateProductPage from "./pages/CreateProductPage.tsx";
+import AllergensPage from "./pages/AllergensPage.tsx";
 
 function App() {
 
@@ -26,6 +28,8 @@ function App() {
                                 <Route path="/products" element={<ProductsPage />} />
                                 <Route path="/scanner" element={<BarcodeScannerPage />} />
                                 <Route path="/my-account" element={<MyAccountPage />} />
+                                <Route path="/create-product" element={<CreateProductPage />} />
+                                <Route path="/create-allergen" element={<AllergensPage />} />
                             </Routes>
                             <SessionTimeout/>
                         </div>
