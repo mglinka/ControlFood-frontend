@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getAllProducts } from '../api/api.ts';
 import { components } from "../controlfood-backend-schema";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 const ProductsPage: React.FC = () => {
     const [products, setProducts] = useState<components["schemas"]["GetProductDTO"][]>([]);
@@ -19,7 +21,7 @@ const ProductsPage: React.FC = () => {
                 const data = await getAllProducts(page, size);
                 console.log('Fetched Data:', data);
 
-                const sortedProducts = data.sort((a:any, b:any) => {
+                const sortedProducts = data.sort((a: any, b: any) => {
                     const aHasImage = a.labelDTO?.image ? 1 : 0;
                     const bHasImage = b.labelDTO?.image ? 1 : 0;
                     return bHasImage - aHasImage;
@@ -55,7 +57,7 @@ const ProductsPage: React.FC = () => {
         <div className="p-6">
             {loading ? (
                 <div className="flex justify-center items-center h-screen">
-                    <div className="spinner"></div>
+                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600" />
                 </div>
             ) : error ? (
                 <div>{error}</div>
