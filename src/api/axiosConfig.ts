@@ -3,7 +3,7 @@ axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 const axiosInstance = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}/api/v1`,
-    timeout: 5000,
+    timeout: 10000,
 
 });
 
