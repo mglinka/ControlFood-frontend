@@ -54,7 +54,9 @@ const ProductsPage: React.FC = () => {
     return (
         <div className="p-6">
             {loading ? (
-                <div>Loading...</div>
+                <div className="flex justify-center items-center h-screen">
+                    <div className="spinner"></div>
+                </div>
             ) : error ? (
                 <div>{error}</div>
             ) : products.length === 0 ? (
@@ -85,7 +87,6 @@ const ProductsPage: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Pagination Controls */}
                     <div className="flex justify-between mt-4">
                         <button
                             onClick={handlePreviousPage}
@@ -106,7 +107,6 @@ const ProductsPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Modal for Selected Product */}
             {selectedProduct && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
