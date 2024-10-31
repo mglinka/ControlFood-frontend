@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import {useAuth} from "../utils/AuthContext.tsx";
+import {authService} from "../utils/authService.ts";
 
 const MyAccountPage: React.FC = () => {
-    const [username, setUsername] = useState('JohnDoe');
-    const [email, setEmail] = useState('johndoe@example.com');
+
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
 
     const [message, setMessage] = useState('');
 
-    const {role} = useAuth();
+    const {role } = useAuth();
     const handleUpdateProfile = () => {
-        console.log('Updating profile:', { username, email });
         setMessage('Profile updated successfully!');
     };
 
@@ -34,31 +33,15 @@ const MyAccountPage: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-2xl font-semibold mb-4">Account Information</h2>
                 <p className="mb-2"><strong>Username:</strong> {role}</p>
-                <p className="mb-2"><strong>Email:</strong> {email}</p>
+                <p className="mb-2"><strong>Email:</strong> {authService.getAccountEmail()}</p>
 
             </div>
 
             {/* Profile Settings Section */}
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <h2 className="text-2xl font-semibold mb-4">Profile Settings</h2>
-                <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">Username</label>
-                    <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
-                </div>
+
+
                 <button
                     onClick={handleUpdateProfile}
                     className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"

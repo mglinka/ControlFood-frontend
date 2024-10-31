@@ -54,7 +54,7 @@ const Sidebar: React.FC = () => {
                     <button onClick={toggleSidebar} className="text-2xl">
                         {sidebar ? <AiOutlineClose /> : <AiOutlineMenu />}
                     </button>
-                    <h1 className="ml-4 text-xl font-semibold">ControlFood</h1>
+                    <h1 className="ml-4 text-xl font-semibold"><Link to="/main-page">ControlFood</Link></h1>
                 </div>
 
                 <div className="relative ml-2">

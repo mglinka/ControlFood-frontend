@@ -40,7 +40,7 @@ export function LoginForm() {
             login(token);
 
             console.log('Decoded Token:', decoded);
-            navigate('/profile');
+            navigate('/main-page');
         } catch (error: any) {
 
             setErrorMessage(error.response?.data?.message || 'Authentication failed. Please try again.');

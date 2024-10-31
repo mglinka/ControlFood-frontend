@@ -1,48 +1,65 @@
 import { useState } from "react";
 import { components } from "../controlfood-backend-schema";
+import axiosInstance from "../api/axiosConfig.ts";
 
 export function CreateAllergenForm() {
-    const [createAllergen, setCreateAllergen] = useState<components["schemas"]["CreateAllergenDTO"]>({
-        name: ""
-    });
+    const [createAllergen, setCreateAllergen] = useState<components["schemas"]["CreateAllergenDTO"]>({ name: '' });
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+    // Handle form input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCreateAllergen((prev) => ({
-            ...prev,
-            [name]: value
-        }));
+        setCreateAllergen((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Handle form submission
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Allergen Created:", createAllergen);
-        // Here you can add logic to send the `createAllergen` data to your API.
+        setError(null); // Reset error
+        setLoading(true); // Start loading state
+
+        try {
+            const response = await axiosInstance.post('/allergens/add', createAllergen, {
+
+            });
+
+            console.log("Allergen Created:", response.data);
+            setSuccessMessage('Allergen created successfully!');
+            setCreateAllergen({ name: '' });
+        } catch (err) {
+            console.error("Error creating allergen:", err);
+            setError('Failed to create allergen. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg space-y-6">
-            <h2 className="text-3xl font-bold text-center mb-6">Create Allergen</h2>
-
-            {/* Allergen Name Field */}
-            <div className="mb-6">
-                <label className="block mb-1 font-semibold">Allergen Name:</label>
+        <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Create Allergen</h2>
+            <form onSubmit={handleSubmit} className="flex flex-col">
                 <input
                     type="text"
                     name="name"
                     value={createAllergen.name}
                     onChange={handleChange}
-                    className="border rounded-lg p-3 w-full"
+                    placeholder="Allergen Name"
                     required
+                    className="mb-4 p-2 border border-gray-300 rounded"
                 />
-            </div>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`py-2 px-4 rounded ${loading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
+                >
+                    {loading ? 'Creating...' : 'Create Allergen'}
+                </button>
+            </form>
 
-            <button
-                type="submit"
-                className="bg-blue-500 text-white p-3 rounded-lg w-full hover:bg-blue-600 transition duration-200"
-            >
-                Create Allergen
-            </button>
-        </form>
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+            {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
+        </div>
     );
-}
+};

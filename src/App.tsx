@@ -11,6 +11,7 @@ import SessionTimeout from "./utils/SessionTimeout.tsx";
 import MyAccountPage from "./pages/MyAccountPage.tsx";
 import CreateProductPage from "./pages/CreateProductPage.tsx";
 import AllergensPage from "./pages/AllergensPage.tsx";
+import MainPage from "./pages/MainPage.tsx";
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
                                 <Route path="/my-account" element={<MyAccountPage />} />
                                 <Route path="/create-product" element={<CreateProductPage />} />
                                 <Route path="/create-allergen" element={<AllergensPage />} />
+                                <Route path="/main-page" element={<MainPage />} />
                             </Routes>
                             <SessionTimeout/>
                         </div>

@@ -83,7 +83,19 @@ export const authService = {
 
         }
         return null;
+    },
+    getAccountEmail(): string | null {
+        const token = localStorage.getItem('token');
+        console.log("Marta", token)
+        if (token) {
+            const decoded = this.decodeToken(token);
+
+            return decoded ? decoded.email : null;
+
+        }
+        return null;
     }
+
 
 
 };
