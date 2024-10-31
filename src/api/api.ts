@@ -40,10 +40,16 @@ export const loginUser = async (email?: string , password?: string ) => {
 
 };
 
-export const getAllProducts = async () => {
-    const response = await axiosInstance.get('/products/withLabels');
-    return response.data;
+export const getAllProducts = async (page = 0, size = 15) => {
+    try {
+        const response = await axiosInstance.get(`/products/withLabels?page=${page}&size=${size}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products with pagination:", error);
+        throw new Error("Failed to fetch products");
+    }
 };
+
 
 export const getAllUnits = async () =>{
     const response = await axiosInstance.get('/units');

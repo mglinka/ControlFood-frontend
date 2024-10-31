@@ -29,8 +29,16 @@ export const authService = {
 
     decodeToken(token: string): TokenPayload | null {
         try {
-            const decoded = jwtDecode<TokenPayload>(token);
-            return decoded;
+            const decoded = jwtDecode<any>(token); // Decode without strict typing first
+
+            const tokenPayload: TokenPayload = {
+                id: decoded.jti,
+                email: decoded.sub,
+                role: decoded.role,    // Directly use 'role'
+                exp: decoded.exp       // Directly use 'exp'
+            };
+
+            return tokenPayload;
         } catch (error) {
             console.error("Error decoding token:", error);
             return null;
@@ -60,6 +68,22 @@ export const authService = {
             throw new Error("Token refresh failed");
         }
     },
+
+    getAccountId(): string | null {
+        const token = localStorage.getItem('token');
+        console.log("Marta", token)
+        if (token) {
+            const decoded = this.decodeToken(token);
+            console.log(decoded)
+            console.log(decoded?.exp)
+            console.log(decoded?.email)
+            console.log(decoded?.id)
+            console.log(decoded?.role)
+            return decoded ? decoded.id : null;
+
+        }
+        return null;
+    }
 
 
 };

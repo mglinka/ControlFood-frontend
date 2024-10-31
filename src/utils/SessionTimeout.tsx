@@ -12,7 +12,7 @@ const SessionTimeout: React.FC = () => {
 
         const decodedToken = JSON.parse(atob(token.split('.')[1]));
         const tokenExpiration = decodedToken.exp * 1000;
-        const warningTime = tokenExpiration - 14 * 60 * 1000; // 14 minutes before expiration
+        const warningTime = tokenExpiration - 3 * 60 * 1000; // 14 minutes before expiration
 
         const warningTimer = setTimeout(() => setShowWarning(true), warningTime - Date.now());
         const timeoutTimer = setTimeout(() => {

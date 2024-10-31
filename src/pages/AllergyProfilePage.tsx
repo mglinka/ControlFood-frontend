@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AllergySelector from './AllergySelector';
 import { components } from "../controlfood-backend-schema";
 import axiosInstance from "../api/axiosConfig.ts";
+import { authService } from '../utils/authService';
 
 type CreateAllergyProfileDTO = components["schemas"]["CreateAllergyProfileDTO"];
 
@@ -22,6 +23,7 @@ const AllergyProfilePage: React.FC<{ }> = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [saveError, setSaveError] = useState<string | null>(null);
+
 
     const fetchAllergies = async () => {
         setLoading(true);
@@ -55,8 +57,15 @@ const AllergyProfilePage: React.FC<{ }> = () => {
 
     const handleSaveProfile = async () => {
         try {
+            const accountId = authService.getAccountId();
+            console.log("ID ACCOUNT:" , accountId)
+            // Check if accountId is null
+            if (!accountId) {
+                throw new Error("Account ID is not available. User might not be logged in.");
+            }
+
             const requestBody: CreateAllergyProfileDTO = {
-                accountId: "1111",
+                accountId: accountId, // Now guaranteed to be a string
                 allergens: selectedAllergies.map(({ allergenId, intensity }) => ({ allergenId, intensity })),
             };
 
@@ -64,7 +73,7 @@ const AllergyProfilePage: React.FC<{ }> = () => {
             alert('Allergy profile saved successfully!');
             setSelectedAllergies([]);
         } catch (err) {
-            setSaveError('Error saving allergy profile');
+            setSaveError(err instanceof Error ? err.message : 'Error saving allergy profile');
         }
     };
 
