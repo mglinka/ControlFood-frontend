@@ -20,7 +20,6 @@ const BarcodeScannerPage: React.FC = () => {
 
     return (
         <div className="flex flex-col md:flex-row items-center justify-center md:items-start md:justify-between gap-8 p-4 md:p-12">
-
             <div className="flex justify-center w-full md:w-1/2">
                 <BarcodeScanner
                     width={400}
@@ -32,10 +31,8 @@ const BarcodeScannerPage: React.FC = () => {
                             fetchProductInfo(scannedData);
                         }
                     }}
-
                 />
             </div>
-
 
             <div className="flex flex-col items-center md:items-start w-full md:w-1/2 bg-white rounded-lg shadow-lg p-6">
                 <p className="text-center md:text-left font-semibold text-lg mb-4">Scanned Result: {data}</p>
@@ -52,7 +49,6 @@ const BarcodeScannerPage: React.FC = () => {
                         <p><strong>Preparation:</strong> {product.labelDTO?.preparation}</p>
                         <p><strong>Instructions after opening:</strong> {product.labelDTO?.instructionsAfterOpening}</p>
 
-
                         {product.labelDTO && (
                             <div className="mt-4">
                                 <h3 className="text-xl font-semibold mb-2">Label Information</h3>
@@ -62,6 +58,18 @@ const BarcodeScannerPage: React.FC = () => {
                                     className="w-full h-48 object-contain mb-4"
                                 />
                                 <p><strong>Allergens:</strong> {product.labelDTO.allergens}</p>
+                            </div>
+                        )}
+
+                        {/* Ingredients Section */}
+                        {product.compositionDTO?.ingredientDTOS && product.compositionDTO.ingredientDTOS.length > 0 && (
+                            <div className="mt-4">
+                                <h3 className="text-xl font-semibold mb-2">Ingredients</h3>
+                                <ul className="list-disc list-inside">
+                                    {product.compositionDTO.ingredientDTOS.map((ingredient, index) => (
+                                        <li key={index}>{ingredient.name}</li>
+                                    ))}
+                                </ul>
                             </div>
                         )}
                     </div>

@@ -114,7 +114,7 @@ const ProductsPage: React.FC = () => {
                     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
                         <button
                             onClick={closeModal}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl p-2" // Increased size
                         >
                             &times;
                         </button>
@@ -128,33 +128,34 @@ const ProductsPage: React.FC = () => {
                             />
                         </div>
 
-                        <div className="mt-2 text-center text-gray-600">
-                            <h3 className="font-semibold">Product Name:</h3>
-                            <p>{selectedProduct.productName || "Unnamed Product"}</p>
-                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                            <div className="mt-2 text-center text-gray-600">
+                                <h3 className="font-semibold">Product Name:</h3>
+                                <p>{selectedProduct.productName || "Unnamed Product"}</p>
+                            </div>
 
-                        <div className="mt-2 text-center text-gray-600">
-                            <h3 className="font-semibold">Allergens:</h3>
-                            <p>{selectedProduct.labelDTO?.allergens || "No allergens listed."}</p>
-                        </div>
+                            <div className="mt-2 text-center text-gray-600">
+                                <h3 className="font-semibold">Allergens:</h3>
+                                <p>{selectedProduct.labelDTO?.allergens || "No allergens listed."}</p>
+                            </div>
 
-                        {/* Display ingredients from compositionDTO */}
-                        <div className="mt-2 text-center text-gray-600">
-                            <h3 className="font-semibold">Ingredients:</h3>
-                            {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
-                                <ul className="list-disc list-inside">
-                                    {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
-                                        <li key={index}>{ingredient.name}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>No ingredients listed.</p>
-                            )}
-                        </div>
+                            <div className="mt-2 text-center text-gray-600">
+                                <h3 className="font-semibold">Ingredients:</h3>
+                                {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
+                                    <ul className="list-disc list-inside">
+                                        {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
+                                            <li key={index}>{ingredient.name}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No ingredients listed.</p>
+                                )}
+                            </div>
 
-                        <div className="mt-2 text-center text-gray-700">
-                            <h3 className="font-semibold">Description:</h3>
-                            <p>{selectedProduct.productDescription || "No description available."}</p>
+                            <div className="mt-2 text-center text-gray-700">
+                                <h3 className="font-semibold">Description:</h3>
+                                <p>{selectedProduct.productDescription || "No description available."}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
