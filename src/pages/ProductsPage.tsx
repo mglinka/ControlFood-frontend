@@ -4,6 +4,8 @@ import { components } from "../controlfood-backend-schema";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
+const placeholderImage = '/default-placeholder.png';
+
 const ProductsPage: React.FC = () => {
     const [products, setProducts] = useState<components["schemas"]["GetProductDTO"][]>([]);
     const [selectedProduct, setSelectedProduct] = useState<components["schemas"]["GetProductDTO"] | null>(null);
@@ -73,15 +75,13 @@ const ProductsPage: React.FC = () => {
                                 onClick={() => setSelectedProduct(product)}
                             >
                                 <div className="flex flex-col items-center flex-grow">
-                                    {product.labelDTO?.image && (
-                                        <div className="w-32 h-32 mb-4 overflow-hidden rounded-lg">
-                                            <img
-                                                src={`data:image/jpeg;base64,${product.labelDTO.image}`}
-                                                alt={product.productName || "Product Image"}
-                                                className="object-contain w-full h-full"
-                                            />
-                                        </div>
-                                    )}
+                                    <div className="w-32 h-32 mb-4 overflow-hidden rounded-lg">
+                                        <img
+                                            src={product.labelDTO?.image ? `data:image/jpeg;base64,${product.labelDTO.image}` : placeholderImage}
+                                            alt={product.productName || "Product Image"}
+                                            className="object-contain w-full h-full"
+                                        />
+                                    </div>
                                     <h2 className="font-semibold text-lg text-center">{product.productName || "Unnamed Product"}</h2>
                                     <p className="mt-2 text-center text-gray-600">{product.productDescription || "No description available."}</p>
                                 </div>
@@ -118,18 +118,44 @@ const ProductsPage: React.FC = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-bold mb-4 text-center">{selectedProduct.productName || "Unnamed Product"}</h2>
-                        {selectedProduct.labelDTO?.image && (
-                            <div className="w-48 h-48 mx-auto mb-4 overflow-hidden rounded-lg">
-                                <img
-                                    src={`data:image/jpeg;base64,${selectedProduct.labelDTO.image}`}
-                                    alt={selectedProduct.productName || "Product Image"}
-                                    className="object-contain w-full h-full"
-                                />
-                            </div>
-                        )}
-                        <p className="mt-2 text-center text-gray-600">{selectedProduct.labelDTO?.allergens || "No allergens listed."}</p>
-                        <p className="text-center text-gray-700">{selectedProduct.productDescription || "No description available."}</p>
+                        <h2 className="text-2xl font-bold mb-4 text-center">Product Details</h2>
+
+                        <div className="w-48 h-48 mx-auto mb-4 overflow-hidden rounded-lg">
+                            <img
+                                src={selectedProduct.labelDTO?.image ? `data:image/jpeg;base64,${selectedProduct.labelDTO.image}` : placeholderImage}
+                                alt={selectedProduct.productName || "Product Image"}
+                                className="object-contain w-full h-full"
+                            />
+                        </div>
+
+                        <div className="mt-2 text-center text-gray-600">
+                            <h3 className="font-semibold">Product Name:</h3>
+                            <p>{selectedProduct.productName || "Unnamed Product"}</p>
+                        </div>
+
+                        <div className="mt-2 text-center text-gray-600">
+                            <h3 className="font-semibold">Allergens:</h3>
+                            <p>{selectedProduct.labelDTO?.allergens || "No allergens listed."}</p>
+                        </div>
+
+                        {/* Display ingredients from compositionDTO */}
+                        <div className="mt-2 text-center text-gray-600">
+                            <h3 className="font-semibold">Ingredients:</h3>
+                            {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
+                                <ul className="list-disc list-inside">
+                                    {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
+                                        <li key={index}>{ingredient.name}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>No ingredients listed.</p>
+                            )}
+                        </div>
+
+                        <div className="mt-2 text-center text-gray-700">
+                            <h3 className="font-semibold">Description:</h3>
+                            <p>{selectedProduct.productDescription || "No description available."}</p>
+                        </div>
                     </div>
                 </div>
             )}

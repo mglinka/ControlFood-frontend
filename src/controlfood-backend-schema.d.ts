@@ -557,6 +557,7 @@ export interface components {
             /** Format: uuid */
             unitId: string;
             labelDTO?: components["schemas"]["LabelDTO"];
+            compositionDTO?: components["schemas"]["CompositionDTO"];
         };
         RequestChangePassword: {
             currentPassword?: string;
@@ -907,7 +908,10 @@ export interface operations {
     };
     getAllProductsWIthLabels: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                size?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
