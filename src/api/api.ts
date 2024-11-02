@@ -1,6 +1,9 @@
 
 import axiosInstance from "./axiosConfig.ts";
+import {AxiosRequestConfig} from "axios";
+import {components} from "../controlfood-backend-schema";
 
+type UpdateAllergyProfileDTO = components["schemas"]["UpdateAllergyProfileDTO"];
 
 export const registerUser = async (firstName: string, lastName: string, email: string, password: string) => {
     const response = await axiosInstance.post('/auth/register', {
@@ -68,3 +71,6 @@ export const getAllergyProfileByAccountId = async (id: string) => {
     return response.data;
 
 };
+
+
+
