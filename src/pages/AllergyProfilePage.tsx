@@ -23,6 +23,7 @@ const AllergyProfilePage: React.FC = () => {
     const [saveError, setSaveError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isCreating, setIsCreating] = useState<boolean>(false);
     const [hasProfile, setHasProfile] = useState<boolean>(false);
 
     const fetchAllergies = async () => {
@@ -102,6 +103,11 @@ const AllergyProfilePage: React.FC = () => {
         const allergenToAdd: SelectedAllergy = { allergenId: allergy.allergen_id, name: allergy.name, intensity };
         setSelectedAllergies((prev) => [...prev, allergenToAdd]);
         setAllergies((prev) => prev.filter((a) => a.allergen_id !== allergy.allergen_id));
+
+        // No auto-save when selecting allergies
+        if (!isCreating) {
+            setIsCreating(true);
+        }
     };
 
     const handleRemoveAllergy = (id: string) => {
@@ -126,22 +132,21 @@ const AllergyProfilePage: React.FC = () => {
                 })),
             };
 
-            console.log("request_body", requestBody);
-
             if (hasProfile) {
-                // Update existing profile
                 await axiosInstance.put(`/allergy-profiles/update/${accountId}`, requestBody);
             } else {
-                // Create new profile
                 await axiosInstance.post(`/allergy-profiles/create`, {
                     accountId: accountId,
                     allergens: requestBody.allergens,
                 });
+                setHasProfile(true);
             }
 
             setSuccessMessage('Allergy profile updated successfully!');
             await handleRefresh();
             setTimeout(() => setSuccessMessage(null), 3000);
+            setIsCreating(false);
+            setIsEditing(false);
         } catch (err) {
             setSaveError(err instanceof Error ? err.message : 'Error saving allergy profile');
         }
@@ -151,6 +156,18 @@ const AllergyProfilePage: React.FC = () => {
         setSelectedAllergies(initialSelectedAllergies);
         await handleRefresh();
         setIsEditing(false);
+        setIsCreating(false);
+    };
+
+    const handleStartCreatingProfile = () => {
+        setIsCreating(true);
+        setSelectedAllergies([]);
+        setInitialSelectedAllergies([]);
+    };
+
+    const handleStartEditingProfile = () => {
+        setIsEditing(true);
+        setInitialSelectedAllergies(selectedAllergies);
     };
 
     const getIntensityColor = (intensity: string) => {
@@ -175,14 +192,13 @@ const AllergyProfilePage: React.FC = () => {
                 <p className="text-red-500">{error}</p>
             ) : (
                 <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
-                    {/* Available Allergens Section */}
                     <div className="md:w-1/2 w-full">
                         <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">Available Allergens</h2>
                         <ul>
                             {allergies.map((allergy) => (
                                 <li key={allergy.allergen_id} className="bg-white p-4 mb-4 rounded-xl shadow text-center">
                                     <span className="font-semibold text-lg">{allergy.name}</span>
-                                    {isEditing && (
+                                    {(isEditing || isCreating) && (
                                         <div className="flex justify-center space-x-3 mt-2">
                                             <button
                                                 onClick={() => handleAddAllergy(allergy, 'low')}
@@ -205,52 +221,40 @@ const AllergyProfilePage: React.FC = () => {
                             ))}
                         </ul>
                     </div>
-                    {/* Selected Allergens Section */}
-                    <div className="md:w-1/2 w-full mt-6 md:mt-0">
+                    <div className="md:w-1/2 w-full">
                         <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">Selected Allergens</h2>
                         <ul>
                             {selectedAllergies.map(({ allergenId, name, intensity }) => (
                                 <li key={allergenId} className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(intensity)}`}>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-semibold">{name}</span>
-                                        {isEditing && (
-                                            <button onClick={() => handleRemoveAllergy(allergenId)} className="bg-red-500 text-white rounded px-4 py-2">
-                                                Remove
-                                            </button>
-                                        )}
-                                    </div>
+                                    <span className="font-semibold text-lg">{name}</span>
+                                    {(isEditing || isCreating) && (
+                                        <button
+                                            onClick={() => handleRemoveAllergy(allergenId)}
+                                            className="ml-4 text-red-600 hover:text-red-800"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
                                 </li>
                             ))}
                         </ul>
-                        {/* Edit or Save Buttons */}
-                        {hasProfile && (
-                            <div className="flex flex-col items-center mt-4">
-                                {isEditing ? (
-                                    <div className="flex space-x-4">
-                                        <button onClick={handleCancelEdit} className="bg-gray-500 text-white rounded px-4 py-2">Cancel</button>
-                                        <button onClick={handleSaveProfile} className="bg-blue-500 text-white rounded px-4 py-2">Save</button>
-                                    </div>
-                                ) : (
-                                    <button onClick={() => setIsEditing(true)} className="bg-blue-500 text-white rounded px-4 py-2">
-                                        Edit
-                                    </button>
-                                )}
-                            </div>
-                        )}
-                        {/* If the user has no profile, show the form to create one */}
-                        {!hasProfile && !isEditing && (
-                            <div className="flex flex-col items-center mt-4">
-                                <p className="text-lg text-gray-700 mb-4">You don't have an allergy profile yet. Please select allergens to create one.</p>
-                                <button onClick={() => { setIsEditing(true); }} className="bg-blue-500 text-white rounded px-4 py-2">
-                                    Start Creating Profile
-                                </button>
-                            </div>
-                        )}
-                        {saveError && <p className="text-red-500 text-center">{saveError}</p>}
-                        {successMessage && <p className="text-green-500 text-center">{successMessage}</p>}
                     </div>
                 </div>
             )}
+            <div className="mt-6 flex justify-center">
+                {isEditing || isCreating ? (
+                    <>
+                        <button onClick={handleSaveProfile} className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Save Profile</button>
+                        <button onClick={handleCancelEdit} className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">Cancel</button>
+                    </>
+                ) : hasProfile ? (
+                    <button onClick={handleStartEditingProfile} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Edit Profile</button>
+                ) : (
+                    <button onClick={handleStartCreatingProfile} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create Profile</button>
+                )}
+            </div>
+            {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
+            {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
         </div>
     );
 };
