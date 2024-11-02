@@ -3,7 +3,6 @@ import axiosInstance from "../api/axiosConfig";
 import { authService } from '../utils/authService';
 import { components } from "../controlfood-backend-schema";
 
-type CreateAllergyProfileDTO = components["schemas"]["CreateAllergyProfileDTO"];
 type UpdateAllergyProfileDTO = components["schemas"]["UpdateAllergyProfileDTO"];
 
 interface Allergy {
@@ -16,6 +15,8 @@ interface SelectedAllergy {
     name: string;
     intensity: string;
 }
+
+
 
 const AllergyProfilePage: React.FC = () => {
     const [allergies, setAllergies] = useState<Allergy[]>([]);
@@ -65,17 +66,17 @@ const AllergyProfilePage: React.FC = () => {
             const allergyProfile = await fetchAllergyProfile();
             if (allergyProfile && allergyProfile.allergens) {
                 const selected = allergyProfile.allergens.map((allergen: any) => ({
-                    allergenId: allergen.allergen_id || allergen.allergenId,
+                    allergenId: allergen.allergenId || allergen.allergen_id,
                     name: allergen.name,
                     intensity: allergen.intensity,
-                })).filter(allergen => allergen.allergenId);
+                })).filter((allergen: SelectedAllergy) => allergen.allergenId); // Explicitly typed allergen
 
                 setSelectedAllergies(selected);
                 setInitialSelectedAllergies(selected);
                 setHasProfile(true);  // User has a profile
                 setAllergies((prevAllergies) =>
                     prevAllergies.filter(allergy =>
-                        !selected.some(selectedAllergy => selectedAllergy.allergenId === allergy.allergen_id)
+                        !selected.some((selectedAllergy: SelectedAllergy) => selectedAllergy.allergenId === allergy.allergen_id)
                     )
                 );
             } else {
