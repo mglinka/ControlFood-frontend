@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import AllergySelector from './AllergySelector';
-import { components } from "../controlfood-backend-schema";
-import axiosInstance from "../api/axiosConfig.ts";
+import axiosInstance from "../api/axiosConfig";
 import { authService } from '../utils/authService';
+import { components } from "../controlfood-backend-schema";
 
 type CreateAllergyProfileDTO = components["schemas"]["CreateAllergyProfileDTO"];
 
@@ -17,19 +16,22 @@ interface SelectedAllergy {
     intensity: string;
 }
 
-const AllergyProfilePage: React.FC<{ }> = () => {
+const AllergyProfilePage: React.FC = () => {
     const [allergies, setAllergies] = useState<Allergy[]>([]);
     const [selectedAllergies, setSelectedAllergies] = useState<SelectedAllergy[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [saveError, setSaveError] = useState<string | null>(null);
 
-
     const fetchAllergies = async () => {
         setLoading(true);
         try {
             const response = await axiosInstance.get<Allergy[]>('/allergens');
-            setAllergies(response.data);
+            const uniqueAllergies = response.data.filter(
+                (allergy, index, self) =>
+                    index === self.findIndex((a) => a.allergen_id === allergy.allergen_id)
+            );
+            setAllergies(uniqueAllergies);
             setLoading(false);
         } catch (err) {
             setError('Error fetching allergens');
@@ -42,6 +44,8 @@ const AllergyProfilePage: React.FC<{ }> = () => {
     }, []);
 
     const handleAddAllergy = (allergy: Allergy, intensity: string) => {
+        if (selectedAllergies.some((a) => a.allergenId === allergy.allergen_id)) return;
+
         const allergenToAdd: SelectedAllergy = { allergenId: allergy.allergen_id, name: allergy.name, intensity };
         setSelectedAllergies((prev) => [...prev, allergenToAdd]);
         setAllergies((prev) => prev.filter((a) => a.allergen_id !== allergy.allergen_id));
@@ -58,14 +62,12 @@ const AllergyProfilePage: React.FC<{ }> = () => {
     const handleSaveProfile = async () => {
         try {
             const accountId = authService.getAccountId();
-            console.log("ID ACCOUNT:" , accountId)
-            // Check if accountId is null
             if (!accountId) {
                 throw new Error("Account ID is not available. User might not be logged in.");
             }
 
             const requestBody: CreateAllergyProfileDTO = {
-                accountId: accountId, // Now guaranteed to be a string
+                accountId: accountId,
                 allergens: selectedAllergies.map(({ allergenId, intensity }) => ({ allergenId, intensity })),
             };
 
@@ -89,21 +91,63 @@ const AllergyProfilePage: React.FC<{ }> = () => {
             ) : error ? (
                 <p className="text-red-500">{error}</p>
             ) : (
-                <div className="flex flex-col md:flex-row md:space-x-6">
-                    <AllergySelector
-                        allergies={availableAllergies}
-                        onAddAllergy={handleAddAllergy}
-                        selectedAllergies={selectedAllergies}
-                    />
-                    <div className="md:w-1/2 w-full mt-6 md:mt-0">
-                        <h2 className="text-2xl font-semibold text-blue-600 mb-4">Selected Allergens</h2>
+                <div className="flex flex-col md:flex-row md:space-x-6 justify-between">
+                    {/* Available Allergens Section */}
+                    <div className="md:w-1/2 w-full">
+                        <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">Available Allergens</h2>
                         <ul>
+                            {availableAllergies.map((allergy) => (
+                                <li key={allergy.allergen_id} className="bg-white p-4 mb-4 rounded-xl shadow text-center">
+                                    <span className="font-semibold text-lg">{allergy.name}</span>
+                                    <div className="flex justify-center space-x-3 mt-2">
+                                        <button
+                                            onClick={() => handleAddAllergy(allergy, 'low')}
+                                            className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 border border-gray-300"
+                                            title="Low Intensity"
+                                        ></button>
+                                        <button
+                                            onClick={() => handleAddAllergy(allergy, 'medium')}
+                                            className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 border border-gray-300"
+                                            title="Medium Intensity"
+                                        ></button>
+                                        <button
+                                            onClick={() => handleAddAllergy(allergy, 'high')}
+                                            className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 border border-gray-300"
+                                            title="High Intensity"
+                                        ></button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    {/* Selected Allergens Section */}
+                    <div className="md:w-1/2 w-full mt-6 md:mt-0">
+                        <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">Selected Allergens</h2>
+                        <ul className="mb-6">
                             {selectedAllergies.map(({ allergenId, name, intensity }) => (
-                                <li key={allergenId} className="flex justify-between items-center bg-white p-4 mb-4 rounded-lg shadow">
-                                    <span className="font-semibold text-lg">{name}</span> - Intensity: {intensity}
+                                <li
+                                    key={allergenId}
+                                    className="flex justify-between items-center bg-white p-4 mb-4 rounded-xl shadow"
+                                    style={{
+                                        borderLeft: `6px solid ${
+                                            intensity === 'high' ? '#e3342f' :
+                                                intensity === 'medium' ? '#f6993f' :
+                                                    '#ffed4a'
+                                        }`,
+                                    }}
+                                >
+                                    <span className="font-semibold text-lg">{name}</span>
+                                    <div
+                                        className="w-6 h-6 rounded-full"
+                                        style={{
+                                            backgroundColor: intensity === 'high' ? '#e3342f' :
+                                                intensity === 'medium' ? '#f6993f' :
+                                                    '#ffed4a',
+                                        }}
+                                    ></div>
                                     <button
                                         onClick={() => handleRemoveAllergy(allergenId)}
-                                        className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition"
+                                        className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
                                     >
                                         Remove
                                     </button>
@@ -113,9 +157,27 @@ const AllergyProfilePage: React.FC<{ }> = () => {
                     </div>
                 </div>
             )}
+            {/* Legend Section */}
+            <div className="mt-6">
+                <h3 className="font-semibold text-center">Legend:</h3>
+                <div className="flex justify-center space-x-4 mt-2">
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                        <span className="ml-2">High</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
+                        <span className="ml-2">Medium</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                        <span className="ml-2">Low</span>
+                    </div>
+                </div>
+            </div>
             <button
                 onClick={handleSaveProfile}
-                className="mt-6 bg-red-500 text-white py-3 px-8 rounded text-xl hover:bg-red-600 transition w-full md:w-80 mx-auto block"
+                className="mt-6 bg-red-500 text-white py-3 px-8 rounded-lg text-xl hover:bg-red-600 transition w-full md:w-80 mx-auto block"
             >
                 Save Profile
             </button>

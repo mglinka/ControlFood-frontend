@@ -60,4 +60,11 @@ export const getAllUnits = async () =>{
 export const getProductByEan = async (ean: string) => {
     const response = await axiosInstance.get(`/products/by-ean/${ean}`);
     return response.data;
+
+
+};
+export const getAllergyProfileByAccountId = async (id: string) => {
+    const response = await axiosInstance.get(`/allergy-profiles/byAccount/${id}`);
+    return response.data;
+
 };

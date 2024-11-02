@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getAllProducts } from '../api/api.ts';
+import { getAllProducts, getAllergyProfileByAccountId } from '../api/api.ts';
 import { components } from "../controlfood-backend-schema";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { authService } from "../utils/authService.ts";
 
 const placeholderImage = '/default-placeholder.png';
 
@@ -14,6 +15,34 @@ const ProductsPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const size = 16;
     const totalPages = 9;
+
+    // State to hold allergen profile
+    const [allergenProfile, setAllergenProfile] = useState<{ allergen_id: string; name: string; intensity: string }[]>([]);
+
+    // Define color mapping for allergen intensity
+    const intensityColors: Record<string, string> = {
+        low: 'bg-yellow-300',    // Yellow for low intensity
+        medium: 'bg-orange-300',  // Orange for medium intensity
+        high: 'bg-red-300'        // Red for high intensity
+    };
+
+    useEffect(() => {
+        const fetchAllergyProfile = async () => {
+            try {
+                const accountId = authService.getAccountId(); // Assuming you have a way to get the account ID
+                if (accountId === null) {
+                    return;
+                }
+                const profileData = await getAllergyProfileByAccountId(accountId);
+                setAllergenProfile(profileData.allergens); // Assuming this returns a list of allergens with their intensities
+            } catch (error) {
+                console.error('Error fetching allergy profile:', error);
+                setError('Error fetching allergy profile.');
+            }
+        };
+
+        fetchAllergyProfile();
+    }, []);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -53,6 +82,12 @@ const ProductsPage: React.FC = () => {
         if (page > 0) {
             setPage(prevPage => prevPage - 1);
         }
+    };
+
+    // Function to get allergen intensity based on the user's profile
+    const getAllergenIntensity = (allergen: string) => {
+        const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen.toLowerCase());
+        return profileAllergen ? profileAllergen.intensity.toLowerCase() : 'unknown';
     };
 
     return (
@@ -114,7 +149,7 @@ const ProductsPage: React.FC = () => {
                     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
                         <button
                             onClick={closeModal}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl p-2" // Increased size
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl p-2"
                         >
                             &times;
                         </button>
@@ -136,8 +171,29 @@ const ProductsPage: React.FC = () => {
 
                             <div className="mt-2 text-center text-gray-600">
                                 <h3 className="font-semibold">Allergens:</h3>
-                                <p>{selectedProduct.labelDTO?.allergens || "No allergens listed."}</p>
+                                {selectedProduct.labelDTO?.allergens ? (
+                                    selectedProduct.labelDTO.allergens.split(',').map(allergen => {
+                                        const allergenTrimmed = allergen.trim();
+                                        const intensity = getAllergenIntensity(allergenTrimmed);
+                                        const bgColor = intensityColors[intensity] || 'bg-gray-300'; // Fallback color
+
+                                        return (
+                                            <div key={allergenTrimmed} className={`flex justify-center items-center rounded-lg ${bgColor} text-white p-2 my-1`}>
+                                                <span>{allergenTrimmed}</span>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <p>No allergens listed.</p>
+                                )}
                             </div>
+
+                            {selectedProduct.labelDTO?.allergens && (
+                                <div className="flex items-center justify-center mt-4 p-2 border border-red-400 bg-red-100 rounded-lg">
+                                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 mr-2" />
+                                    <span className="text-red-700">This product contains allergens. Please check carefully!</span>
+                                </div>
+                            )}
 
                             <div className="mt-2 text-center text-gray-600">
                                 <h3 className="font-semibold">Ingredients:</h3>
