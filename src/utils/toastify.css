@@ -1,0 +1,75 @@
+/* toastify.css */
+
+/* Base styles for all Toastify notifications */
+.Toastify__Toast {
+    border-radius: 8px; /* Rounded corners */
+    padding: 16px; /* Padding around the content */
+    font-family: 'Arial', sans-serif; /* Font family */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    font-size: 14px; /* Font size for the text */
+    display: flex; /* Flex container to align items */
+    align-items: center; /* Center items vertically */
+    background-color: white; /* White background */
+    border-left: 6px solid; /* Left border color will change based on the type */
+}
+
+/* Positioning for the Toastify container */
+.Toastify__Toast-container {
+    bottom: 20px; /* Distance from the bottom of the viewport */
+    right: 20px; /* Distance from the right of the viewport */
+}
+
+/* Success notification styles */
+.Toastify__toast--success {
+    border-left-color: #4CAF50; /* Green border */
+    color: #333; /* Dark text */
+}
+
+/* Error notification styles */
+.Toastify__toast--error {
+    border-left-color: #F44336; /* Red border */
+    color: #333; /* Dark text */
+}
+
+/* Info notification styles */
+.Toastify__toast--info {
+    border-left-color: #2196F3; /* Blue border */
+    color: #333; /* Dark text */
+}
+
+/* Warning notification styles */
+.Toastify__toast--warning {
+    border-left-color: #FF9800; /* Orange border */
+    color: #333; /* Dark text */
+}
+
+/* Circle indicator styles */
+.Toastify__Toast .toast-indicator {
+    width: 36px; /* Diameter of the circle */
+    height: 36px; /* Diameter of the circle */
+    border-radius: 50%; /* Make it a circle */
+    display: flex; /* Flexbox to center the icon */
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
+    margin-right: 12px; /* Spacing between the circle and text */
+}
+
+/* Success icon background */
+.Toastify__toast--success .toast-indicator {
+    background-color: #4CAF50; /* Green background */
+}
+
+/* Error icon background */
+.Toastify__toast--error .toast-indicator {
+    background-color: #F44336; /* Red background */
+}
+
+/* Info icon background */
+.Toastify__toast--info .toast-indicator {
+    background-color: #2196F3; /* Blue background */
+}
+
+/* Warning icon background */
+.Toastify__toast--warning .toast-indicator {
+    background-color: #FF9800; /* Orange background */
+}

@@ -56,6 +56,15 @@ export const getAllUnits = async () =>{
     const response = await axiosInstance.get('/units');
     return response.data;
 }
+export const getNutritionalValueNames = async () => {
+    const response = await axiosInstance.get('/nutritional-value/names');
+    return response.data;
+}
+
+export const getNutritionalValueGroups = async () => {
+    const response = await axiosInstance.get('/nutritional-value/group-names');
+    return response.data;
+}
 
 export const getProductByEan = async (ean: string) => {
     const response = await axiosInstance.get(`/products/by-ean/${ean}`);
@@ -67,6 +76,11 @@ export const getAllergyProfileByAccountId = async (id: string) => {
     const response = await axiosInstance.get(`/allergy-profiles/byAccount/${id}`);
     return response.data;
 
+};
+
+export const getAllAllergens = async () => {
+    const response = await axiosInstance.get("/allergens");
+    return response.data;
 };
 
 

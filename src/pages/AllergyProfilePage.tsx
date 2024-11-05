@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from "../api/axiosConfig";
 import { authService } from '../utils/authService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { getAllAllergens } from "../api/api.ts";
 import axios from "axios";
 
 interface Allergy {
@@ -21,18 +24,17 @@ const AllergyProfilePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [saveError, setSaveError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [hasProfile, setHasProfile] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isCreating, setIsCreating] = useState<boolean>(false);
-    const [hasProfile, setHasProfile] = useState<boolean>(false);
 
     const fetchAllergies = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get<Allergy[]>('/allergens');
-            const uniqueAllergies = response.data.filter(
-                (allergy, index, self) =>
-                    index === self.findIndex((a) => a.allergen_id === allergy.allergen_id)
+            const response = await getAllAllergens();
+            const uniqueAllergies = response.filter(
+                (allergy: Allergy, index: number, self: Allergy[]) =>
+                    index === self.findIndex((a: Allergy) => a.allergen_id === allergy.allergen_id)
             );
             setAllergies(uniqueAllergies);
         } catch (err) {
@@ -104,7 +106,6 @@ const AllergyProfilePage: React.FC = () => {
         setSelectedAllergies((prev) => [...prev, allergenToAdd]);
         setAllergies((prev) => prev.filter((a) => a.allergen_id !== allergy.allergen_id));
 
-        // No auto-save when selecting allergies
         if (!isCreating) {
             setIsCreating(true);
         }
@@ -142,9 +143,10 @@ const AllergyProfilePage: React.FC = () => {
                 setHasProfile(true);
             }
 
-            setSuccessMessage('Allergy profile updated successfully!');
-            await handleRefresh();
-            setTimeout(() => setSuccessMessage(null), 3000);
+            toast.success('Allergy profile updated successfully!');
+            setTimeout(async () => {
+                await handleRefresh();
+            }, 3000);
             setIsCreating(false);
             setIsEditing(false);
         } catch (err) {
@@ -254,7 +256,7 @@ const AllergyProfilePage: React.FC = () => {
                 )}
             </div>
             {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
-            {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
+            <ToastContainer />
         </div>
     );
 };

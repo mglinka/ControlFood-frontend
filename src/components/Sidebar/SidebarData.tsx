@@ -10,7 +10,14 @@ export const SidebarData: SidebarItem[] = [
         title: 'Products',
         path: '/products',
         icon: <AiOutlineFolder />,
-        role: ['ROLE_SPECIALIST', 'ROLE_USER'],
+        role: ['ROLE_USER'],
+    },
+    {
+        title: 'Products',
+        path: '/products-specialist',
+        icon: <AiOutlineFolder />,
+        role: ['ROLE_SPECIALIST'],
+
     },
     {
         title: 'Allergy Profile',

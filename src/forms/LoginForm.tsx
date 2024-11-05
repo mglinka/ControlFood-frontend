@@ -2,11 +2,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { components } from '../controlfood-backend-schema';
-import {Link, useNavigate} from 'react-router-dom';
-import React from 'react';
-import {jwtDecode} from 'jwt-decode'
+import { Link, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Default styles
+import '../utils/toastify.css'; // Your custom styles
+import { z, ZodError } from 'zod'; // Import ZodError from zod
 import axiosInstance from "../api/axiosConfig.ts";
-import {useAuth} from "../utils/AuthContext.tsx";
+import { useAuth } from "../utils/AuthContext.tsx";
+
+// Define Zod schema for validation
+const loginSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string()
+        .min(8, "Password must be at least 8 characters long")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[0-9]/, "Password must contain at least one digit")
+        .regex(/[\W_]/, "Password must contain at least one special character") // Matches any non-word character
+});
 
 export function LoginForm() {
     const navigate = useNavigate();
@@ -16,34 +28,68 @@ export function LoginForm() {
         email: '',
         password: ''
     });
-    const {login} =useAuth();
+    const { login } = useAuth();
 
+    // State to hold validation error messages
+    const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string }>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setAuthenticationRequest(prev => ({ ...prev, [name]: value }));
+
+        // Validate field dynamically on input change
+        if (name === 'email') {
+            try {
+                loginSchema.pick({ email: true }).parse({ email: value }); // Validate email only
+                setValidationErrors(prev => ({ ...prev, email: undefined }));
+            } catch (error) {
+                if (error instanceof ZodError) {
+                    const message = error.errors[0].message; // Get the first validation message
+                    setValidationErrors(prev => ({ ...prev, email: message }));
+                }
+            }
+        } else if (name === 'password') {
+            try {
+                loginSchema.pick({ password: true }).parse({ password: value }); // Validate password only
+                setValidationErrors(prev => ({ ...prev, password: undefined }));
+            } catch (error) {
+                if (error instanceof ZodError) {
+                    const message = error.errors[0].message; // Get the first validation message
+                    setValidationErrors(prev => ({ ...prev, password: message }));
+                }
+            }
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
+        setValidationErrors({}); // Clear previous validation errors
+
+        // Validate entire form data with Zod
+        const result = loginSchema.safeParse(authenticationRequest);
+        if (!result.success) {
+            // If validation fails, extract and set errors
+            const errors = result.error.flatten().fieldErrors;
+            setValidationErrors({
+                email: errors.email?.[0],
+                password: errors.password?.[0]
+            });
+            setLoading(false);
+            return;
+        }
 
         try {
             const response = await axiosInstance.post('/auth/authenticate', authenticationRequest);
-            console.log(response.data);
-
-
             const token = response.data;
-            const decoded = jwtDecode(token);
-
 
             login(token);
-
-            console.log('Decoded Token:', decoded);
-            navigate('/main-page');
+            toast.success('Successfully signed in!');
+            setTimeout(() => navigate('/main-page'), 1000);
         } catch (error: any) {
-
-            setErrorMessage(error.response?.data?.message || 'Authentication failed. Please try again.');
+            const message = error.response?.data?.message || 'Authentication failed. Please try again.';
+            setErrorMessage(message);
+            toast.error(message);
             console.error('Auth error:', error);
         } finally {
             setLoading(false);
@@ -79,6 +125,7 @@ export function LoginForm() {
                                 onChange={handleChange}
                                 className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                             />
+                            {validationErrors.email && <p className="text-red-500 text-sm">{validationErrors.email}</p>}
                         </div>
                     </div>
 
@@ -87,11 +134,6 @@ export function LoginForm() {
                             <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                                 Password
                             </label>
-                            <div className="text-sm">
-                                <a href="#" className="font-semibold text-red-600 hover:text-red-500">
-                                    Forgot password?
-                                </a>
-                            </div>
                         </div>
                         <div className="mt-2">
                             <input
@@ -104,6 +146,7 @@ export function LoginForm() {
                                 onChange={handleChange}
                                 className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                             />
+                            {validationErrors.password && <p className="text-red-500 text-sm">{validationErrors.password}</p>}
                         </div>
                     </div>
 
@@ -123,6 +166,8 @@ export function LoginForm() {
                     <Link to="/register" className="font-semibold leading-6 text-red-600 hover:text-red-500">Sign up here</Link>
                 </p>
             </div>
+
+            <ToastContainer position="bottom-right" /> {/* Adjust position here */}
         </div>
     );
 }
