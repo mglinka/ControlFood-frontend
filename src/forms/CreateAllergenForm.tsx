@@ -100,8 +100,9 @@ export function CreateAllergenForm() {
     };
 
     return (
-        <div className="flex justify-between p-6">
-            <div className="w-full md:w-1/2 pr-4">
+        <div className="flex flex-col md:flex-row justify-between p-6">
+            {/* Left Column */}
+            <div className="w-full md:w-1/2 md:pr-4 mb-6 md:mb-0">
                 <h2 className="text-2xl font-bold mb-4 text-blue-700">Create Allergen</h2>
                 <form onSubmit={handleSubmit} className="flex flex-col">
                     <input
@@ -123,7 +124,8 @@ export function CreateAllergenForm() {
                 </form>
             </div>
 
-            <div className="w-full md:w-1/2 pl-4">
+            {/* Right Column */}
+            <div className="w-full md:w-1/2 md:pl-4">
                 <h3 className="text-xl font-semibold mb-4 text-blue-700">Allergens List</h3>
                 <div className="overflow-auto h-[calc(100vh-120px)]">
                     {allergens.length > 0 ? (
