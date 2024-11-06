@@ -7,13 +7,15 @@ import "react-toastify/dist/ReactToastify.css";
 import '../utils/toastify.css';
 import { z } from "zod";
 
+
+
 export function CreateAllergenForm() {
     const [createAllergen, setCreateAllergen] = useState<components["schemas"]["CreateAllergenDTO"]>({ name: '' });
     const [loading, setLoading] = useState(false);
-    const [allergens, setAllergens] = useState<components["schemas"]["CreateAllergenDTO"][]>([]);
+    const [allergens, setAllergens] = useState<components["schemas"]["GetAllergenDTO"][]>([]);
     const [selectedAllergen, setSelectedAllergen] = useState<components["schemas"]["GetAllergenDTO"] | null>(null);
-    const [showModal, setShowModal] = useState(false);
-    const [showConfirmDelete, setShowConfirmDelete] = useState(false); // New state for confirmation
+    const [showActionModal, setShowActionModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<"edit" | "delete" | null>(null);
 
     const createAllergenSchema = z.object({
         name: z
@@ -69,34 +71,48 @@ export function CreateAllergenForm() {
         }
     };
 
-    const handleEdit = () => {
-        if (selectedAllergen) {
-            setCreateAllergen({ name: selectedAllergen.name });
-            setShowModal(true);
+    const handleEditSave = async () => {
+        if (selectedAllergen && createAllergen.name?.trim()) {
+            try {
+                await axiosInstance.put(`/allergens/edit/${selectedAllergen.allergen_id}`, { name: createAllergen.name });
+                toast.success('Allergen updated successfully!');
+                setShowActionModal(false);
+                setConfirmAction(null);
+                fetchAllergens();
+            } catch (error) {
+                console.error("Error updating allergen:", error);
+                toast.error("Failed to update allergen. Please try again.");
+            }
+        } else {
+            toast.error("Allergen name cannot be empty.");
         }
     };
 
     const handleDelete = async () => {
         if (selectedAllergen && selectedAllergen.allergen_id) {
-            console.log("Deleting allergen with ID:", selectedAllergen.allergen_id);
             try {
                 await axiosInstance.delete(`/allergens/remove/${selectedAllergen.allergen_id}`);
                 toast.success('Allergen deleted successfully!');
                 fetchAllergens();
-                setShowConfirmDelete(false); // Close confirm dialog
-                setSelectedAllergen(null); // Clear selected allergen after deletion
+                setShowActionModal(false);
+                setConfirmAction(null);
+                setSelectedAllergen(null);
             } catch (error) {
                 console.error("Error deleting allergen:", error);
                 toast.error('Failed to delete allergen.');
             }
-        } else {
-            console.error("No allergen selected for deletion or ID is undefined.");
         }
     };
 
+    const handleSelectAllergen = (allergen: components["schemas"]["GetAllergenDTO"]) => {
+        setSelectedAllergen(allergen);
+        setShowActionModal(true);
+    };
+
     const handleCloseModal = () => {
-        setShowModal(false);
-        setSelectedAllergen(null); // Clear selected allergen when closing
+        setShowActionModal(false);
+        setConfirmAction(null);
+        setSelectedAllergen(null);
     };
 
     return (
@@ -132,13 +148,9 @@ export function CreateAllergenForm() {
                         <ul className="space-y-2">
                             {allergens.map((allergen) => (
                                 <li
-                                    key={allergen.name}
+                                    key={allergen.allergen_id}
                                     className="p-2 border rounded bg-blue-100 cursor-pointer hover:bg-blue-200"
-                                    onClick={() => {
-                                        console.log("Selected allergen:", allergen); // Debugging line
-                                        setSelectedAllergen(allergen);
-                                        setShowModal(true);
-                                    }}
+                                    onClick={() => handleSelectAllergen(allergen)}
                                 >
                                     {allergen.name}
                                 </li>
@@ -152,7 +164,7 @@ export function CreateAllergenForm() {
 
             <ToastContainer />
 
-            {showModal && selectedAllergen && (
+            {showActionModal && selectedAllergen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded shadow-lg relative">
                         <button
@@ -162,21 +174,21 @@ export function CreateAllergenForm() {
                             &times;
                         </button>
                         <h3 className="text-xl font-semibold mb-4 text-blue-700">Manage Allergen</h3>
-                        <div className="mb-4">
-                            <p>Are you sure you want to edit or delete this allergen?</p>
-                            <p>Name: {selectedAllergen.name}</p>
-                        </div>
-                        <div className="flex justify-between">
+                        <p>Choose an action for allergen: <strong>{selectedAllergen.name}</strong></p>
+                        <div className="flex justify-between mt-4">
                             <button
-                                onClick={handleEdit}
+                                onClick={() => {
+                                    setConfirmAction("edit");
+                                    setShowActionModal(false);
+                                }}
                                 className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
                             >
                                 Edit
                             </button>
                             <button
                                 onClick={() => {
-                                    setShowModal(false); // Close main modal
-                                    setShowConfirmDelete(true); // Open confirmation dialog
+                                    setConfirmAction("delete");
+                                    setShowActionModal(false);
                                 }}
                                 className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700"
                             >
@@ -187,11 +199,46 @@ export function CreateAllergenForm() {
                 </div>
             )}
 
-            {showConfirmDelete && selectedAllergen && (
+            {confirmAction === "edit" && selectedAllergen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded shadow-lg relative">
                         <button
-                            onClick={() => setShowConfirmDelete(false)} // Close confirmation dialog
+                            onClick={() => setConfirmAction(null)}
+                            className="absolute top-2 right-2 text-blue-700 text-xl"
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-xl font-semibold mb-4 text-blue-700">Edit Allergen</h3>
+                        <input
+                            type="text"
+                            value={createAllergen.name}
+                            onChange={handleChange}
+                            name="name"
+                            className="mb-4 p-2 border border-blue-300 rounded focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        />
+                        <div className="flex justify-between">
+                            <button
+                                onClick={handleEditSave}
+                                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                            >
+                                Save Changes
+                            </button>
+                            <button
+                                onClick={() => setConfirmAction(null)}
+                                className="bg-gray-300 text-black py-2 px-4 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmAction === "delete" && selectedAllergen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded shadow-lg relative">
+                        <button
+                            onClick={() => setConfirmAction(null)}
                             className="absolute top-2 right-2 text-blue-700 text-xl"
                         >
                             &times;
@@ -206,7 +253,7 @@ export function CreateAllergenForm() {
                                 Yes, Delete
                             </button>
                             <button
-                                onClick={() => setShowConfirmDelete(false)} // Cancel deletion
+                                onClick={() => setConfirmAction(null)}
                                 className="bg-gray-300 text-black py-2 px-4 rounded hover:bg-gray-400"
                             >
                                 Cancel

@@ -13,6 +13,7 @@ import CreateProductPage from "./pages/CreateProductPage.tsx";
 import AllergensPage from "./pages/AllergensPage.tsx";
 import MainPage from "./pages/MainPage.tsx";
 import SpProductsPage from "./pages/SpProudctsPage.tsx";
+import Breadcrumbs from "./components/Breadcrumbs";
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
                     <div className="relative">
                         <Sidebar />
                         <div className="pt-16">
+                            <Breadcrumbs />
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/register" element={<RegisterPage />} />
