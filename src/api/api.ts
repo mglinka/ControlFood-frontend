@@ -83,5 +83,15 @@ export const getAllAllergens = async () => {
     return response.data;
 };
 
+export const changePassword = async (payload: { currentPassword: string; newPassword: string; confirmationPassword: string }) => {
+    const response = await axiosInstance.post("/me/change-password", payload);
+    return response.data;
+};
+
+export const getAccountInfo = async (id:string)=> {
+    const response = await axiosInstance.get(`/account/${id}`);
+    return response.data;
+}
+
 
 
