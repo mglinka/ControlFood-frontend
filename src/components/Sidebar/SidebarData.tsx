@@ -54,5 +54,11 @@ export const SidebarData: SidebarItem[] = [
         path: '/accounts',
         icon:<FaOpencart/>,
         role:['ROLE_ADMIN']
+    },
+    {
+        title: 'Access Levels',
+        path: '/access-levels',
+        icon:<FaOpencart/>,
+        role:['ROLE_ADMIN']
     }
 ];

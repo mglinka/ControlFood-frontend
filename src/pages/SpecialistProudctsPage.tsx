@@ -56,7 +56,6 @@ const SpProductsPage: React.FC = () => {
     };
 
     const handleEditProduct = () => {
-        // Logic to handle product editing
         console.log('Edit product:', selectedProduct);
     };
 

@@ -5,7 +5,6 @@ import { SidebarData } from './SidebarData.tsx';
 import Submenu from './Submenu.tsx';
 import { useAuth } from "../../utils/AuthContext.tsx";
 
-
 const getSidebarColor = (role: string | null) => {
     switch (role) {
         case 'ROLE_ADMIN':
@@ -39,12 +38,17 @@ const Sidebar: React.FC = () => {
         setSidebar(false);
     };
 
+    const closeAccountMenu = () => {
+        setAccountMenu(false);
+    };
+
     if (!showSidebar) return null;
 
     const filteredSidebarData = SidebarData.filter(item => item.role.includes(role as string));
 
     const handleLogout = () => {
         logout();
+        closeAccountMenu();
     };
 
     return (
@@ -62,11 +66,16 @@ const Sidebar: React.FC = () => {
                         <AiOutlineUser className="text-4xl" />
                     </button>
                     {accountMenu && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
-                            <Link to="/my-account" className="block px-4 py-2 hover:bg-gray-200"
-                                  onClick={toggleAccountMenu}>My Account</Link>
-                            <Link to="/login" className="block px-4 py-2 hover:bg-gray-200"
-                                  onClick={handleLogout}>Logout {role}</Link>
+                        <div
+                            className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50"
+                            onMouseLeave={closeAccountMenu}
+                        >
+                            <Link to="/my-account" className="block px-4 py-2 hover:bg-gray-200" onClick={closeAccountMenu}>
+                                My Account
+                            </Link>
+                            <Link to="/login" className="block px-4 py-2 hover:bg-gray-200" onClick={handleLogout}>
+                                Logout {role}
+                            </Link>
                         </div>
                     )}
                 </div>
@@ -76,7 +85,7 @@ const Sidebar: React.FC = () => {
                 className={`fixed top-0 left-0 w-64 h-full ${getSidebarColor(role)} z-40 transition-transform ${sidebar ? 'translate-x-0' : '-translate-x-full'} duration-300`}>
                 <ul className="pt-16">
                     {filteredSidebarData.map((item, index) => (
-                        <Submenu item={item} key={index} onItemClick={closeSidebar}/>
+                        <Submenu item={item} key={index} onItemClick={closeSidebar} />
                     ))}
                 </ul>
             </div>

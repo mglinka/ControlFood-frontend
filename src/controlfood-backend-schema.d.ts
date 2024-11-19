@@ -20,7 +20,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/allergy-profiles/update/{id}": {
+    "/api/v1/me/updateInfo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateInfo"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/changeRole": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["changeRole"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/allergy-profiles/update/{accountId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -29,6 +61,54 @@ export interface paths {
         };
         get?: never;
         put: operations["updateAllergyProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/allergens/edit/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editAllergen"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/account/enableAccount": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["enableAccount"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/account/disableAccount": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["disableAccount"];
         post?: never;
         delete?: never;
         options?: never;
@@ -180,6 +260,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/products": {
         parameters: {
             query?: never;
@@ -244,6 +340,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/nutritional-value/names": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllNutritionalValueNames"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nutritional-value/group-names": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllNutritionalValueGroupNames"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/verify-account/{token}": {
         parameters: {
             query?: never;
@@ -300,6 +428,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getAllergyProfileById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/allergy-profiles/byAccount/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllergyProfileByAccountId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -395,8 +539,6 @@ export interface components {
         UpdateAccountDataDTO: {
             firstName?: string;
             lastName?: string;
-            /** Format: int32 */
-            gender: number;
         };
         GetAccountPersonalDTO: {
             /** Format: uuid */
@@ -420,14 +562,14 @@ export interface components {
             /** @enum {string} */
             name?: "ROLE_ADMIN" | "ROLE_USER" | "ROLE_SPECIALIST";
             authority?: string;
+            roleName?: string;
         };
-        GetAllergenDTO: {
-            /** Format: uuid */
-            allergen_id?: string;
-            name?: string;
+        AllergenIntensityDTO: {
+            allergen_id: string;
+            intensity?: string;
         };
         UpdateAllergyProfileDTO: {
-            allergens?: components["schemas"]["GetAllergenDTO"][];
+            allergens?: components["schemas"]["AllergenIntensityDTO"][];
         };
         GetAllergenIntensityDTO: {
             /** Format: uuid */
@@ -440,6 +582,14 @@ export interface components {
             profile_id?: string;
             allergens?: components["schemas"]["GetAllergenIntensityDTO"][];
         };
+        UpdateAllergenDTO: {
+            name?: string;
+        };
+        GetAllergenDTO: {
+            /** Format: uuid */
+            allergen_id?: string;
+            name?: string;
+        };
         AdditionDTO: {
             name?: string;
         };
@@ -450,21 +600,21 @@ export interface components {
         };
         CreateProductDTO: {
             ean: string;
-            producerDTO: components["schemas"]["ProducerDTO"];
-            productName?: string;
+            productName: string;
             productDescription?: string;
             /** Format: int32 */
             productQuantity?: number;
-            unitDTO?: components["schemas"]["UnitDTO"];
-            packageTypeDTO?: components["schemas"]["PackageTypeDTO"];
-            country?: string;
+            country: string;
+            unitDTO: components["schemas"]["UnitDTO"];
+            producerDTO: components["schemas"]["ProducerDTO"];
+            packageTypeDTO: components["schemas"]["PackageTypeDTO"];
             compositionDTO?: components["schemas"]["CompositionDTO"];
-            nutritionalIndexDTOS?: components["schemas"]["NutritionalIndexDTO"][];
+            nutritionalIndexDTOS: components["schemas"]["NutritionalIndexDTO"][];
             productIndexDTOS?: components["schemas"]["ProductIndexDTO"][];
             labelDTO?: components["schemas"]["LabelDTO"];
             portionDTO?: components["schemas"]["PortionDTO"];
             ratingDTOS?: components["schemas"]["RatingDTO"][];
-            nutritionalValueDTOS?: components["schemas"]["NutritionalValueDTO"][];
+            nutritionalValueDTOS: components["schemas"]["NutritionalValueDTO"][];
         };
         FlavourDTO: {
             name?: string;
@@ -473,8 +623,8 @@ export interface components {
             name?: string;
         };
         LabelDTO: {
-            storage?: string;
-            durability?: string;
+            storage: string;
+            durability: string;
             instructionsAfterOpening?: string;
             preparation?: string;
             allergens?: string;
@@ -494,6 +644,7 @@ export interface components {
             nrv?: number;
         };
         NutritionalValueGroupDTO: {
+            /** @example Błonnik */
             groupName?: string;
         };
         NutritionalValueNameDTO: {
@@ -510,8 +661,8 @@ export interface components {
             unitDTO?: components["schemas"]["UnitDTO"];
         };
         ProducerDTO: {
-            name?: string;
-            address?: string;
+            name: string;
+            address: string;
             /** Format: int32 */
             countryCode?: number;
             contact?: string;
@@ -577,16 +728,17 @@ export interface components {
             email?: string;
             password?: string;
         };
-        AllergenIntensityDTO: {
-            allergenId: string;
-            intensity?: string;
-        };
         CreateAllergyProfileDTO: {
             accountId: string;
             allergens: components["schemas"]["AllergenIntensityDTO"][];
         };
         CreateAllergenDTO: {
+            name: string;
+        };
+        RoleDTO: {
             name?: string;
+            /** Format: uuid */
+            id?: string;
         };
         GetAccountDTO: {
             /** Format: uuid */
@@ -594,6 +746,8 @@ export interface components {
             email?: string;
             firstName?: string;
             lastName?: string;
+            role?: string;
+            enabled?: boolean;
         };
     };
     responses: never;
@@ -630,12 +784,59 @@ export interface operations {
             };
         };
     };
+    updateInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAccountDataDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    changeRole: {
+        parameters: {
+            query: {
+                accountId: string;
+                roleId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
     updateAllergyProfile: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                accountId: string;
             };
             cookie?: never;
         };
@@ -652,6 +853,76 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetAllergyProfileDTO"];
+                };
+            };
+        };
+    };
+    editAllergen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAllergenDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GetAllergenDTO"];
+                };
+            };
+        };
+    };
+    enableAccount: {
+        parameters: {
+            query: {
+                id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    disableAccount: {
+        parameters: {
+            query: {
+                id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
                 };
             };
         };
@@ -864,6 +1135,26 @@ export interface operations {
             };
         };
     };
+    getAllRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RoleDTO"][];
+                };
+            };
+        };
+    };
     getAllProducts: {
         parameters: {
             query?: never;
@@ -951,6 +1242,46 @@ export interface operations {
             };
         };
     };
+    getAllNutritionalValueNames: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NutritionalValueNameDTO"][];
+                };
+            };
+        };
+    };
+    getAllNutritionalValueGroupNames: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NutritionalValueGroupDTO"][];
+                };
+            };
+        };
+    };
     verifyAccount: {
         parameters: {
             query?: never;
@@ -1016,6 +1347,28 @@ export interface operations {
         };
     };
     getAllergyProfileById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GetAllergyProfileDTO"];
+                };
+            };
+        };
+    };
+    getAllergyProfileByAccountId: {
         parameters: {
             query?: never;
             header?: never;

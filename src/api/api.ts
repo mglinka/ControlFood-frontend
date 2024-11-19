@@ -1,4 +1,3 @@
-
 import axiosInstance from "./axiosConfig.ts";
 
 
@@ -91,7 +90,39 @@ export const changePassword = async (payload: { currentPassword: string; newPass
 export const getAccountInfo = async (id:string)=> {
     const response = await axiosInstance.get(`/account/${id}`);
     return response.data;
-}
+};
+
+export const updateAccountInfo = async (payload:{firstName: string, lastName: string}) => {
+    const response = await axiosInstance.put("/me/updateInfo", payload);
+    return response.data;
+};
+
+export const getAllAccounts = async () => {
+    const response  = await axiosInstance.get("/accounts");
+    return response.data;
+};
+
+export const enableAccount = async (id: string) => {
+    const response = await axiosInstance.put(`/account/enableAccount?id=${id}`);
+    return response.data;
+};
+
+
+export const disableAccount = async (id:string) => {
+    const response = await axiosInstance.put(`/account/disableAccount?id=${id}`);
+    return response.data;
+};
+
+export const getRoles = async () => {
+    const response = await axiosInstance.get("/roles");
+    return response.data;
+};
+
+export const changeRole = async (accountId: string, roleId:string) => {
+    return await axiosInstance.put(`/changeRole?accountId=${accountId}&roleId=${roleId}`);
+};
+
+
 
 
 
