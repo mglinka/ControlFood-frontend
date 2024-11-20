@@ -2,7 +2,7 @@ import {
     AiOutlineFolder,
     AiOutlineBarcode
 } from 'react-icons/ai';
-import { FaCog, FaOpencart } from 'react-icons/fa';
+import { FaOpencart } from 'react-icons/fa';
 import { SidebarItem } from '../../models/SidebarItem.ts';
 
 export const SidebarData: SidebarItem[] = [
@@ -30,12 +30,6 @@ export const SidebarData: SidebarItem[] = [
         path: '/scanner',
         icon: <AiOutlineBarcode />,
         role: ['ROLE_SPECIALIST', 'ROLE_USER'],
-    },
-    {
-        title: 'Configurations',
-        path: '/configurations',
-        icon: <FaCog />,
-        role: ['ROLE_ADMIN'],
     },
     {
         title: 'Create product',

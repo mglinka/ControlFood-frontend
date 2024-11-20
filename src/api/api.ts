@@ -39,9 +39,9 @@ export const loginUser = async (email?: string , password?: string ) => {
 
 };
 
-export const getAllProducts = async (page = 0, size = 15) => {
+export const getAllProducts = async (page = 0, size = 15, searchQuery="") => {
     try {
-        const response = await axiosInstance.get(`/products/withLabels?page=${page}&size=${size}`);
+        const response = await axiosInstance.get(`/products/withLabels?page=${page}&size=${size}&query=${encodeURI(searchQuery)}`);
 
         return response.data;
     } catch (error) {

@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { getAllProducts, getAllergyProfileByAccountId } from '../api/api.ts';
-import { components } from "../controlfood-backend-schema";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { authService } from "../utils/authService.ts";
+import React, {useEffect, useState} from 'react';
+import {getAllergyProfileByAccountId, getAllProducts} from '../api/api.ts';
+import {components} from "../controlfood-backend-schema";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faExclamationTriangle, faSpinner} from '@fortawesome/free-solid-svg-icons';
+import {authService} from "../utils/authService.ts";
 
 const placeholderImage = '/default-placeholder.png';
 
 const ProductsPage: React.FC = () => {
+
     const [products, setProducts] = useState<components["schemas"]["GetProductDTO"][]>([]);
     const [selectedProduct, setSelectedProduct] = useState<components["schemas"]["GetProductDTO"] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -16,25 +17,29 @@ const ProductsPage: React.FC = () => {
     const size = 16;
     const totalPages = 9;
 
-    // State to hold allergen profile
-    const [allergenProfile, setAllergenProfile] = useState<{ allergen_id: string; name: string; intensity: string }[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
-    // Define color mapping for allergen intensity
+    const [allergenProfile, setAllergenProfile] = useState<{
+        allergen_id: string;
+        name: string;
+        intensity: string
+    }[]>([]);
+
     const intensityColors: Record<string, string> = {
-        low: 'bg-yellow-300',    // Yellow for low intensity
-        medium: 'bg-orange-300',  // Orange for medium intensity
-        high: 'bg-red-300'        // Red for high intensity
+        low: 'bg-yellow-300',
+        medium: 'bg-orange-300',
+        high: 'bg-red-300'
     };
 
     useEffect(() => {
         const fetchAllergyProfile = async () => {
             try {
-                const accountId = authService.getAccountId(); // Assuming you have a way to get the account ID
+                const accountId = authService.getAccountId();
                 if (accountId === null) {
                     return;
                 }
                 const profileData = await getAllergyProfileByAccountId(accountId);
-                setAllergenProfile(profileData.allergens); // Assuming this returns a list of allergens with their intensities
+                setAllergenProfile(profileData.allergens);
             } catch (error) {
                 console.error('Error fetching allergy profile:', error);
                 setError('Error fetching allergy profile.');
@@ -70,6 +75,34 @@ const ProductsPage: React.FC = () => {
         fetchProducts();
     }, [page]);
 
+    useEffect(() => {
+        const timeId = setTimeout(() => {
+            const fetchProducts = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const data = await getAllProducts(page, size, searchQuery);
+                    console.log('Fetched Data:', data);
+
+                    const sortedProducts = data.sort((a: any, b: any) => {
+                        const aHasImage = a.labelDTO?.image ? 1 : 0;
+                        const bHasImage = b.labelDTO?.image ? 1 : 0;
+                        return bHasImage - aHasImage;
+                    });
+
+                    setProducts(sortedProducts);
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                    setError('Error fetching products. Please try again later.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+                fetchProducts();}
+        , 1000)
+        return () => clearTimeout(timeId)
+    }, [searchQuery]);
+
     const closeModal = () => setSelectedProduct(null);
 
     const handleNextPage = () => {
@@ -84,7 +117,6 @@ const ProductsPage: React.FC = () => {
         }
     };
 
-    // Function to get allergen intensity based on the user's profile
     const getAllergenIntensity = (allergen: string) => {
         const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen.toLowerCase());
         return profileAllergen ? profileAllergen.intensity.toLowerCase() : 'unknown';
@@ -92,9 +124,18 @@ const ProductsPage: React.FC = () => {
 
     return (
         <div className="p-6">
+            <input
+                onChange={(event) => {
+                    setSearchQuery(event.target.value)
+                    setPage(0)
+                }}
+                className={"w-full my-4"}
+                type="text"
+                placeholder={"Szukaj"}
+            />
             {loading ? (
                 <div className="flex justify-center items-center h-screen">
-                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600" />
+                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600"/>
                 </div>
             ) : error ? (
                 <div>{error}</div>
@@ -178,7 +219,8 @@ const ProductsPage: React.FC = () => {
                                         const bgColor = intensityColors[intensity] || 'bg-gray-300'; // Fallback color
 
                                         return (
-                                            <div key={allergenTrimmed} className={`flex justify-center items-center rounded-lg ${bgColor} text-white p-2 my-1`}>
+                                            <div key={allergenTrimmed}
+                                                 className={`flex justify-center items-center rounded-lg ${bgColor} text-white p-2 my-1`}>
                                                 <span>{allergenTrimmed}</span>
                                             </div>
                                         );
@@ -189,8 +231,9 @@ const ProductsPage: React.FC = () => {
                             </div>
 
                             {selectedProduct.labelDTO?.allergens && (
-                                <div className="flex items-center justify-center mt-4 p-2 border border-red-400 bg-red-100 rounded-lg">
-                                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 mr-2" />
+                                <div
+                                    className="flex items-center justify-center mt-4 p-2 border border-red-400 bg-red-100 rounded-lg">
+                                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 mr-2"/>
                                     <span className="text-red-700">This product contains allergens. Please check carefully!</span>
                                 </div>
                             )}
