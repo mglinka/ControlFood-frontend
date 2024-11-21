@@ -14,6 +14,7 @@ const SpProductsPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const size = 16;
     const totalPages = 9;
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -41,6 +42,36 @@ const SpProductsPage: React.FC = () => {
         fetchProducts();
     }, [page]);
 
+    useEffect(() => {
+        const timeId = setTimeout(() => {
+                const fetchProducts = async () => {
+                    setLoading(true);
+                    setError(null);
+                    try {
+                        const data = await getAllProducts(page, size, searchQuery);
+                        console.log('Fetched Data:', data);
+
+                        const sortedProducts = data.sort((a: any, b: any) => {
+                            const aHasImage = a.labelDTO?.image ? 1 : 0;
+                            const bHasImage = b.labelDTO?.image ? 1 : 0;
+                            return bHasImage - aHasImage;
+                        });
+
+                        setProducts(sortedProducts);
+                    } catch (error) {
+                        console.error('Error fetching products:', error);
+                        setError('Error fetching products. Please try again later.');
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchProducts();}
+            , 1000)
+        return () => clearTimeout(timeId)
+    }, [searchQuery]);
+
+
+
     const closeModal = () => setSelectedProduct(null);
 
     const handleNextPage = () => {
@@ -61,9 +92,18 @@ const SpProductsPage: React.FC = () => {
 
     return (
         <div className="p-6">
+            <input
+                onChange={(event) => {
+                    setSearchQuery(event.target.value)
+                    setPage(0)
+                }}
+                className={"w-full my-4"}
+                type="text"
+                placeholder={"Szukaj"}
+            />
             {loading ? (
                 <div className="flex justify-center items-center h-screen">
-                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600" />
+                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600"/>
                 </div>
             ) : error ? (
                 <div>{error}</div>

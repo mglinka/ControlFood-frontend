@@ -120,11 +120,12 @@ const AccessLevelsPage: React.FC = () => {
                                     <td className="py-2 px-4">{account.role}</td> {/* Show role name */}
                                     <td className="py-2 px-4 text-center">
                                         <button
-                                            className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600"
+                                            className="text-black py-1 px-3 rounded-md border-2 border-red-600"
                                             onClick={() => handleOpenModal(account.id as string)}
                                         >
                                             Change Access Level
                                         </button>
+
                                     </td>
                                 </tr>
                             ))}

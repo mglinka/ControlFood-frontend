@@ -80,7 +80,7 @@ const AccountsPage: React.FC = () => {
                     <div className="overflow-x-auto">
                         <table className="w-full bg-white rounded-lg shadow-md overflow-hidden text-sm sm:text-base">
                             <thead>
-                            <tr className="bg-gradient-to-r from-red-500 to-red-700 text-white">
+                            <tr className="bg-red-500 text-white">
                                 <th className="py-3 px-4 text-left">First Name</th>
                                 <th className="py-3 px-4 text-left">Last Name</th>
                                 <th className="py-3 px-4 text-left">Email</th>
@@ -97,21 +97,17 @@ const AccountsPage: React.FC = () => {
                                     <td className="py-3 px-4">{account.email}</td>
                                     <td className="py-3 px-4">{account.role}</td>
                                     <td className="py-3 px-4">
-                                        <span
-                                            className={`inline-block py-1 px-3 rounded-full text-white font-medium ${
-                                                account.enabled
-                                                    ? 'bg-gradient-to-r from-red-400 to-red-600'
-                                                    : 'bg-gradient-to-r from-red-600 to-red-400'
-                                            }`}
-                                        >
-                                            {account.enabled ? 'Enabled' : 'Disabled'}
-                                        </span>
+                                            <span
+                                                className={`inline-block py-1 px-3 rounded-full text-white font-medium ${
+                                                    account.enabled
+                                                        ? 'bg-red-500' // Jednolity kolor tła dla aktywnego konta
+                                                        : 'bg-gray-400' // Kolor tła dla nieaktywnego konta
+                                                }`}
+                                            >
+                                                {account.enabled ? 'Enabled' : 'Disabled'}
+                                            </span>
                                     </td>
-                                    <td className="py-3 px-4 text-center flex flex-col sm:flex-row justify-center items-center gap-4">
-                                        <CircularButton
-                                            onClick={() => toast.info('Edit functionality is not implemented yet.')}
-                                            label="Edit"
-                                        />
+                                    <td className="py-3 px-4 text-center flex justify-center items-center gap-4">
                                         <CircularButton
                                             onClick={() => handleToggleEnabled(account.id, account.enabled)}
                                             label={account.enabled ? 'Disable' : 'Enable'}

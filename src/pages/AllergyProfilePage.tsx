@@ -5,6 +5,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAllAllergens } from "../api/api.ts";
 import axios from "axios";
+import {XCircleIcon} from "@heroicons/react/16/solid";
+
 
 interface Allergy {
     allergen_id: string;
@@ -195,10 +197,11 @@ const AllergyProfilePage: React.FC = () => {
             ) : (
                 <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
                     <div className="md:w-1/2 w-full">
-                        <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">Available Allergens</h2>
+                        <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
                         <ul>
                             {allergies.map((allergy) => (
-                                <li key={allergy.allergen_id} className="bg-white p-4 mb-4 rounded-xl shadow text-center">
+                                <li key={allergy.allergen_id}
+                                    className="bg-white p-4 mb-4 rounded-xl shadow text-center">
                                     <span className="font-semibold text-lg">{allergy.name}</span>
                                     {(isEditing || isCreating) && (
                                         <div className="flex justify-center space-x-3 mt-2">
@@ -224,35 +227,45 @@ const AllergyProfilePage: React.FC = () => {
                         </ul>
                     </div>
                     <div className="md:w-1/2 w-full">
-                        <h2 className="text-2xl font-semibold text-blue-600 mb-4 text-center">Selected Allergens</h2>
+                        <h2 className="text-2xl font-semibold text-black mb-4 text-center">Selected Allergens</h2>
                         <ul>
-                            {selectedAllergies.map(({ allergenId, name, intensity }) => (
-                                <li key={allergenId} className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(intensity)}`}>
+                            {selectedAllergies.map(({allergenId, name, intensity}) => (
+                                <li key={allergenId}
+                                    className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(intensity)} flex items-center justify-between`}>
                                     <span className="font-semibold text-lg">{name}</span>
                                     {(isEditing || isCreating) && (
                                         <button
                                             onClick={() => handleRemoveAllergy(allergenId)}
-                                            className="ml-4 text-red-600 hover:text-red-800"
+                                            className="text-red-600 hover:text-red-800 focus:outline-none"
                                         >
-                                            Remove
+                                            <XCircleIcon className="h-8 w-8" aria-hidden="true"/>
                                         </button>
                                     )}
                                 </li>
                             ))}
                         </ul>
                     </div>
+
                 </div>
             )}
             <div className="mt-6 flex justify-center">
                 {isEditing || isCreating ? (
                     <>
-                        <button onClick={handleSaveProfile} className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Save Profile</button>
-                        <button onClick={handleCancelEdit} className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">Cancel</button>
+                        <button onClick={handleSaveProfile}
+                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Save Profile
+                        </button>
+                        <button onClick={handleCancelEdit}
+                                className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">Cancel
+                        </button>
                     </>
                 ) : hasProfile ? (
-                    <button onClick={handleStartEditingProfile} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Edit Profile</button>
+                    <button onClick={handleStartEditingProfile}
+                            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Edit
+                        Profile</button>
                 ) : (
-                    <button onClick={handleStartCreatingProfile} className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create Profile</button>
+                    <button onClick={handleStartCreatingProfile}
+                            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create
+                        Profile</button>
                 )}
             </div>
             {saveError && <p className="text-red-500 mt-4">{saveError}</p>}

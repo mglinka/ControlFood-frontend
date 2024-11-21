@@ -75,8 +75,9 @@ const MyAccountPage: React.FC = () => {
     return (
         <div className="p-4 bg-gray-100 rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl mx-auto">
             <div className="flex flex-col items-center text-center mb-6">
-                <div className="bg-gray-200 rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center mb-4">
-                    <span className="text-gray-500 text-4xl sm:text-5xl">👤</span>
+                <div
+                    className="bg-gray-200 rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center mb-4">
+                    <span className="text-black text-4xl sm:text-5xl">👤</span>
                 </div>
                 <h1 className="text-lg sm:text-xl font-semibold text-gray-800">Użytkownik</h1>
                 <p className="text-gray-500 text-xs sm:text-sm">{authService.getAccountEmail()}</p>
@@ -86,7 +87,10 @@ const MyAccountPage: React.FC = () => {
                 <h2 className="text-lg sm:text-xl font-semibold mb-2">Account Information</h2>
                 {accountInfo ? (
                     <>
-                        <p className="text-sm sm:text-base"><strong>Role:</strong> {role}</p>
+                        <p className="text-sm sm:text-base">
+                            <strong>Role:</strong> {role != null ? role.replace(/_/g, ' ').toLowerCase().replace(/^role\s+/i, '') : 'No role assigned'}
+                        </p>
+
                         <p className="text-sm sm:text-base"><strong>Email:</strong> {accountInfo.email}</p>
                         <p className="text-sm sm:text-base"><strong>First Name:</strong> {accountInfo.firstName}</p>
                         <p className="text-sm sm:text-base"><strong>Last Name:</strong> {accountInfo.lastName}</p>
@@ -106,7 +110,7 @@ const MyAccountPage: React.FC = () => {
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm"
                             />
                         </div>
                         <div>
@@ -115,7 +119,7 @@ const MyAccountPage: React.FC = () => {
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black sm:text-sm"
                             />
                         </div>
                         <div className="flex justify-end space-x-4">
@@ -129,7 +133,7 @@ const MyAccountPage: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={handleUpdateProfile}
-                                className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-md shadow-sm hover:from-orange-400 hover:to-red-400"
+                                className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-black to-black rounded-md shadow-sm hover:from-gray-700 hover:to-gray-700"
                             >
                                 Save Changes
                             </button>
@@ -141,7 +145,7 @@ const MyAccountPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setIsEditingProfile(true)}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-md shadow-sm hover:from-orange-400 hover:to-red-400"
+                        className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-black to-black rounded-md shadow-sm hover:from-gray-700 hover:to-gray-700"
                     >
                         Edit Profile
                     </button>
@@ -149,7 +153,7 @@ const MyAccountPage: React.FC = () => {
             )}
 
             <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-6 sm:p-10 mt-6">
-                <h2 className="text-2xl font-bold leading-9 tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-4">
+                <h2 className="text-2xl font-bold leading-9 tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-700 mb-4">
                     Change Password
                 </h2>
                 <form className="space-y-6">
@@ -162,7 +166,7 @@ const MyAccountPage: React.FC = () => {
                             type="password"
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-orange-500 sm:text-sm"
+                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-black sm:text-sm"
                         />
                     </div>
                     <div>
@@ -174,7 +178,7 @@ const MyAccountPage: React.FC = () => {
                             type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-orange-500 sm:text-sm"
+                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-black sm:text-sm"
                         />
                     </div>
                     <div>
@@ -186,13 +190,13 @@ const MyAccountPage: React.FC = () => {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-orange-500 sm:text-sm"
+                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-black sm:text-sm"
                         />
                     </div>
                     <button
                         type="button"
                         onClick={handleChangePassword}
-                        className="flex w-full justify-center rounded-md bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:from-orange-400 hover:to-red-400"
+                        className="flex w-full justify-center rounded-md bg-gradient-to-r from-black to-black px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:from-gray-700 hover:to-gray-700"
                     >
                         Change Password
                     </button>

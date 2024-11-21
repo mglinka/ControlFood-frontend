@@ -22,7 +22,7 @@ export function CreateAllergenForm() {
             .string()
             .min(1, { message: "Allergen name is required." })
             .max(50, { message: "Allergen name cannot exceed 50 characters." })
-            .regex(/^[A-Za-z\s]+$/, { message: "Allergen name can only contain letters and spaces." })
+            .regex(/^[A-Za-ząćęłńóśżźĄĆĘŁŃÓŚŻŹ\s]+$/, { message: "Allergen name can only contain letters (including Polish characters) and spaces." })
     });
 
     useEffect(() => {
@@ -51,6 +51,7 @@ export function CreateAllergenForm() {
         try {
             createAllergenSchema.parse(createAllergen);
             await axiosInstance.post('/allergens/add', createAllergen);
+            console.log("TU", createAllergen);
             toast.success('Allergen created successfully!');
             setCreateAllergen({ name: '' });
             fetchAllergens();
@@ -117,9 +118,8 @@ export function CreateAllergenForm() {
 
     return (
         <div className="flex flex-col md:flex-row justify-between p-6">
-            {/* Left Column */}
             <div className="w-full md:w-1/2 md:pr-4 mb-6 md:mb-0">
-                <h2 className="text-2xl font-bold mb-4 text-blue-700">Create Allergen</h2>
+                <h2 className="text-2xl font-bold mb-4 text-black">Create Allergen</h2>
                 <form onSubmit={handleSubmit} className="flex flex-col">
                     <input
                         type="text"
@@ -133,7 +133,7 @@ export function CreateAllergenForm() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`py-2 px-4 rounded ${loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                        className={`py-2 px-4 rounded ${loading ? 'bg-orange-500' : 'bg-orange-500 hover:bg-orange-600'} text-white`}
                     >
                         {loading ? 'Creating...' : 'Create Allergen'}
                     </button>
@@ -142,7 +142,7 @@ export function CreateAllergenForm() {
 
             {/* Right Column */}
             <div className="w-full md:w-1/2 md:pl-4">
-                <h3 className="text-xl font-semibold mb-4 text-blue-700">Allergens List</h3>
+                <h3 className="text-xl font-semibold mb-4 text-orange-600">Allergens List</h3>
                 <div className="overflow-auto h-[calc(100vh-120px)]">
                     {allergens.length > 0 ? (
                         <ul className="space-y-2">
@@ -173,15 +173,15 @@ export function CreateAllergenForm() {
                         >
                             &times;
                         </button>
-                        <h3 className="text-xl font-semibold mb-4 text-blue-700">Manage Allergen</h3>
-                        <p>Choose an action for allergen: <strong>{selectedAllergen.name}</strong></p>
+                        <h3 className="text-xl font-semibold mb-4 text-black">Manage Allergen</h3>
+                        <p>Do you want to edit or delete allergen: <strong>{selectedAllergen.name}</strong></p>
                         <div className="flex justify-between mt-4">
                             <button
                                 onClick={() => {
                                     setConfirmAction("edit");
                                     setShowActionModal(false);
                                 }}
-                                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                                className="bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600"
                             >
                                 Edit
                             </button>
@@ -208,7 +208,7 @@ export function CreateAllergenForm() {
                         >
                             &times;
                         </button>
-                        <h3 className="text-xl font-semibold mb-4 text-blue-700">Edit Allergen</h3>
+                        <h3 className="text-xl font-semibold mb-4 text-black">Edit Allergen</h3>
                         <input
                             type="text"
                             value={createAllergen.name}
@@ -216,16 +216,16 @@ export function CreateAllergenForm() {
                             name="name"
                             className="mb-4 p-2 border border-blue-300 rounded focus:border-blue-500 focus:ring focus:ring-blue-200"
                         />
-                        <div className="flex justify-between">
+                        <div className="flex justify-center gap-4 w-full mt-6">
                             <button
                                 onClick={handleEditSave}
-                                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                                className="bg-orange-500 text-white py-3 px-6 rounded-lg text-lg hover:bg-blue-700 transition duration-300"
                             >
                                 Save Changes
                             </button>
                             <button
                                 onClick={() => setConfirmAction(null)}
-                                className="bg-gray-300 text-black py-2 px-4 rounded hover:bg-gray-400"
+                                className="bg-gray-300 text-black py-3 px-6 rounded-lg text-lg hover:bg-gray-400 transition duration-300"
                             >
                                 Cancel
                             </button>

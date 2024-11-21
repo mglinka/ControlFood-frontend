@@ -659,7 +659,7 @@ export function CreateProductForm() {
                     ))}
                     <div className="flex justify-center">
                         <button type="button" onClick={handleAddIngredient}
-                                className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600">
+                                className="bg-orange-500 text-white rounded-lg p-2 hover:bg-orange-600">
                             Add Ingredient
                         </button>
                     </div>
@@ -682,7 +682,7 @@ export function CreateProductForm() {
                         <button
                             type="button"
                             onClick={handleAddAddition}
-                            className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600">
+                            className="bg-orange-500 text-white rounded-lg p-2 hover:bg-orange-600">
                             Add Addition
                         </button>
                     </div>
@@ -723,7 +723,7 @@ export function CreateProductForm() {
                     ))}
                     <div className="flex justify-center">
                         <button type="button" onClick={handleAddNutritionalIndex}
-                                className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600">
+                                className="bg-orange-500 text-white rounded-lg p-2 hover:bg-orange-600">
                             Add Nutritional Index
                         </button>
                     </div>
@@ -753,7 +753,7 @@ export function CreateProductForm() {
                     ))}
                     <div className="flex justify-center">
                         <button type="button" onClick={handleAddProductIndex}
-                                className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600">
+                                className="bg-orange-500 text-white rounded-lg p-2 hover:bg-orange-600">
                             Add Product Index
                         </button>
                     </div>
@@ -791,7 +791,7 @@ export function CreateProductForm() {
                     ))}
                     <div className="flex justify-center">
                         <button type="button" onClick={handleAddRating}
-                                className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600">
+                                className="bg-orange-500 text-white rounded-lg p-2 hover:bg-orange-600">
                             Add Rating
                         </button>
                     </div>
@@ -875,7 +875,7 @@ export function CreateProductForm() {
                         <button
                             type="button"
                             onClick={handleAddNutritionalValue}
-                            className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600"
+                            className="bg-orange-500 text-white rounded-lg p-2 hover:bg-orange-600"
                         >
                             Add Nutritional Value
                         </button>
@@ -885,7 +885,7 @@ export function CreateProductForm() {
                 <div className="mb-6">
                     <div className="flex justify-center">
                         <button type="submit"
-                                className="w-full max-w-xs bg-blue-500 text-white rounded-lg p-3 hover:bg-blue-600">Create
+                                className="w-full max-w-xs bg-orange-500 text-white rounded-lg p-3 hover:bg-orange-600">Create
                             Product
                         </button>
                     </div>
