@@ -122,6 +122,23 @@ export const changeRole = async (accountId: string, roleId:string) => {
     return await axiosInstance.put(`/changeRole?accountId=${accountId}&roleId=${roleId}`);
 };
 
+export const getAllAllergyProfileSchemas = async () => {
+    return await axiosInstance.get('/allergy-profile-schemas');
+};
+
+export const createAllergyProfileSchema = async (payload: {
+    allergens: { allergen_id: string | undefined }[];
+    name: string
+}) => {
+    try {
+        await axiosInstance.post('/allergy-profile-schemas/create', payload);
+    } catch (error) {
+        console.error('Error creating allergy profile schema:', error);
+        throw error; // Rethrow the error to be handled by the caller
+    }
+};
+
+
 
 
 

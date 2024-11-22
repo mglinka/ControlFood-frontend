@@ -30,7 +30,7 @@ export function CreateProductForm() {
     });
 
     const CreateProductSchema = z.object({
-        ean: z.string().length(13, "EAN must be exactly 13 digits"),
+        ean: z.string().length(13, "EAN must be exactly 13 digits").regex(/^\d+$/, "EAN must contain only digits"),
         producerDTO: ProducerSchema,
         productName: z.string().min(1, "Product name cannot be null").max(100, "Product name must be between 1 and 100 characters"),
         productDescription: z.string().max(255, "Product description must be 255 characters or less").optional(),
@@ -439,6 +439,8 @@ export function CreateProductForm() {
             }
         }
     };
+
+
 
 
     return (

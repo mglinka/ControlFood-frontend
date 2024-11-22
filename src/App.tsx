@@ -16,6 +16,7 @@ import SpProductsPage from "./pages/SpecialistProudctsPage.tsx";
 import Breadcrumbs from "./components/Breadcrumbs";
 import AccountsPage from "./pages/AccountsPage.tsx";
 import AccessLevelsPage from "./pages/AccessLevelsPage.tsx";
+import SchemasPage from "./pages/SchemasPage.tsx";
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
                                 <Route path="/main-page" element={<MainPage />} />
                                 <Route path="/accounts" element={<AccountsPage/>}/>
                                 <Route path="/access-levels" element={<AccessLevelsPage/>}/>
+                                <Route path="/schemas" element={<SchemasPage/>}/>
                             </Routes>
                             <SessionTimeout/>
                         </div>

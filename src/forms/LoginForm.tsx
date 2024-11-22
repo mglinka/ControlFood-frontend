@@ -87,7 +87,7 @@ export function LoginForm() {
             toast.success('Successfully signed in!');
             setTimeout(() => navigate('/main-page'), 1000);
         } catch (error: any) {
-            const message = error.response?.data?.message || 'Authentication failed. Please try again.';
+            const message = error.response?.data?.message;
             setErrorMessage(message);
             toast.error(message);
             console.error('Auth error:', error);

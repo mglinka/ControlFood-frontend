@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/allergy-profile-schemas/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editAllergyProfileSchema"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/allergens/edit/{id}": {
         parameters: {
             query?: never;
@@ -206,6 +222,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["createProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/allergy-profile-schemas/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createAllergyProfileSchema"];
         delete?: never;
         options?: never;
         head?: never;
@@ -452,6 +484,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/allergy-profile-schemas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllProfilesSchemas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/allergy-profile-schemas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllergyProfileSchemaById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/allergens": {
         parameters: {
             query?: never;
@@ -495,6 +559,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/allergy-profile-schemas/delete/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteAllergyProfileSchema"];
         options?: never;
         head?: never;
         patch?: never;
@@ -581,6 +661,16 @@ export interface components {
             /** Format: uuid */
             profile_id?: string;
             allergens?: components["schemas"]["GetAllergenIntensityDTO"][];
+        };
+        AllergenDTO: {
+            /** Format: uuid */
+            allergen_id?: string;
+        };
+        UpdateAllergyProfileSchemaDTO: {
+            /** Format: uuid */
+            schema_id?: string;
+            name: string;
+            allergens: components["schemas"]["AllergenDTO"][];
         };
         UpdateAllergenDTO: {
             name?: string;
@@ -732,6 +822,10 @@ export interface components {
             accountId: string;
             allergens: components["schemas"]["AllergenIntensityDTO"][];
         };
+        CreateAllergyProfileSchemaDTO: {
+            name: string;
+            allergens: components["schemas"]["AllergenDTO"][];
+        };
         CreateAllergenDTO: {
             name: string;
         };
@@ -739,6 +833,12 @@ export interface components {
             name?: string;
             /** Format: uuid */
             id?: string;
+        };
+        GetAllergyProfileSchemaDTO: {
+            name?: string;
+            /** Format: uuid */
+            schema_id?: string;
+            allergens?: components["schemas"]["GetAllergenDTO"][];
         };
         GetAccountDTO: {
             /** Format: uuid */
@@ -853,6 +953,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetAllergyProfileDTO"];
+                };
+            };
+        };
+    };
+    editAllergyProfileSchema: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAllergyProfileSchemaDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
                 };
             };
         };
@@ -1067,6 +1191,30 @@ export interface operations {
             };
         };
     };
+    createAllergyProfileSchema: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAllergyProfileSchemaDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
     addAllergen: {
         parameters: {
             query?: never;
@@ -1202,6 +1350,7 @@ export interface operations {
             query?: {
                 page?: number;
                 size?: number;
+                query?: string;
             };
             header?: never;
             path?: never;
@@ -1390,6 +1539,48 @@ export interface operations {
             };
         };
     };
+    getAllProfilesSchemas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GetAllergyProfileSchemaDTO"][];
+                };
+            };
+        };
+    };
+    getAllergyProfileSchemaById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GetAllergyProfileSchemaDTO"];
+                };
+            };
+        };
+    };
     getAllAllergens: {
         parameters: {
             query?: never;
@@ -1448,6 +1639,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetAccountDTO"];
+                };
+            };
+        };
+    };
+    deleteAllergyProfileSchema: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
                 };
             };
         };

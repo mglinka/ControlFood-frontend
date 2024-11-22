@@ -54,5 +54,11 @@ export const SidebarData: SidebarItem[] = [
         path: '/access-levels',
         icon:<FaOpencart/>,
         role:['ROLE_ADMIN']
+    },
+    {
+        title: 'Schemas',
+        path: '/schemas',
+        icon:<FaOpencart/>,
+        role:['ROLE_SPECIALIST']
     }
 ];
