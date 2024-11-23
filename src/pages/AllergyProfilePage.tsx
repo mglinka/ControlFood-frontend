@@ -18,8 +18,9 @@ interface SelectedAllergy {
     name: string;
     intensity: string;
 }
+
 const AllergyProfilePage: React.FC = () => {
-    const [showInitialPrompt, setShowInitialPrompt] = useState<boolean>(true); // Nowy stan dla pytania początkowego
+    const [showInitialPrompt, setShowInitialPrompt] = useState<boolean>(true);
     const [viewOption, setViewOption] = useState<"schemas" | "profile">("profile");
     const [allergies, setAllergies] = useState<Allergy[]>([]);
     const [selectedAllergies, setSelectedAllergies] = useState<SelectedAllergy[]>([]);
@@ -205,15 +206,14 @@ const AllergyProfilePage: React.FC = () => {
             {showInitialPrompt ? (
                 <div className="text-center">
                     <p className="text-xl mb-4">Would you like to select a template or create your own allergy profile?</p>
-                    <div className="flex justify-center space-x-4">
+                    <div className="flex flex-wrap justify-center space-x-4">
                         <button
                             onClick={handleStartWithSchemas}
-                            className="bg-white w-40 py-2 px-4 hover:bg-gray-100 text-black border-2 border-black rounded-3xl"
+                            className="bg-white w-40 py-2 px-4 hover:bg-gray-100 text-black border-2 border-black rounded-3xl mb-4 sm:mb-0"
                         >
                             <span className="block">Select</span>
                             <span className="block">Template</span>
                         </button>
-
 
                         <button
                             onClick={handleStartWithCustomProfile}
@@ -225,7 +225,7 @@ const AllergyProfilePage: React.FC = () => {
                     </div>
                 </div>
             ) : viewOption === "schemas" ? (
-                <UserProfileSchemas/>
+                <UserProfileSchemas />
             ) : (
                 <div>
                     {loading ? (
@@ -234,7 +234,7 @@ const AllergyProfilePage: React.FC = () => {
                         <p className="text-red-500">{error}</p>
                     ) : (
                         <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
-                            <div className="md:w-1/2 w-full">
+                            <div className="md:w-1/2 w-full mb-6 md:mb-0">
                                 <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
                                 <ul>
                                     {allergies.map((allergy) => (
