@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axiosConfig";
-import { authService } from '../utils/authService';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { authService } from "../utils/authService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { getAllAllergens } from "../api/api.ts";
 import axios from "axios";
-import {XCircleIcon} from "@heroicons/react/16/solid";
-
+import { XCircleIcon } from "@heroicons/react/16/solid";
+import UserProfileSchemas from "../components/UserProfileSchemas"; // Import the UserProfileSchemas component
 
 interface Allergy {
     allergen_id: string;
@@ -18,8 +18,9 @@ interface SelectedAllergy {
     name: string;
     intensity: string;
 }
-
 const AllergyProfilePage: React.FC = () => {
+    const [showInitialPrompt, setShowInitialPrompt] = useState<boolean>(true); // Nowy stan dla pytania początkowego
+    const [viewOption, setViewOption] = useState<"schemas" | "profile">("profile");
     const [allergies, setAllergies] = useState<Allergy[]>([]);
     const [selectedAllergies, setSelectedAllergies] = useState<SelectedAllergy[]>([]);
     const [initialSelectedAllergies, setInitialSelectedAllergies] = useState<SelectedAllergy[]>([]);
@@ -40,7 +41,7 @@ const AllergyProfilePage: React.FC = () => {
             );
             setAllergies(uniqueAllergies);
         } catch (err) {
-            setError('Error fetching allergens');
+            setError("Error fetching allergens");
         } finally {
             setLoading(false);
         }
@@ -79,8 +80,11 @@ const AllergyProfilePage: React.FC = () => {
                 setInitialSelectedAllergies(selected);
                 setHasProfile(true);
                 setAllergies((prevAllergies) =>
-                    prevAllergies.filter(allergy =>
-                        !selected.some((selectedAllergy: SelectedAllergy) => selectedAllergy.allergenId === allergy.allergen_id)
+                    prevAllergies.filter(
+                        (allergy) =>
+                            !selected.some(
+                                (selectedAllergy: SelectedAllergy) => selectedAllergy.allergenId === allergy.allergen_id
+                            )
                     )
                 );
             } else {
@@ -88,8 +92,8 @@ const AllergyProfilePage: React.FC = () => {
                 setSelectedAllergies([]);
             }
         } catch (error) {
-            console.error('Failed to load allergy profile', error);
-            setError('Failed to load allergy profile');
+            console.error("Failed to load allergy profile", error);
+            setError("Failed to load allergy profile");
         }
     };
 
@@ -97,8 +101,14 @@ const AllergyProfilePage: React.FC = () => {
         loadProfileData();
     }, []);
 
-    const handleRefresh = async () => {
-        await loadProfileData();
+    const handleStartWithSchemas = () => {
+        setViewOption("schemas");
+        setShowInitialPrompt(false); // Ukryj pytanie początkowe
+    };
+
+    const handleStartWithCustomProfile = () => {
+        setViewOption("profile");
+        setShowInitialPrompt(false); // Ukryj pytanie początkowe
     };
 
     const handleAddAllergy = (allergy: Allergy, intensity: string) => {
@@ -117,7 +127,10 @@ const AllergyProfilePage: React.FC = () => {
         const removedAllergy = selectedAllergies.find((allergy) => allergy.allergenId === id);
         if (removedAllergy) {
             setSelectedAllergies((prev) => prev.filter((selected) => selected.allergenId !== id));
-            setAllergies((prev) => [...prev, { allergen_id: removedAllergy.allergenId, name: removedAllergy.name }]);
+            setAllergies((prev) => [
+                ...prev,
+                { allergen_id: removedAllergy.allergenId, name: removedAllergy.name },
+            ]);
         }
     };
 
@@ -145,130 +158,155 @@ const AllergyProfilePage: React.FC = () => {
                 setHasProfile(true);
             }
 
-            toast.success('Allergy profile updated successfully!');
+            toast.success("Allergy profile updated successfully!");
             setTimeout(async () => {
-                await handleRefresh();
+                await loadProfileData();
             }, 3000);
             setIsCreating(false);
             setIsEditing(false);
         } catch (err) {
-            setSaveError(err instanceof Error ? err.message : 'Error saving allergy profile');
+            setSaveError(err instanceof Error ? err.message : "Error saving allergy profile");
         }
     };
 
     const handleCancelEdit = async () => {
         setSelectedAllergies(initialSelectedAllergies);
-        await handleRefresh();
+        await loadProfileData();
         setIsEditing(false);
         setIsCreating(false);
     };
 
+    const getIntensityColor = (intensity: string) => {
+        switch (intensity) {
+            case "low":
+                return "border-yellow-600";
+            case "medium":
+                return "border-orange-600";
+            case "high":
+                return "border-red-600";
+            default:
+                return "";
+        }
+    };
     const handleStartCreatingProfile = () => {
         setIsCreating(true);
-        setSelectedAllergies([]);
-        setInitialSelectedAllergies([]);
+        setIsEditing(false); // Ensure only one mode is active at a time
     };
 
     const handleStartEditingProfile = () => {
         setIsEditing(true);
-        setInitialSelectedAllergies(selectedAllergies);
-    };
-
-    const getIntensityColor = (intensity: string) => {
-        switch (intensity) {
-            case 'low':
-                return 'border-yellow-600';
-            case 'medium':
-                return 'border-orange-600';
-            case 'high':
-                return 'border-red-600';
-            default:
-                return '';
-        }
+        setIsCreating(false); // Ensure only one mode is active at a time
     };
 
     return (
         <div className="p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-5xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6">Allergy Profile</h1>
-            {loading ? (
-                <p>Loading...</p>
-            ) : error ? (
-                <p className="text-red-500">{error}</p>
-            ) : (
-                <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
-                    <div className="md:w-1/2 w-full">
-                        <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
-                        <ul>
-                            {allergies.map((allergy) => (
-                                <li key={allergy.allergen_id}
-                                    className="bg-white p-4 mb-4 rounded-xl shadow text-center">
-                                    <span className="font-semibold text-lg">{allergy.name}</span>
-                                    {(isEditing || isCreating) && (
-                                        <div className="flex justify-center space-x-3 mt-2">
-                                            <button
-                                                onClick={() => handleAddAllergy(allergy, 'low')}
-                                                className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 border border-gray-300"
-                                                title="Low Intensity"
-                                            ></button>
-                                            <button
-                                                onClick={() => handleAddAllergy(allergy, 'medium')}
-                                                className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 border border-gray-300"
-                                                title="Medium Intensity"
-                                            ></button>
-                                            <button
-                                                onClick={() => handleAddAllergy(allergy, 'high')}
-                                                className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 border border-gray-300"
-                                                title="High Intensity"
-                                            ></button>
-                                        </div>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="md:w-1/2 w-full">
-                        <h2 className="text-2xl font-semibold text-black mb-4 text-center">Selected Allergens</h2>
-                        <ul>
-                            {selectedAllergies.map(({allergenId, name, intensity}) => (
-                                <li key={allergenId}
-                                    className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(intensity)} flex items-center justify-between`}>
-                                    <span className="font-semibold text-lg">{name}</span>
-                                    {(isEditing || isCreating) && (
-                                        <button
-                                            onClick={() => handleRemoveAllergy(allergenId)}
-                                            className="text-red-600 hover:text-red-800 focus:outline-none"
-                                        >
-                                            <XCircleIcon className="h-8 w-8" aria-hidden="true"/>
-                                        </button>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6">Allergy Management</h1>
 
+            {showInitialPrompt ? (
+                <div className="text-center">
+                    <p className="text-xl mb-4">Would you like to select a template or create your own allergy profile?</p>
+                    <div className="flex justify-center space-x-4">
+                        <button
+                            onClick={handleStartWithSchemas}
+                            className="bg-white w-40 py-2 px-4 hover:bg-gray-100 text-black border-2 border-black rounded-3xl"
+                        >
+                            <span className="block">Select</span>
+                            <span className="block">Template</span>
+                        </button>
+
+
+                        <button
+                            onClick={handleStartWithCustomProfile}
+                            className="bg-white w-40 py-2 px-4 hover:bg-gray-100 text-black border-2 border-black rounded-3xl"
+                        >
+                            <span className="block">Create</span>
+                            <span className="block">Custom Profile</span>
+                        </button>
+                    </div>
+                </div>
+            ) : viewOption === "schemas" ? (
+                <UserProfileSchemas/>
+            ) : (
+                <div>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
+                            <div className="md:w-1/2 w-full">
+                                <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
+                                <ul>
+                                    {allergies.map((allergy) => (
+                                        <li key={allergy.allergen_id}
+                                            className="bg-white p-4 mb-4 rounded-xl shadow text-center">
+                                            <span className="font-semibold text-lg">{allergy.name}</span>
+                                            {(isEditing || isCreating) && (
+                                                <div className="flex justify-center space-x-3 mt-2">
+                                                    <button
+                                                        onClick={() => handleAddAllergy(allergy, 'low')}
+                                                        className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 border border-gray-300"
+                                                        title="Low Intensity"
+                                                    ></button>
+                                                    <button
+                                                        onClick={() => handleAddAllergy(allergy, 'medium')}
+                                                        className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 border border-gray-300"
+                                                        title="Medium Intensity"
+                                                    ></button>
+                                                    <button
+                                                        onClick={() => handleAddAllergy(allergy, 'high')}
+                                                        className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 border border-gray-300"
+                                                        title="High Intensity"
+                                                    ></button>
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="md:w-1/2 w-full">
+                                <h2 className="text-2xl font-semibold text-black mb-4 text-center">Selected Allergens</h2>
+                                <ul>
+                                    {selectedAllergies.map(({ allergenId, name, intensity }) => (
+                                        <li key={allergenId}
+                                            className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(intensity)} flex items-center justify-between`}>
+                                            <span className="font-semibold text-lg">{name}</span>
+                                            {(isEditing || isCreating) && (
+                                                <button
+                                                    onClick={() => handleRemoveAllergy(allergenId)}
+                                                    className="text-red-600 hover:text-red-800 focus:outline-none"
+                                                >
+                                                    <XCircleIcon className="h-8 w-8" aria-hidden="true" />
+                                                </button>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+                    <div className="mt-6 flex justify-center">
+                        {isEditing || isCreating ? (
+                            <>
+                                <button onClick={handleSaveProfile}
+                                        className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Save Profile
+                                </button>
+                                <button onClick={handleCancelEdit}
+                                        className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">Cancel
+                                </button>
+                            </>
+                        ) : hasProfile ? (
+                            <button onClick={handleStartEditingProfile}
+                                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Edit Profile</button>
+                        ) : (
+                            <button onClick={handleStartCreatingProfile}
+                                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create Profile</button>
+                        )}
+                    </div>
+                    {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
                 </div>
             )}
-            <div className="mt-6 flex justify-center">
-                {isEditing || isCreating ? (
-                    <>
-                        <button onClick={handleSaveProfile}
-                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Save Profile
-                        </button>
-                        <button onClick={handleCancelEdit}
-                                className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">Cancel
-                        </button>
-                    </>
-                ) : hasProfile ? (
-                    <button onClick={handleStartEditingProfile}
-                            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Edit
-                        Profile</button>
-                ) : (
-                    <button onClick={handleStartCreatingProfile}
-                            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create
-                        Profile</button>
-                )}
-            </div>
-            {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
+
             <ToastContainer />
         </div>
     );

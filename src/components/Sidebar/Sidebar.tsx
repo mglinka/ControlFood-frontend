@@ -70,10 +70,18 @@ const Sidebar: React.FC = () => {
                             className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50"
                             onMouseLeave={closeAccountMenu}
                         >
-                            <Link to="/my-account" className="block px-4 py-2 hover:bg-gray-200" onClick={closeAccountMenu}>
+                            <Link
+                                to="/my-account"
+                                className="block px-4 py-2 hover:bg-gray-100 hover:border-black border-2 rounded-md"
+                                onClick={closeAccountMenu}
+                            >
                                 My Account
                             </Link>
-                            <Link to="/login" className="block px-4 py-2 hover:bg-gray-200" onClick={handleLogout}>
+                            <Link
+                                to="/login"
+                                className="block px-4 py-2 hover:bg-gray-100 hover:border-black border-2 rounded-md"
+                                onClick={handleLogout}
+                            >
                                 Logout
                             </Link>
                         </div>
@@ -85,7 +93,7 @@ const Sidebar: React.FC = () => {
                 className={`fixed top-0 left-0 w-64 h-full ${getSidebarColor(role)} z-40 transition-transform ${sidebar ? 'translate-x-0' : '-translate-x-full'} duration-300`}>
                 <ul className="pt-16">
                     {filteredSidebarData.map((item, index) => (
-                        <Submenu item={item} key={index} onItemClick={closeSidebar} />
+                        <Submenu item={item} key={index} onItemClick={closeSidebar}/>
                     ))}
                 </ul>
             </div>

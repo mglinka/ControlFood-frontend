@@ -85,7 +85,7 @@ export function LoginForm() {
 
             login(token);
             toast.success('Successfully signed in!');
-            setTimeout(() => navigate('/main-page'), 1000);
+            setTimeout(() => navigate('/main-page'), 700);
         } catch (error: any) {
             const message = error.response?.data?.message;
             setErrorMessage(message);

@@ -25,9 +25,9 @@ const MainPage: React.FC = () => {
                 <LocalImage />
             </div>
 
-            <div className="z-10 flex flex-col items-start p-6 space-y-10 w-[45vw] absolute right-0 top-[55%]">
+            <div className="z-10 flex flex-col items-start p-4 sm:p-6 lg:p-8 space-y-10 w-full sm:w-[60vw] md:w-[50vw] lg:w-[45vw] absolute right-0 top-[60%] mt-20">
                 {/* First Box: Browse Products */}
-                <div className="h-[160px] mt-16 w-full p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
+                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
                     {role === "ROLE_ADMIN" ? (
                         <MdAdminPanelSettings size={40} className="text-gray-800" />
                     ) : (
@@ -48,7 +48,7 @@ const MainPage: React.FC = () => {
                 </div>
 
                 {/* Second Box: Create and Edit Allergy Profile */}
-                <div className="h-[160px] w-full p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
+                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
                     {role === "ROLE_SPECIALIST" ? (
                         <MdPersonAdd size={40} className="text-gray-800" />
                     ) : (
@@ -71,7 +71,7 @@ const MainPage: React.FC = () => {
                 </div>
 
                 {/* Third Box: Scan EAN Code */}
-                <div className="h-[160px] w-full p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
+                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
                     {role === "ROLE_ADMIN" ? (
                         <MdSettings size={40} className="text-gray-800" />
                     ) : (
