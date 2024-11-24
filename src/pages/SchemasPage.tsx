@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { components } from "../controlfood-backend-schema";
-import { getAllAllergyProfileSchemas, getAllAllergens, createAllergyProfileSchema, deleteAllergyProfileSchema } from "../api/api.ts";
+import { getAllAllergyProfileSchemas, getAllAllergens, deleteAllergyProfileSchema } from "../api/api.ts";
 import { CreateAllergyProfileSchemaForm } from "../forms/CreateAllergyProfileSchemaForm";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaPen, FaTrash } from 'react-icons/fa'; // Import icons from FontAwesome
-import { FaPlus } from 'react-icons/fa'; // Import the FaPlus icon
-
+import { FaPen, FaTrash, FaPlus } from 'react-icons/fa'; // Import icons from FontAwesome
 
 const SchemasPage: React.FC = () => {
     const [allergyProfileSchemas, setAllergyProfileSchemas] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"][]>([]);
@@ -46,43 +44,26 @@ const SchemasPage: React.FC = () => {
         fetchAllergens();
     }, []);
 
-    const handleSchemaCreate = async (newSchema: { name?: string; allergens?: components["schemas"]["GetAllergenDTO"][] }) => {
-        try {
-            if (!newSchema.name || !newSchema.allergens) {
-                throw new Error("Name and allergens are required.");
-            }
-
-            const transformedSchema = {
-                name: newSchema.name,
-                allergens: newSchema.allergens.map((allergen) => ({
-                    allergen_id: allergen.allergen_id,
-                })),
-            };
-
-            // Call API to create a new schema
-            await createAllergyProfileSchema(transformedSchema);
-
-            // Directly update the state with the new schema without fetching again
-            setAllergyProfileSchemas((prevSchemas) => [
-                ...prevSchemas,
-                {
-                    ...transformedSchema,
-                    allergens: newSchema.allergens, // add full allergen details
-                },
-            ]);
-
-            // Close the form modal
-            setFormVisible(false);
-
-        } catch (error) {
-            console.error("Error creating allergy profile schema:", error);
-            toast.error("Failed to create allergy profile schema. Please try again.");
+    const handleSchemaCreate = (newSchema: { name?: string; allergens?: components["schemas"]["GetAllergenDTO"][] }) => {
+        if (!newSchema.name || !newSchema.allergens) {
+            toast.error("Name and allergens are required.");
+            return;
         }
+
+        setAllergyProfileSchemas((prevSchemas) => [
+            ...prevSchemas,
+            {
+                ...newSchema,
+                allergens: newSchema.allergens, // add full allergen details
+            },
+        ]);
+
+        // Close the form modal
+        setFormVisible(false);
     };
 
     const handleDeleteSchema = async (schemaId: string) => {
         try {
-            console.log("Delete", schemaId)
             await deleteAllergyProfileSchema(schemaId);
             setAllergyProfileSchemas((prevSchemas) => prevSchemas.filter((schema) => schema.schema_id !== schemaId));
             setSelectedSchema(null); // Close the modal after deletion
@@ -94,7 +75,6 @@ const SchemasPage: React.FC = () => {
     };
 
     const handleEditSchema = (schemaId: string) => {
-        // Logic to handle the schema editing (you can either pre-fill the form or open a different form)
         toast.info(`Editing schema ${schemaId} is not implemented yet.`);
     };
 
@@ -165,12 +145,11 @@ const SchemasPage: React.FC = () => {
                         <h3 className="font-semibold text-lg mt-4">Allergens:</h3>
                         <ul className="list-disc pl-5">
                             {selectedSchema.allergens?.map((allergen, index) => {
-                                // Match the allergen_id with the full allergen data to get the name
                                 const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
                                 return allergenDetails ? (
-                                    <li key={index}>{allergenDetails.name}</li> // Render the allergen name
+                                    <li key={index}>{allergenDetails.name}</li>
                                 ) : (
-                                    <li key={index}>Unknown Allergen</li> // In case the allergen data is missing
+                                    <li key={index}>Unknown Allergen</li>
                                 );
                             })}
                         </ul>
@@ -195,7 +174,6 @@ const SchemasPage: React.FC = () => {
 
             <ToastContainer/>
         </div>
-
     );
 };
 
