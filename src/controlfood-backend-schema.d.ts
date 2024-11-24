@@ -228,6 +228,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/allergy-profiles/assignProfile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["assignAllergyProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/allergy-profile-schemas/create": {
         parameters: {
             query?: never;
@@ -799,6 +815,9 @@ export interface components {
             unitId: string;
             labelDTO?: components["schemas"]["LabelDTO"];
             compositionDTO?: components["schemas"]["CompositionDTO"];
+            nutritionalIndexDTO?: components["schemas"]["NutritionalIndexDTO"];
+            productIndexDTO?: components["schemas"]["ProductIndexDTO"];
+            nutritionalValueDTO?: components["schemas"]["NutritionalValueDTO"];
         };
         RequestChangePassword: {
             currentPassword?: string;
@@ -821,6 +840,12 @@ export interface components {
         CreateAllergyProfileDTO: {
             accountId: string;
             allergens: components["schemas"]["AllergenIntensityDTO"][];
+        };
+        AssignProfileDTO: {
+            /** Format: uuid */
+            schema_id: string;
+            allergens: components["schemas"]["AllergenDTO"][];
+            intensity?: string;
         };
         CreateAllergyProfileSchemaDTO: {
             name: string;
@@ -1187,6 +1212,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetAllergyProfileDTO"];
+                };
+            };
+        };
+    };
+    assignAllergyProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignProfileDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
                 };
             };
         };

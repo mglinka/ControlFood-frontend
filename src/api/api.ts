@@ -1,4 +1,7 @@
 import axiosInstance from "./axiosConfig.ts";
+import {components} from "../controlfood-backend-schema";
+
+type AssignProfileDTO = components["schemas"]["AssignProfileDTO"];
 
 
 export const registerUser = async (firstName: string, lastName: string, email: string, password: string) => {
@@ -138,6 +141,24 @@ export const createAllergyProfileSchema = async (payload: {
     }
 };
 
+
+
+export const deleteAllergyProfileSchema = async (id:string) => {
+    return await axiosInstance.delete(`/allergy-profile-schemas/delete/${id}`);
+
+};
+
+
+
+export const assignAllergyProfile = async (data: AssignProfileDTO) => {
+    try {
+        const response = await axiosInstance.post('/allergy-profiles/assignProfile', data);
+        return response.data;
+    } catch (error) {
+        console.error("Error assigning allergy profile:", error);
+        throw error; // Re-throwing to handle it where this method is called
+    }
+};
 
 
 

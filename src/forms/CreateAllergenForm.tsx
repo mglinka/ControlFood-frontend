@@ -54,7 +54,7 @@ export function CreateAllergenForm() {
             console.log("TU", createAllergen);
             toast.success('Allergen created successfully!');
             setCreateAllergen({ name: '' });
-            fetchAllergens();
+            await fetchAllergens();
         } catch (err) {
             if (err instanceof z.ZodError) {
                 const fieldErrors: { name?: string } = {};

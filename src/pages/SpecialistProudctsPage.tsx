@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllProducts } from '../api/api.ts';
 import { components } from "../controlfood-backend-schema";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {faSearch, faSpinner} from '@fortawesome/free-solid-svg-icons';
 
 const placeholderImage = '/default-placeholder.png';
 
@@ -90,15 +90,20 @@ const SpProductsPage: React.FC = () => {
 
     return (
         <div className="p-6">
-            <input
-                onChange={(event) => {
-                    setSearchQuery(event.target.value)
-                    setPage(0)
-                }}
-                className={"w-full my-4"}
-                type="text"
-                placeholder={"Szukaj"}
-            />
+            <div className="relative w-full my-4">
+                <input
+                    onChange={(event) => {
+                        setSearchQuery(event.target.value);
+                        setPage(0);
+                    }}
+                    className="w-full px-6 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black placeholder-gray-400 pl-12"
+                    type="text"
+                    placeholder="Szukaj"
+                />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <FontAwesomeIcon icon={faSearch} className="w-5 h-5"/>
+            </span>
+            </div>
             {loading ? (
                 <div className="flex justify-center items-center h-screen">
                     <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600"/>

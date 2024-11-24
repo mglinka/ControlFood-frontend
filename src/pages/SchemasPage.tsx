@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { components } from "../controlfood-backend-schema";
-import { getAllAllergyProfileSchemas, getAllAllergens } from "../api/api.ts";
-import { CreateAllergyProfileSchemaForm } from "../forms/CreateAllergyProfileSchemaForm"; // Import formularza
+import { getAllAllergyProfileSchemas, getAllAllergens, createAllergyProfileSchema, deleteAllergyProfileSchema } from "../api/api.ts";
+import { CreateAllergyProfileSchemaForm } from "../forms/CreateAllergyProfileSchemaForm";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { FaPen, FaTrash } from 'react-icons/fa'; // Import icons from FontAwesome
+import { FaPlus } from 'react-icons/fa'; // Import the FaPlus icon
+
 
 const SchemasPage: React.FC = () => {
     const [allergyProfileSchemas, setAllergyProfileSchemas] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"][]>([]);
-    const [allergens, setAllergens] = useState<components["schemas"]["GetAllergenDTO"][]>([]); // Lista alergenów
-    const [loading, setLoading] = useState<boolean>(false); // Loading state
-    const [error, setError] = useState<string | null>(null); // Error state
-    const [selectedSchema, setSelectedSchema] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"] | null>(null); // Selected schema state
-    const [isFormVisible, setFormVisible] = useState<boolean>(false); // To toggle form visibility
+    const [allergens, setAllergens] = useState<components["schemas"]["GetAllergenDTO"][]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedSchema, setSelectedSchema] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"] | null>(null);
+    const [isFormVisible, setFormVisible] = useState<boolean>(false);
 
-    // Fetch allergy profile schemas and allergens
     useEffect(() => {
         const fetchAllergyProfileSchemas = async () => {
             setLoading(true);
@@ -21,61 +25,100 @@ const SchemasPage: React.FC = () => {
                 const response = await getAllAllergyProfileSchemas();
                 setAllergyProfileSchemas(response.data);
             } catch (error) {
-                console.error('Error fetching allergy profiles:', error);
-                setError('Error fetching allergy profiles. Please try again later.');
+                console.error("Error fetching allergy profiles:", error);
+                setError("Error fetching allergy profiles. Please try again later.");
             } finally {
                 setLoading(false);
             }
         };
 
-
         const fetchAllergens = async () => {
             try {
                 const response = await getAllAllergens();
-                setAllergens(response); // Set allergens data
+                setAllergens(response);
             } catch (error) {
                 console.error("Error fetching allergens:", error);
                 setError("Error fetching allergens.");
             }
         };
 
-        fetchAllergyProfileSchemas(); // Fetch allergy profiles
-        fetchAllergens(); // Fetch allergens
+        fetchAllergyProfileSchemas();
+        fetchAllergens();
     }, []);
 
-    // Handle schema click for details
-    const handleSchemaClick = (schema: components["schemas"]["GetAllergyProfileSchemaDTO"]) => {
-        setSelectedSchema(schema);
+    const handleSchemaCreate = async (newSchema: { name?: string; allergens?: components["schemas"]["GetAllergenDTO"][] }) => {
+        try {
+            if (!newSchema.name || !newSchema.allergens) {
+                throw new Error("Name and allergens are required.");
+            }
+
+            const transformedSchema = {
+                name: newSchema.name,
+                allergens: newSchema.allergens.map((allergen) => ({
+                    allergen_id: allergen.allergen_id,
+                })),
+            };
+
+            // Call API to create a new schema
+            await createAllergyProfileSchema(transformedSchema);
+
+            // Directly update the state with the new schema without fetching again
+            setAllergyProfileSchemas((prevSchemas) => [
+                ...prevSchemas,
+                {
+                    ...transformedSchema,
+                    allergens: newSchema.allergens, // add full allergen details
+                },
+            ]);
+
+            // Close the form modal
+            setFormVisible(false);
+
+        } catch (error) {
+            console.error("Error creating allergy profile schema:", error);
+            toast.error("Failed to create allergy profile schema. Please try again.");
+        }
     };
 
-    // Handle schema creation after form submission
-    const handleSchemaCreate = (newSchema: components["schemas"]["GetAllergyProfileSchemaDTO"]) => {
-        setAllergyProfileSchemas((prevSchemas) => [...prevSchemas, newSchema]);
-        setFormVisible(false); // Hide the form after submission
+    const handleDeleteSchema = async (schemaId: string) => {
+        try {
+            console.log("Delete", schemaId)
+            await deleteAllergyProfileSchema(schemaId);
+            setAllergyProfileSchemas((prevSchemas) => prevSchemas.filter((schema) => schema.schema_id !== schemaId));
+            setSelectedSchema(null); // Close the modal after deletion
+            toast.success("Allergy profile schema deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting allergy profile schema:", error);
+            toast.error("Failed to delete allergy profile schema. Please try again.");
+        }
+    };
+
+    const handleEditSchema = (schemaId: string) => {
+        // Logic to handle the schema editing (you can either pre-fill the form or open a different form)
+        toast.info(`Editing schema ${schemaId} is not implemented yet.`);
     };
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-semibold mb-6 text-center">Allergy Profile Schemas</h1>
 
-            {/* Show Loading or Error Messages */}
             {loading && <div className="text-center text-xl text-blue-600">Loading...</div>}
             {error && <div className="text-center text-red-600">{error}</div>}
 
-            {/* Toggle Form Button */}
-            <div className="text-center mb-6">
+            {/* Show the "Create New Allergy Profile" button */}
+            <div className="text-left mb-6">
                 <button
                     onClick={() => setFormVisible(true)}
-                    className="bg-green-500 text-white px-6 py-2 rounded"
+                    className="bg-orange-500 text-white p-4 rounded-full flex items-center"
                 >
-                    Create New Allergy Profile
+                    <FaPlus className="text-white text-2xl"/>
                 </button>
             </div>
 
             {/* Show the form if it's visible */}
             {isFormVisible && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
                         <button
                             className="absolute top-2 right-2 text-gray-500 text-xl"
                             onClick={() => setFormVisible(false)}
@@ -84,20 +127,21 @@ const SchemasPage: React.FC = () => {
                         </button>
                         <CreateAllergyProfileSchemaForm
                             onCreate={handleSchemaCreate}
-                            allergens={allergens} // Pass allergens to the form
+                            allergens={allergens}
+                            onClose={() => setFormVisible(false)} // Close the form when done
                         />
                     </div>
                 </div>
             )}
 
-            {/* Show the list of allergy profile schemas */}
+            {/* Display the list of allergy profile schemas */}
             {!isFormVisible && !loading && !error && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {allergyProfileSchemas.map((allergyProfileSchema) => (
                         <div
                             key={allergyProfileSchema.schema_id}
                             className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col cursor-pointer"
-                            onClick={() => handleSchemaClick(allergyProfileSchema)}
+                            onClick={() => setSelectedSchema(allergyProfileSchema)}
                         >
                             <h2 className="font-semibold text-lg text-center">
                                 {allergyProfileSchema.name || "Unnamed Product"}
@@ -107,21 +151,51 @@ const SchemasPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Show selected schema details */}
+            {/* Modal for selected schema */}
             {selectedSchema && (
-                <div className="mt-8 border border-gray-300 p-6 rounded-lg shadow-lg">
-                    <h2 className="text-xl font-semibold text-center mb-4">{selectedSchema.name}</h2>
-                    <p className="text-lg">Schema ID: {selectedSchema.schema_id}</p>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-500 text-3xl"
+                            onClick={() => setSelectedSchema(null)} // Close the details modal
+                        >
+                            &times;
+                        </button>
+                        <h2 className="text-xl font-semibold text-center mb-4">{selectedSchema.name}</h2>
+                        <h3 className="font-semibold text-lg mt-4">Allergens:</h3>
+                        <ul className="list-disc pl-5">
+                            {selectedSchema.allergens?.map((allergen, index) => {
+                                // Match the allergen_id with the full allergen data to get the name
+                                const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
+                                return allergenDetails ? (
+                                    <li key={index}>{allergenDetails.name}</li> // Render the allergen name
+                                ) : (
+                                    <li key={index}>Unknown Allergen</li> // In case the allergen data is missing
+                                );
+                            })}
+                        </ul>
 
-                    <h3 className="font-semibold text-lg mt-4">Allergens:</h3>
-                    <ul className="list-disc pl-5">
-                        {selectedSchema.allergens?.map((allergen, index) => (
-                            <li key={index}>{allergen.name}</li>
-                        ))}
-                    </ul>
+                        <div className="absolute bottom-6 right-6 flex gap-4">
+                            <button
+                                onClick={() => handleEditSchema(selectedSchema?.schema_id as string)}
+                                className="bg-orange-500 text-white p-3 rounded-full hover:bg-orange-600"
+                            >
+                                <FaPen className="w-5 h-5 text-white"/>
+                            </button>
+                            <button
+                                onClick={() => handleDeleteSchema(selectedSchema?.schema_id as string)}
+                                className="bg-red-500 text-white p-3 rounded-full hover:bg-red-600"
+                            >
+                                <FaTrash className="w-5 h-5 text-white"/>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
+
+            <ToastContainer/>
         </div>
+
     );
 };
 
