@@ -7,56 +7,56 @@ import { SidebarItem } from '../../models/SidebarItem.ts';
 
 export const SidebarData: SidebarItem[] = [
     {
-        title: 'Products',
+        title: 'Produkty',
         path: '/products',
         icon: <AiOutlineFolder />,
         role: ['ROLE_USER'],
     },
     {
-        title: 'Products',
+        title: 'Produkty',
         path: '/products-specialist',
         icon: <AiOutlineFolder />,
         role: ['ROLE_SPECIALIST'],
 
     },
     {
-        title: 'Allergy Profile',
+        title: 'Profil alergiczny',
         path: '/profile',
         icon: <FaOpencart />,
         role: ['ROLE_USER'],
     },
     {
-        title: 'Scanner EAN',
+        title: 'Skaner kodów EAN',
         path: '/scanner',
         icon: <AiOutlineBarcode />,
         role: ['ROLE_SPECIALIST', 'ROLE_USER'],
     },
     {
-        title: 'Create product',
+        title: 'Stwórz produkt',
         path: '/create-product',
         icon:<FaOpencart/>,
         role:['ROLE_SPECIALIST']
     },
     {
-        title: 'Create allergen',
+        title: 'Alergeny',
         path: '/create-allergen',
         icon:<FaOpencart/>,
         role:['ROLE_SPECIALIST']
     },
     {
-        title: 'Accounts',
+        title: 'Konta',
         path: '/accounts',
         icon:<FaOpencart/>,
         role:['ROLE_ADMIN']
     },
     {
-        title: 'Access Levels',
+        title: 'Poziomy dostępu',
         path: '/access-levels',
         icon:<FaOpencart/>,
         role:['ROLE_ADMIN']
     },
     {
-        title: 'Schemas',
+        title: 'Szablony',
         path: '/schemas',
         icon:<FaOpencart/>,
         role:['ROLE_SPECIALIST']

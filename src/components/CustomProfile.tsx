@@ -204,20 +204,22 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
                         <button
                             onClick={handleSaveProfile}
-                            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transform transition-transform duration-200 hover:scale-105"
+                            className="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transform hover:scale-110 transition duration-300 ease-in-out shadow-lg hover:shadow-xl"
                         >
-                            <FiCheckCircle className="text-2xl"/>
+                            <FiCheckCircle className="text-white text-2xl"/>
                         </button>
+
                     </div>
 
 
                 ) : hasProfile ? (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+                        className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transform hover:scale-110 transition duration-300 ease-in-out"
                     >
-                        <FaPen className="w-5 h-5 text-white"/>
+                        <FaPen className="w-5 h-5 text-white" />
                     </button>
+
                 ) : (
                     <>
                         <button
@@ -240,7 +242,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
             {/* Allergies section */}
             <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
                 <div className="md:w-1/2 w-full mb-6 md:mb-0">
-                    <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
+                    <h2 className="text-2xl font-semibold text-black mb-4 text-center">Alergeny</h2>
                     <ul>
                         {allergies.map((allergy) => (
                             <li
@@ -272,7 +274,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                     </ul>
                 </div>
                 <div className="md:w-1/2 w-full">
-                    <h2 className="text-2xl font-semibold text-black mb-4 text-center">Selected Allergens</h2>
+                    <h2 className="text-2xl font-semibold text-black mb-4 text-center">Wybrane alergeny</h2>
                     <ul>
                         {selectedAllergies.map(({ allergenId, name, intensity }) => (
                             <li

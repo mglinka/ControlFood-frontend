@@ -44,6 +44,7 @@ const Sidebar: React.FC = () => {
 
     if (!showSidebar) return null;
 
+    // Filter SidebarData based on the role
     const filteredSidebarData = SidebarData.filter(item => item.role.includes(role as string));
 
     const handleLogout = () => {
@@ -53,6 +54,7 @@ const Sidebar: React.FC = () => {
 
     return (
         <>
+            {/* Header */}
             <div className={`fixed top-0 left-0 w-full ${getSidebarColor(role)} text-white h-16 flex items-center justify-between px-4 shadow-md z-50`}>
                 <div className="flex items-center">
                     <button onClick={toggleSidebar} className="text-2xl">
@@ -61,8 +63,9 @@ const Sidebar: React.FC = () => {
                     <h1 className="ml-4 text-xl font-semibold"><Link to="/main-page">ControlFood</Link></h1>
                 </div>
 
+                {/* Account Menu Button */}
                 <div className="relative ml-2">
-                    <button onClick={toggleAccountMenu} className="flex items-center">
+                    <button onClick={toggleAccountMenu} className="flex items-center transform transition-transform hover:scale-110">
                         <AiOutlineUser className="text-4xl" />
                     </button>
                     {accountMenu && (
@@ -72,23 +75,24 @@ const Sidebar: React.FC = () => {
                         >
                             <Link
                                 to="/my-account"
-                                className="block px-4 py-2 hover:bg-gray-100 hover:border-black border-2 rounded-md"
+                                className="block px-4 py-2 hover:bg-gray-100 rounded-md transition-all duration-200 transform hover:scale-105"
                                 onClick={closeAccountMenu}
                             >
-                                My Account
+                                Moje konto
                             </Link>
                             <Link
                                 to="/login"
-                                className="block px-4 py-2 hover:bg-gray-100 hover:border-black border-2 rounded-md"
+                                className="block px-4 py-2 hover:bg-gray-100 rounded-md transition-all duration-200 transform hover:scale-105"
                                 onClick={handleLogout}
                             >
-                                Logout
+                                Wyloguj się
                             </Link>
                         </div>
                     )}
                 </div>
             </div>
 
+            {/* Sidebar */}
             <div
                 className={`fixed top-0 left-0 w-64 h-full ${getSidebarColor(role)} z-40 transition-transform ${sidebar ? 'translate-x-0' : '-translate-x-full'} duration-300`}>
                 <ul className="pt-16">
@@ -98,6 +102,7 @@ const Sidebar: React.FC = () => {
                 </ul>
             </div>
 
+            {/* Overlay */}
             {sidebar && (
                 <div onClick={toggleSidebar} className="fixed inset-0 bg-black opacity-50 z-30"></div>
             )}

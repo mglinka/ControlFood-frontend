@@ -15,7 +15,7 @@ const BarcodeScannerPage: React.FC = () => {
     };
 
     useEffect(() => {
-        console.log("Product state updated:", product);
+        console.log("Product state updated:", product, data);
     }, [product]);
 
     return (
@@ -35,36 +35,36 @@ const BarcodeScannerPage: React.FC = () => {
             </div>
 
             <div className="flex flex-col items-center md:items-start w-full md:w-1/2 bg-white rounded-lg shadow-lg p-6">
-                <p className="text-center md:text-left font-semibold text-lg mb-4">Scanned Result: {data}</p>
-
                 {product ? (
                     <div className="text-gray-800 w-full">
-                        <h2 className="text-2xl font-bold mb-4">Product Information</h2>
-                        <p><strong>Name:</strong> {product.productName}</p>
-                        <p><strong>Description:</strong> {product.productDescription}</p>
+                        <p className="text-center md:text-left font-semibold text-lg mb-4">Zeskanowany kod EAN: {data}</p>
+
+                        <h2 className="text-2xl font-bold mb-4">Informacje o produkcie</h2>
+                        <p><strong>Nazwa produktu:</strong> {product.productName}</p>
+                        <p><strong>Opis:</strong> {product.productDescription}</p>
                         <p><strong>EAN:</strong> {product.ean}</p>
-                        <p><strong>Country:</strong> {product.country}</p>
-                        <p><strong>Durability:</strong> {product.labelDTO?.durability}</p>
-                        <p><strong>Storage:</strong> {product.labelDTO?.storage}</p>
-                        <p><strong>Preparation:</strong> {product.labelDTO?.preparation}</p>
-                        <p><strong>Instructions after opening:</strong> {product.labelDTO?.instructionsAfterOpening}</p>
+                        <p><strong>Kraj:</strong> {product.country}</p>
+                        <p><strong>Data ważności:</strong> {product.labelDTO?.durability}</p>
+                        <p><strong>Przechowywanie:</strong> {product.labelDTO?.storage}</p>
+                        <p><strong>Przygotowanie:</strong> {product.labelDTO?.preparation}</p>
+                        <p><strong>Instrukcje po otwarciu:</strong> {product.labelDTO?.instructionsAfterOpening}</p>
 
                         {product.labelDTO && (
                             <div className="mt-4">
-                                <h3 className="text-xl font-semibold mb-2">Label Information</h3>
+                                <h3 className="text-xl font-semibold mb-2">Informacje na etykiecie</h3>
                                 <img
                                     src={`data:image/jpeg;base64,${product.labelDTO.image}`}
                                     alt={product.productName}
                                     className="w-full h-48 object-contain mb-4"
                                 />
-                                <p><strong>Allergens:</strong> {product.labelDTO.allergens}</p>
+                                <p><strong>Alergeny:</strong> {product.labelDTO.allergens}</p>
                             </div>
                         )}
 
                         {/* Ingredients Section */}
                         {product.compositionDTO?.ingredientDTOS && product.compositionDTO.ingredientDTOS.length > 0 && (
                             <div className="mt-4">
-                                <h3 className="text-xl font-semibold mb-2">Ingredients</h3>
+                                <h3 className="text-xl font-semibold mb-2">Składniki</h3>
                                 <ul className="list-disc list-inside">
                                     {product.compositionDTO.ingredientDTOS.map((ingredient, index) => (
                                         <li key={index}>{ingredient.name}</li>
@@ -75,31 +75,31 @@ const BarcodeScannerPage: React.FC = () => {
 
                         {/* Nutritional Values Section */}
                         {product.nutritionalValueDTOS && product.nutritionalValueDTOS.length > 0 && (
-                            <div className="mt-4">
-                                <h3 className="text-xl font-semibold mb-2">Nutritional Values</h3>
+                            <div className="flex-1 overflow-y-auto mt-4">
+                                <h3 className="text-center font-semibold text-lg mb-4 text-black">Tabela wartości odżywczych</h3>
                                 <div className="overflow-x-auto">
-                                    <table className="table-auto border-collapse border border-gray-200 w-full text-sm text-left">
+                                    <table className="table-auto border-collapse border border-gray-800 w-full text-sm text-left text-black">
                                         <thead>
-                                        <tr className="bg-green-700 text-white text-center">
-                                            <th className="border border-gray-300 px-4 py-2">Nutritional Group</th>
-                                            <th className="border border-gray-300 px-4 py-2">Nutritional Value</th>
-                                            <th className="border border-gray-300 px-4 py-2">Per 100g/ml</th>
-                                            <th className="border border-gray-300 px-4 py-2">% NRV</th>
+                                        <tr className="bg-white text-black text-center">
+                                            <th className="border border-gray-400 px-4 py-2">Grupa wartości odżywczych</th>
+                                            <th className="border border-gray-400 px-4 py-2">Wartość odżywcza</th>
+                                            <th className="border border-gray-400 px-4 py-2">100g/ml</th>
+                                            <th className="border border-gray-400 px-4 py-2">% NRV</th>
                                         </tr>
                                         </thead>
-                                        <tbody className="text-gray-700">
+                                        <tbody>
                                         {product.nutritionalValueDTOS.map((value, index) => (
-                                            <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                                                <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                            <tr key={index} className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                                                <td className="border border-gray-400 px-4 py-2 font-semibold">
                                                     {value.nutritionalValueName?.group?.groupName || "Unknown Group"}
                                                 </td>
-                                                <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                                <td className="border border-gray-400 px-4 py-2 font-semibold">
                                                     {value.nutritionalValueName?.name || "Unknown Value"}
                                                 </td>
-                                                <td className="border border-gray-300 px-4 py-2 text-center">
+                                                <td className="border border-gray-400 px-4 py-2 text-center">
                                                     {value.quantity !== undefined ? value.quantity : "-"} {value.unit?.name || "No Unit"}
                                                 </td>
-                                                <td className="border border-gray-300 px-4 py-2 text-center">
+                                                <td className="border border-gray-400 px-4 py-2 text-center">
                                                     {value.nrv !== undefined ? `${value.nrv.toFixed(1)}%` : "-"}
                                                 </td>
                                             </tr>
@@ -111,7 +111,7 @@ const BarcodeScannerPage: React.FC = () => {
                         )}
                     </div>
                 ) : (
-                    <p className="text-gray-600">No product data available. Scan a barcode to see details.</p>
+                    <p className="text-gray-600">Zeskanuj kod EAN</p>
                 )}
             </div>
         </div>

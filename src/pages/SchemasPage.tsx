@@ -268,7 +268,7 @@ const SchemasPage: React.FC = () => {
                             </div>
                             <button
                                 onClick={handleEditSubmit}
-                                className="bg-green-500 text-white p-3 rounded-full hover:bg-green-600 w-full"
+                                className="bg-orange-500 text-white p-3 rounded-full hover:bg-orange-600 w-full"
                             >
                                 Save Changes
                             </button>

@@ -27,42 +27,48 @@ const MainPage: React.FC = () => {
 
             <div className="z-10 flex flex-col items-start p-4 sm:p-6 lg:p-8 space-y-10 w-full sm:w-[60vw] md:w-[50vw] lg:w-[45vw] absolute right-0 top-[60%] mt-20">
                 {/* First Box: Browse Products */}
-                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
+                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
                     {role === "ROLE_ADMIN" ? (
                         <MdAdminPanelSettings size={40} className="text-gray-800" />
                     ) : (
                         <MdShoppingCart size={40} className="text-gray-800" />
                     )}
                     <div className="flex-1">
-                        <h3 className="mb-4 text-xl font-semibold text-gray-800">Browse Products</h3>
+                        <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                            {role === "ROLE_ADMIN" ? "Zarządzanie kontami" : "Przeglądanie produktów"}
+                        </h3>
                         <p className="text-gray-600">
                             {role === "ROLE_ADMIN" ? (
-                                <>As an admin, you can manage the product inventory and access exclusive features.</>
-                            ) : role === "ROLE_USER" || role === "ROLE_SPECIALIST" ? (
-                                <>Explore a wide variety of products tailored to your needs and preferences.</>
+                                <>Jako administrator masz pełną odpowiedzialność za zarządzanie kontami użytkowników w systemie ControlFood.</>
+                            ) : role === "ROLE_USER" ? (
+                                <>Jako użytkownik, masz możliwość przeglądania szerokiej gamy produktów, które pasują do Twoich preferencji i potrzeb zdrowotnych.</>
+                            ) : role === "ROLE_SPECIALIST" ? (
+                                <>Jako specjalista masz możliwość nie tylko przeglądania szczegółowego katalogu produktów, ale również wzbogacania go o nowe pozycje. </>
                             ) : (
-                                <>Welcome! Explore our product catalog.</>
+                                <>Welcome</>
                             )}
                         </p>
                     </div>
                 </div>
 
                 {/* Second Box: Create and Edit Allergy Profile */}
-                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
+                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
                     {role === "ROLE_SPECIALIST" ? (
-                        <MdPersonAdd size={40} className="text-gray-800" />
+                        <MdPersonAdd size={40} className="text-gray-800"/>
                     ) : (
                         <MdPerson size={40} className="text-gray-800" />
                     )}
                     <div className="flex-1">
-                        <h3 className="mb-4 text-xl font-semibold text-gray-800">Create and Edit Allergy Profile</h3>
+                        <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                            {role === "ROLE_ADMIN" ? "Poziomy dostępu" : "Profil alergiczny"}
+                        </h3>
                         <p className="text-gray-600">
                             {role === "ROLE_ADMIN" ? (
-                                <>Admins can view and manage all profiles.</>
+                                <>Zarządzaj poziomami dostępu dla poszczególnych użytkowników. Przypisuj odpowiednie role (np. użytkownik, specjalista, administrator). Dzięki temu zapewnisz prawidłowe i bezpieczne korzystanie z systemu.</>
                             ) : role === "ROLE_USER" ? (
-                                <>Manage your own allergy profile to align products with your health needs.</>
+                                <>Twórz i zarządzaj swoim profilem alergicznym, aby produkty, które wybierasz, były w pełni dostosowane do Twoich potrzeb zdrowotnych.</>
                             ) : role === "ROLE_SPECIALIST" ? (
-                                <>Assist users in creating and managing their allergy profiles for better recommendations.</>
+                                <>Jako specjalista masz możliwość tworzenia dedykowanych szablonów, które użytkownicy mogą wykorzystać do szybkiego i łatwego tworzenia swoich profili alergicznych.</>
                             ) : (
                                 <>Personalize your experience by setting up an allergy profile.</>
                             )}
@@ -71,21 +77,25 @@ const MainPage: React.FC = () => {
                 </div>
 
                 {/* Third Box: Scan EAN Code */}
-                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4">
+                <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
                     {role === "ROLE_ADMIN" ? (
                         <MdSettings size={40} className="text-gray-800" />
                     ) : (
                         <MdQrCodeScanner size={40} className="text-gray-800" />
                     )}
                     <div className="flex-1">
-                        <h3 className="mb-4 text-xl font-semibold text-gray-800">Scan EAN Code</h3>
-                        <p>
+                        <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                            {role === "ROLE_ADMIN" ? "Funkcjonalności" : "Skaner kodów EAN"}
+                        </h3>
+                        <p className="text-gray-600">
                             {role === "ROLE_ADMIN" ? (
-                                <>Admins can configure system settings and manage operations.</>
-                            ) : role === "ROLE_USER" || role === "ROLE_SPECIALIST" ? (
-                                <>Quickly scan product codes for instant details.</>
+                                <>Jako administrator możesz blokować i odblokowywać konta użytkowników, co pozwala na kontrolowanie dostępu i zapewnienie bezpieczeństwa systemu.</>
+                            ) : role === "ROLE_USER" ? (
+                                <>Skanuj kody produktów, aby natychmiast uzyskać szczegółowe informacje o składnikach, alergenach i innych ważnych cechach produktu, zapewniając bezpieczeństwo i dopasowanie do Twoich potrzeb.</>
+                            ) : role === "ROLE_SPECIALIST" ? (
+                                <>Skorzystaj z naszego skanera, aby szybko zeskanować kody produktów i uzyskać szczegółowe informacje, które pomogą Ci w zarządzaniu profilami alergicznymi oraz tworzeniu i wykorzystywaniu spersonalizowanych szablonów alergicznych.</>
                             ) : (
-                                <>Use our scanner to streamline your shopping experience.</>
+                                <>Witaj na naszej platformie!</>
                             )}
                         </p>
                     </div>

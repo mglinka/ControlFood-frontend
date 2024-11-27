@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {getAllergyProfileByAccountId, getAllProducts} from '../api/api.ts';
 import {components} from "../controlfood-backend-schema";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faExclamationTriangle, faSpinner} from '@fortawesome/free-solid-svg-icons';
+import {faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {authService} from "../utils/authService.ts";
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
@@ -26,11 +26,7 @@ const ProductsPage: React.FC = () => {
         intensity: string
     }[]>([]);
 
-    const intensityColors: Record<string, string> = {
-        low: 'bg-yellow-300',
-        medium: 'bg-orange-300',
-        high: 'bg-red-300'
-    };
+
 
     useEffect(() => {
         const fetchAllergyProfile = async () => {
@@ -216,42 +212,54 @@ const ProductsPage: React.FC = () => {
 
                             <div className="text-gray-700 space-y-4">
                                 <div className="text-center">
-                                    <h3 className="font-semibold text-lg">Product Name:</h3>
+                                    <h3 className="font-semibold text-lg">Nazwa produktu:</h3>
                                     <p>{selectedProduct.productName || "Unnamed Product"}</p>
                                 </div>
 
                                 <div>
-                                    <h3 className="font-semibold">Allergens:</h3>
+                                    <h3 className="font-semibold">Alergeny:</h3>
                                     {selectedProduct.labelDTO?.allergens ? (
-                                        selectedProduct.labelDTO.allergens.split(',').map(allergen => {
-                                            const allergenTrimmed = allergen.trim();
-                                            const intensity = getAllergenIntensity(allergenTrimmed);
-                                            const bgColor = intensityColors[intensity] || 'bg-gray-300';
+                                        <div className="flex flex-wrap gap-2 justify-center">
+                                            {selectedProduct.labelDTO.allergens.split(',').map(allergen => {
+                                                const allergenTrimmed = allergen.trim();
+                                                const intensity = getAllergenIntensity(allergenTrimmed);
 
-                                            return (
-                                                <div
-                                                    key={allergenTrimmed}
-                                                    className={`flex justify-start items-center rounded-lg ${bgColor} text-white p-2 my-1`}
-                                                >
-                                                    <span>{allergenTrimmed}</span>
-                                                </div>
-                                            );
-                                        })
+                                                // Zdefiniowane kolory w zależności od intensywności
+                                                let bgColor = '';
+                                                switch (intensity) {
+                                                    case 'low':
+                                                        bgColor = 'bg-yellow-500'; // Żółty
+                                                        break;
+                                                    case 'medium':
+                                                        bgColor = 'bg-orange-600'; // Pomarańczowy
+                                                        break;
+                                                    case 'high':
+                                                        bgColor = 'bg-red-600'; // Czerwony
+                                                        break;
+                                                    default:
+                                                        bgColor = 'bg-gray-300'; // Szary, jeśli brak intensywności
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={allergenTrimmed}
+                                                        className={`flex items-center justify-center px-4 py-2 rounded-full text-white ${bgColor} cursor-pointer hover:scale-105 transform transition duration-200 text-sm`}
+                                                    >
+                                                        <span className="font-semibold">{allergenTrimmed}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     ) : (
-                                        <p>No allergens listed.</p>
+                                        <p>Brak alergenów w produkcie.</p>
                                     )}
                                 </div>
 
-                                {selectedProduct.labelDTO?.allergens && (
-                                    <div
-                                        className="flex items-center justify-center mt-4 p-2 border border-red-400 bg-red-100 rounded-lg">
-                                        <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 mr-2"/>
-                                        <span className="text-red-700">This product contains allergens. Please check carefully!</span>
-                                    </div>
-                                )}
+
+
 
                                 <div>
-                                    <h3 className="font-semibold">Ingredients:</h3>
+                                    <h3 className="font-semibold">Składniki:</h3>
                                     {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
                                         <ul className="list-disc list-inside ml-4">
                                             {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
@@ -259,43 +267,47 @@ const ProductsPage: React.FC = () => {
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p>No ingredients listed.</p>
+                                        <p>Brak składników w produkcie</p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <h3 className="font-semibold">Description:</h3>
+                                    <h3 className="font-semibold">Opis:</h3>
                                     <p>{selectedProduct.productDescription || "No description available."}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto">
-                            <h3 className="text-center font-semibold text-lg mb-4">Nutritional Values</h3>
+                            <h3 className="text-center font-semibold text-lg mb-4 text-black">Tabela wartości
+                                odżywczych</h3>
                             <div className="overflow-x-auto">
                                 <table
-                                    className="table-auto border-collapse border border-gray-200 w-full text-sm text-left">
+                                    className="table-auto border-collapse border border-gray-800 w-full text-sm text-left text-black">
                                     <thead>
-                                    <tr className="bg-green-700 text-white text-center">
-                                        <th className="border border-gray-300 px-4 py-2">Nutritional Group</th>
-                                        <th className="border border-gray-300 px-4 py-2">Nutritional Value</th>
-                                        <th className="border border-gray-300 px-4 py-2">Per 100g/ml</th>
-                                        <th className="border border-gray-300 px-4 py-2">% NRV</th>
+                                    <tr className="bg-white text-black text-center">
+                                        <th className="border border-gray-400 px-4 py-2">Grupa wartości odżywczych</th>
+                                        <th className="border border-gray-400 px-4 py-2">Wartość odżywcza</th>
+                                        <th className="border border-gray-400 px-4 py-2">100g/ml</th>
+                                        <th className="border border-gray-400 px-4 py-2">% NRV</th>
                                     </tr>
                                     </thead>
-                                    <tbody className="text-gray-700">
+                                    <tbody>
                                     {selectedProduct?.nutritionalValueDTOS.map((value, index) => (
-                                        <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                                            <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                        <tr
+                                            key={index}
+                                            className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                                        >
+                                        <td className="border border-gray-400 px-4 py-2 font-semibold">
                                                 {value.nutritionalValueName?.group?.groupName || "Unknown Group"}
                                             </td>
-                                            <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                            <td className="border border-gray-400 px-4 py-2 font-semibold">
                                                 {value.nutritionalValueName?.name || "Unknown Value"}
                                             </td>
-                                            <td className="border border-gray-300 px-4 py-2 text-center">
+                                            <td className="border border-gray-400 px-4 py-2 text-center">
                                                 {value.quantity !== undefined ? value.quantity : "-"} {value.unit?.name || "No Unit"}
                                             </td>
-                                            <td className="border border-gray-300 px-4 py-2 text-center">
+                                            <td className="border border-gray-400 px-4 py-2 text-center">
                                                 {value.nrv !== undefined ? `${value.nrv.toFixed(1)}%` : "-"}
                                             </td>
                                         </tr>
@@ -304,6 +316,7 @@ const ProductsPage: React.FC = () => {
                                 </table>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
