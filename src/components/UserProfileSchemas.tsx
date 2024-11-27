@@ -3,19 +3,21 @@ import { getAllAllergyProfileSchemas, assignAllergyProfile } from "../api/api.ts
 import { components } from "../controlfood-backend-schema";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FiCheckCircle, FiLoader } from "react-icons/fi";
+import { ArrowLeftIcon } from "@heroicons/react/16/solid";
 
 interface UserProfileSchemasProps {
-    onBack: () => void; // Function to go back
-    onProfileAssigned: () => void; // Callback when profile is assigned
+    onBack: () => void;
+    onProfileAssigned: () => void;
 }
 
 const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfileAssigned }) => {
     const [schemas, setSchemas] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"][]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedSchema, setSelectedSchema] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"] | null>(null);
-    const [intensity, setIntensity] = useState<string>(""); // For storing user input for intensity
+    const [selectedSchemas, setSelectedSchemas] = useState<Set<string>>(new Set());
     const [assigning, setAssigning] = useState<boolean>(false);
+    const [modalOpen, setModalOpen] = useState<boolean>(false); // To control modal visibility
 
     useEffect(() => {
         const fetchSchemas = async () => {
@@ -32,62 +34,46 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
         fetchSchemas();
     }, []);
 
-    const openModal = (schema: components["schemas"]["GetAllergyProfileSchemaDTO"]) => {
-        setSelectedSchema(schema);
-        setIntensity(""); // Reset intensity when opening modal
+    const toggleSchemaSelection = (schemaId: string) => {
+        setSelectedSchemas((prevSelected) => {
+            const newSelected = new Set(prevSelected);
+            if (newSelected.has(schemaId)) {
+                newSelected.delete(schemaId);
+            } else {
+                newSelected.add(schemaId);
+            }
+            return newSelected;
+        });
     };
 
-    const closeModal = () => {
-        setSelectedSchema(null);
-        setIntensity("");
+    const handleAssign = async () => {
+        if (selectedSchemas.size === 0) {
+            alert("Please select at least one schema.");
+            return;
+        }
+
+        setModalOpen(true); // Open the modal to ask for intensity
     };
 
-    const handleChoose = async () => {
-        if (selectedSchema) {
-            if (!selectedSchema.schema_id) {
-                console.error("Schema ID is undefined.");
-                alert("Invalid schema selected. Please try again.");
-                return;
-            }
+    const handleIntensitySelection = async (intensity: string) => {
+        setModalOpen(false); // Close the modal once intensity is selected
 
-            if (!intensity) {
-                alert("Please select an intensity level.");
-                return;
-            }
+        setAssigning(true);
 
-            // Validate that all allergens have IDs
-            const allergens = selectedSchema.allergens?.map((allergen) => {
-                if (!allergen.allergen_id) {
-                    console.error("Allergen ID is undefined for an allergen.");
-                    throw new Error("Invalid allergen data.");
-                }
-                return { allergen_id: allergen.allergen_id };
-            });
+        try {
+            const data: components["schemas"]["AssignProfileDTO"] = {
+                schema_ids: Array.from(selectedSchemas),
+                intensity: intensity,
+            };
 
-            setAssigning(true);
-
-            try {
-                // Construct the AssignProfileDTO object
-                const data: components["schemas"]["AssignProfileDTO"] = {
-                    schema_id: selectedSchema.schema_id,
-                    allergens: allergens?.map((allergen) => ({ allergen_id: allergen.allergen_id })) || [],
-                    intensity, // Use user-selected intensity
-                };
-
-                // Call the assignAllergyProfile API
-                await assignAllergyProfile(data);
-                toast.success("Profile assigned successfully!");
-
-                // Trigger the callback to update the parent component
-                setTimeout(()=> onProfileAssigned(), 900);
-
-                closeModal();
-            } catch (error) {
-                console.error("Failed to assign profile:", error);
-                toast.error("Failed to assign profile. Please try again.");
-            } finally {
-                setAssigning(false);
-            }
+            await assignAllergyProfile(data);
+            toast.success("Profile assigned successfully!");
+            setTimeout(() => onProfileAssigned(), 900);
+        } catch (error) {
+            console.error("Failed to assign profile:", error);
+            toast.error("Failed to assign profile. Please try again.");
+        } finally {
+            setAssigning(false);
         }
     };
 
@@ -96,10 +82,10 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
             <h1 className="text-2xl font-semibold mb-4 text-center">User Profile Schemas</h1>
 
             <button
-                onClick={onBack} // Funkcja powrotu
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors mb-4"
+                onClick={onBack}
+                className="bg-gray-300 text-gray-700 p-3 rounded-full hover:bg-gray-400 transform transition-transform duration-200 hover:scale-105 mb-4"
             >
-                Back to Profile Creation
+                <ArrowLeftIcon className="h-6 w-6" />
             </button>
 
             {loading && <p className="text-center text-blue-600">Loading schemas...</p>}
@@ -115,88 +101,108 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
                     {schemas.map((schema) => (
                         <div
                             key={schema.schema_id}
-                            className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col cursor-pointer"
-                            onClick={() => openModal(schema)}
+                            className={`relative bg-white border rounded-lg p-6 shadow-md hover:shadow-lg cursor-pointer transition-shadow duration-200 ${
+                                selectedSchemas.has(schema.schema_id as string) ? "border-blue-500" : "border-gray-300"
+                            }`}
+                            onClick={() => toggleSchemaSelection(schema.schema_id as string)}
                         >
-                            <h2 className="text-lg font-semibold mb-2 text-center">
-                                {schema.name || "Unnamed Schema"}
-                            </h2>
-
+                            <div className="absolute top-0 right-0 -mt-3 -mr-3 p-2 rounded-full">
+                                {selectedSchemas.has(schema.schema_id as string) && (
+                                    <div className="bg-blue-500 text-white p-2 rounded-full">
+                                        <FiCheckCircle className="h-6 w-6"/>
+                                    </div>
+                                )}
+                            </div>
+                            <h2 className="text-lg font-semibold mb-4 text-center">{schema.name || "Unnamed Schema"}</h2>
                             <div className="mt-4">
-                                <h3 className="font-semibold text-sm mb-1">Allergens:</h3>
-                                <ul className="list-disc pl-5 text-sm">
+                                <div className="flex flex-wrap gap-3">
                                     {schema.allergens && schema.allergens.length > 0 ? (
                                         schema.allergens.map((allergen, index) => (
-                                            <li key={index}>{allergen.name}</li>
+                                            <span
+                                                key={index}
+                                                className="bg-blue-500 text-white text-sm py-2 px-4 rounded-full shadow-md hover:scale-105 cursor-pointer transition-transform"
+                                            >
+                                            {allergen.name}
+                                            </span>
                                         ))
                                     ) : (
-                                        <li className="italic text-gray-500">No allergens listed</li>
+                                        <span className="italic text-gray-500">No allergens listed</span>
                                     )}
-                                </ul>
+                                </div>
                             </div>
+
+
                         </div>
                     ))}
                 </div>
             )}
 
-            {selectedSchema && (
-                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
-                        <h2 className="text-lg font-semibold text-center mb-4">
-                            {selectedSchema.name || "Unnamed Schema"}
-                        </h2>
+            {!loading && !error && (
+                <div className="fixed bottom-4 right-4">
+                    {selectedSchemas.size > 0 && (
+                        <button
+                            className={`bg-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors ${
+                                assigning ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                            onClick={handleAssign}
+                            disabled={assigning}
+                        >
+                            {assigning ? (
+                                <FiLoader className="animate-spin text-2xl" />
+                            ) : (
+                                <FiCheckCircle className="text-2xl" />
+                            )}
+                        </button>
+                    )}
+                </div>
+            )}
 
-                        <div className="mb-4">
-                            <h3 className="font-semibold text-sm mb-1">Allergens:</h3>
-                            <ul className="list-disc pl-5 text-sm">
-                                {selectedSchema.allergens && selectedSchema.allergens.length > 0 ? (
-                                    selectedSchema.allergens.map((allergen, index) => (
-                                        <li key={index}>{allergen.name}</li>
-                                    ))
-                                ) : (
-                                    <li className="italic text-gray-500">No allergens listed</li>
-                                )}
-                            </ul>
+            {/* Modal do wyboru intensywności */}
+            {modalOpen && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+                        <h2 className="text-xl font-semibold mb-6 text-center">Select Intensity Level</h2>
+
+                        <div className="flex flex-col gap-4">
+                            {/* Low Intensity */}
+                            <div
+                                className="relative bg-yellow-400 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                                onClick={() => handleIntensitySelection("low")}
+                            >
+                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-yellow-500 rounded-b-full"></div>
+                                <div className="py-6 text-lg font-bold">Low</div>
+                            </div>
+
+                            {/* Medium Intensity */}
+                            <div
+                                className="relative bg-orange-500 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                                onClick={() => handleIntensitySelection("moderate")}
+                            >
+                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-orange-600 rounded-b-full"></div>
+                                <div className="py-6 text-lg font-bold">Medium</div>
+                            </div>
+
+                            {/* High Intensity */}
+                            <div
+                                className="relative bg-red-500 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                                onClick={() => handleIntensitySelection("high")}
+                            >
+                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-red-600 rounded-b-full"></div>
+                                <div className="py-6 text-lg font-bold">High</div>
+                            </div>
                         </div>
 
-                        <div className="mb-4">
-                            <label htmlFor="intensity" className="block font-semibold text-sm mb-2">
-                                Intensity Level
-                            </label>
-                            <select
-                                id="intensity"
-                                value={intensity}
-                                onChange={(e) => setIntensity(e.target.value)}
-                                className="w-full border border-gray-300 rounded p-2"
-                            >
-                                <option value="" disabled>
-                                    Select intensity
-                                </option>
-                                <option value="low">Low</option>
-                                <option value="moderate">Moderate</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-
-                        <div className="flex justify-end gap-4">
-                            <button
-                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-                                onClick={handleChoose}
-                                disabled={assigning}
-                            >
-                                {assigning ? "Assigning..." : "Choose"}
-                            </button>
-                            <button
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
-                                onClick={closeModal}
-                                disabled={assigning}
-                            >
-                                Cancel
-                            </button>
-                        </div>
+                        {/* Cancel Button */}
+                        <button
+                            className="mt-6 bg-gray-300 text-gray-700 px-6 py-2 rounded-full w-full hover:bg-gray-400"
+                            onClick={() => setModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}
+
             <ToastContainer />
         </div>
     );

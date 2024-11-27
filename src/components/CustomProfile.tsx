@@ -4,8 +4,10 @@ import { authService } from "../utils/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllAllergens } from "../api/api";
-import { XCircleIcon } from "@heroicons/react/16/solid";
+import {ArrowLeftIcon, XCircleIcon} from "@heroicons/react/16/solid";
 import axios from "axios";
+import { FaPen, FaPlus } from 'react-icons/fa';
+import {FiCheckCircle} from "react-icons/fi";
 
 interface Allergy {
     allergen_id: string;
@@ -44,6 +46,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
             setAllergies(uniqueAllergies);
         } catch (err) {
             setError("Error fetching allergens");
+            console.log(error, loading);
         } finally {
             setLoading(false);
         }
@@ -187,100 +190,119 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
     return (
         <div className="p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-5xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6">Allergy Profile</h1>
 
 
-                <div>
-                    {loading ? (
-                        <p>Loading...</p>
-                    ) : error ? (
-                        <p className="text-red-500">{error}</p>
-                    ) : (
-                        <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
-                            <div className="md:w-1/2 w-full mb-6 md:mb-0">
-                                <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
-                                <ul>
-                                    {allergies.map((allergy) => (
-                                        <li key={allergy.allergen_id}
-                                            className="bg-white p-4 mb-4 rounded-xl shadow text-center">
-                                            <span className="font-semibold text-lg">{allergy.name}</span>
-                                            {(isEditing || isCreating) && (
-                                                <div className="flex justify-center space-x-3 mt-2">
-                                                    <button
-                                                        onClick={() => handleAddAllergy(allergy, 'low')}
-                                                        className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 border border-gray-300"
-                                                        title="Low Intensity"
-                                                    ></button>
-                                                    <button
-                                                        onClick={() => handleAddAllergy(allergy, 'medium')}
-                                                        className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 border border-gray-300"
-                                                        title="Medium Intensity"
-                                                    ></button>
-                                                    <button
-                                                        onClick={() => handleAddAllergy(allergy, 'high')}
-                                                        className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 border border-gray-300"
-                                                        title="High Intensity"
-                                                    ></button>
-                                                </div>
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className="md:w-1/2 w-full">
-                                <h2 className="text-2xl font-semibold text-black mb-4 text-center">Selected Allergens</h2>
-                                <ul>
-                                    {selectedAllergies.map(({ allergenId, name, intensity }) => (
-                                        <li key={allergenId}
-                                            className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(intensity)} flex items-center justify-between`}>
-                                            <span className="font-semibold text-lg">{name}</span>
-                                            {(isEditing || isCreating) && (
-                                                <button
-                                                    onClick={() => handleRemoveAllergy(allergenId)}
-                                                    className="text-red-600 hover:text-red-800 focus:outline-none"
-                                                >
-                                                    <XCircleIcon className="h-8 w-8" aria-hidden="true" />
-                                                </button>
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-                    <div className="mt-6 flex justify-center">
-                        {isEditing || isCreating ? (
-                            <>
-                                <button onClick={handleSaveProfile}
-                                        className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Save Profile
-                                </button>
-                                <button onClick={handleCancelEdit}
-                                        className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">Cancel
-                                </button>
-                            </>
-                        ) : hasProfile ? (
-                            <button onClick={() => setIsEditing(true)}
-                                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Edit Profile</button>
-                        ) : (
-                            <>
-                                <button onClick={() => setIsCreating(true)}
-                                        className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
-                                    Create Profile
-                                </button>
-                                {/* Przycisk przywracający widok z przyciskami */}
-                                <button onClick={onBack}
-                                        className="ml-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">
-                                    Back to Options
-                                </button>
-                            </>
-                        )}
+            <div className="mt-4 mb-6 space-x-4 flex">
+                {isEditing || isCreating ? (
+                    <div className="flex justify-between items-center w-full">
+                        <button
+                            onClick={handleCancelEdit}
+                            className="bg-gray-300 text-gray-700 p-3 rounded-full hover:bg-gray-400 transform transition-transform duration-200 hover:scale-105"
+                        >
+                            <ArrowLeftIcon className="h-6 w-6"/>
+                        </button>
+
+                        <button
+                            onClick={handleSaveProfile}
+                            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transform transition-transform duration-200 hover:scale-105"
+                        >
+                            <FiCheckCircle className="text-2xl"/>
+                        </button>
                     </div>
-                    {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
+
+
+                ) : hasProfile ? (
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+                    >
+                        <FaPen className="w-5 h-5 text-white"/>
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={onBack}
+                            className="ml-4 bg-gray-300 text-gray-700 p-3 rounded-full hover:bg-gray-400"
+                        >
+                            <ArrowLeftIcon className="h-6 w-6" />
+                        </button>
+                        <button
+                            onClick={() => setIsCreating(true)}
+                            className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700"
+                        >
+                            <FaPlus className="text-white text-2xl" />
+                        </button>
+                    </>
+
+                )}
+            </div>
+
+            {/* Allergies section */}
+            <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
+                <div className="md:w-1/2 w-full mb-6 md:mb-0">
+                    <h2 className="text-2xl font-semibold text-black mb-4 text-center">Available Allergens</h2>
+                    <ul>
+                        {allergies.map((allergy) => (
+                            <li
+                                key={allergy.allergen_id}
+                                className="bg-white p-4 mb-4 rounded-xl shadow text-center"
+                            >
+                                <span className="font-semibold text-lg">{allergy.name}</span>
+                                {(isEditing || isCreating) && (
+                                    <div className="flex justify-center space-x-3 mt-2">
+                                        <button
+                                            onClick={() => handleAddAllergy(allergy, "low")}
+                                            className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 border border-gray-300"
+                                            title="Low Intensity"
+                                        ></button>
+                                        <button
+                                            onClick={() => handleAddAllergy(allergy, "medium")}
+                                            className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 border border-gray-300"
+                                            title="Medium Intensity"
+                                        ></button>
+                                        <button
+                                            onClick={() => handleAddAllergy(allergy, "high")}
+                                            className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 border border-gray-300"
+                                            title="High Intensity"
+                                        ></button>
+                                    </div>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
+                <div className="md:w-1/2 w-full">
+                    <h2 className="text-2xl font-semibold text-black mb-4 text-center">Selected Allergens</h2>
+                    <ul>
+                        {selectedAllergies.map(({ allergenId, name, intensity }) => (
+                            <li
+                                key={allergenId}
+                                className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(
+                                    intensity
+                                )} flex items-center justify-between`}
+                            >
+                                <span className="font-semibold text-lg">{name}</span>
+                                {(isEditing || isCreating) && (
+                                    <button
+                                        onClick={() => handleRemoveAllergy(allergenId)}
+                                        className="text-red-600 hover:text-red-800 focus:outline-none"
+                                    >
+                                        <XCircleIcon className="h-8 w-8" aria-hidden="true" />
+                                    </button>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+
+            {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
 
             <ToastContainer />
         </div>
     );
+
+
 };
 
 export default CustomProfile;

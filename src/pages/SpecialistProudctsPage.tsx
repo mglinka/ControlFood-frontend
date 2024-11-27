@@ -6,7 +6,7 @@ import {faSearch, faSpinner} from '@fortawesome/free-solid-svg-icons';
 
 const placeholderImage = '/default-placeholder.png';
 
-const SpProductsPage: React.FC = () => {
+const SpecialistProductsPage: React.FC = () => {
     const [products, setProducts] = useState<components["schemas"]["GetProductDTO"][]>([]);
     const [selectedProduct, setSelectedProduct] = useState<components["schemas"]["GetProductDTO"] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -158,63 +158,112 @@ const SpProductsPage: React.FC = () => {
 
             {selectedProduct && (
                 <div className="fixed inset-0 flex items-center justify-center bg-opacity-25 bg-gray-900 z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl relative overflow-auto max-h-[80vh]">
+
                         <button
                             onClick={closeModal}
                             className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl p-2"
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-bold mb-4 text-center">Product Details</h2>
 
-                        <div className="w-48 h-48 mx-auto mb-4 overflow-hidden rounded-lg">
-                            <img
-                                src={selectedProduct.labelDTO?.image ? `data:image/jpeg;base64,${selectedProduct.labelDTO.image}` : placeholderImage}
-                                alt={selectedProduct.productName || "Product Image"}
-                                className="object-contain w-full h-full"
-                            />
-                        </div>
+                        <h2 className="text-2xl font-bold mb-4 text-center md:col-span-2">Product Details</h2>
 
-                        <div className="max-h-60 overflow-y-auto">
-                            <div className="mt-2 text-center text-gray-600">
-                                <h3 className="font-semibold">Product Name:</h3>
-                                <p>{selectedProduct.productName || "Unnamed Product"}</p>
+                        {/* Flex container for both columns */}
+                        <div className="flex w-full space-x-6 overflow-auto">
+
+                            {/* Left Column - Product Info */}
+                            <div className="w-2/5 overflow-y-auto pr-4 space-y-4">
+                                <div className="w-48 h-48 mx-auto mb-4 overflow-hidden rounded-lg">
+                                    <img
+                                        src={selectedProduct.labelDTO?.image ? `data:image/jpeg;base64,${selectedProduct.labelDTO.image}` : placeholderImage}
+                                        alt={selectedProduct.productName || "Product Image"}
+                                        className="object-contain w-full h-full"
+                                    />
+                                </div>
+
+                                <div className="mt-2 text-center text-gray-600">
+                                    <h3 className="font-semibold">Product Name:</h3>
+                                    <p>{selectedProduct.productName || "Unnamed Product"}</p>
+                                </div>
+
+                                <div className="mt-2 text-center text-gray-600">
+                                    <h3 className="font-semibold">Allergens:</h3>
+                                    {selectedProduct.labelDTO?.allergens ? (
+                                        <div className="flex flex-wrap justify-center space-x-2">
+                                            {/* Layout Chips for allergens */}
+                                            {selectedProduct.labelDTO.allergens.split(',').map((allergen, index) => (
+                                                <span key={index} className="bg-orange-200 text-black text-sm font-semibold px-4 py-2 rounded-full">
+                                        {allergen.trim()}
+                                    </span>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p>No allergens listed.</p>
+                                    )}
+                                </div>
+
+                                <div className="mt-2 text-center text-gray-600">
+                                    <h3 className="font-semibold">Ingredients:</h3>
+                                    {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
+                                        <ul className="list-disc list-inside">
+                                            {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
+                                                <li key={index}>{ingredient.name}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>No ingredients listed.</p>
+                                    )}
+                                </div>
+
+                                <div className="mt-2 text-center text-gray-700">
+                                    <h3 className="font-semibold">Description:</h3>
+                                    <p>{selectedProduct.productDescription || "No description available."}</p>
+                                </div>
                             </div>
 
-                            <div className="mt-2 text-center text-gray-600">
-                                <h3 className="font-semibold">Allergens:</h3>
-                                {selectedProduct.labelDTO?.allergens ? (
-                                    selectedProduct.labelDTO.allergens
-                                ) : (
-                                    <p>No allergens listed.</p>
-                                )}
-                            </div>
-
-                            <div className="mt-2 text-center text-gray-600">
-                                <h3 className="font-semibold">Ingredients:</h3>
-                                {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
-                                    <ul className="list-disc list-inside">
-                                        {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
-                                            <li key={index}>{ingredient.name}</li>
+                            {/* Right Column - Nutritional Values Table */}
+                            <div className="w-3/5 overflow-y-auto pl-4 space-y-4">
+                                <h3 className="text-center font-semibold text-lg mb-4">Nutritional Values</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="table-auto border-collapse border border-gray-200 w-full text-sm text-left rounded-lg shadow-md overflow-hidden">
+                                        <thead className="bg-gradient-to-r from-orange-600 to-orange-500 text-white">
+                                        <tr className="text-center">
+                                            <th className="border border-gray-300 px-4 py-3 rounded-tl-lg">Nutritional Group</th>
+                                            <th className="border border-gray-300 px-4 py-3">Nutritional Value</th>
+                                            <th className="border border-gray-300 px-4 py-3">Per 100g/ml</th>
+                                            <th className="border border-gray-300 px-4 py-3 rounded-tr-lg">% NRV</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody className="text-gray-700">
+                                        {selectedProduct?.nutritionalValueDTOS.map((value, index) => (
+                                            <tr key={index} className={index % 2 === 0 ? "bg-gray-50 hover:bg-orange-100 transition-colors" : "hover:bg-orange-100 transition-colors"}>
+                                                <td className="border border-gray-300 px-4 py-3 font-semibold">
+                                                    {value.nutritionalValueName?.group?.groupName || "Unknown Group"}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-3 font-semibold">
+                                                    {value.nutritionalValueName?.name || "Unknown Value"}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-3 text-center">
+                                                    {value.quantity !== undefined ? value.quantity : "-"} {value.unit?.name || "No Unit"}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-3 text-center">
+                                                    {value.nrv !== undefined ? `${value.nrv.toFixed(1)}%` : "-"}
+                                                </td>
+                                            </tr>
                                         ))}
-                                    </ul>
-                                ) : (
-                                    <p>No ingredients listed.</p>
-                                )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-
-                            <div className="mt-2 text-center text-gray-700">
-                                <h3 className="font-semibold">Description:</h3>
-                                <p>{selectedProduct.productDescription || "No description available."}</p>
-                            </div>
-
-
                         </div>
                     </div>
                 </div>
             )}
+
+
         </div>
     );
 };
 
-export default SpProductsPage;
+export default SpecialistProductsPage;

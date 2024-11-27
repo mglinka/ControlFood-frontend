@@ -2,6 +2,7 @@ import axiosInstance from "./axiosConfig.ts";
 import {components} from "../controlfood-backend-schema";
 
 type AssignProfileDTO = components["schemas"]["AssignProfileDTO"];
+type UpdateAllergyProfileSchemaDTO = components["schemas"]["UpdateAllergyProfileSchemaDTO"];
 
 
 export const registerUser = async (firstName: string, lastName: string, email: string, password: string) => {
@@ -58,6 +59,12 @@ export const getAllUnits = async () =>{
     const response = await axiosInstance.get('/units');
     return response.data;
 }
+
+export const getAllPackageTypes = async () =>{
+    const response = await axiosInstance.get('/package-types');
+    return response.data;
+}
+
 export const getNutritionalValueNames = async () => {
     const response = await axiosInstance.get('/nutritional-value/names');
     return response.data;
@@ -146,6 +153,10 @@ export const createAllergyProfileSchema = async (payload: {
 export const deleteAllergyProfileSchema = async (id:string) => {
     return await axiosInstance.delete(`/allergy-profile-schemas/delete/${id}`);
 
+};
+
+export const editAllergyProfileSchema = async (payload:UpdateAllergyProfileSchemaDTO) => {
+    return await axiosInstance.put(`/allergy-profile-schemas/edit`, payload);
 };
 
 

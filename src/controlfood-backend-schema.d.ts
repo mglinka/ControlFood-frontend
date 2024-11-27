@@ -815,9 +815,7 @@ export interface components {
             unitId: string;
             labelDTO?: components["schemas"]["LabelDTO"];
             compositionDTO?: components["schemas"]["CompositionDTO"];
-            nutritionalIndexDTO?: components["schemas"]["NutritionalIndexDTO"];
-            productIndexDTO?: components["schemas"]["ProductIndexDTO"];
-            nutritionalValueDTO?: components["schemas"]["NutritionalValueDTO"];
+            nutritionalValueDTOS: components["schemas"]["NutritionalValueDTO"][];
         };
         RequestChangePassword: {
             currentPassword?: string;
@@ -842,9 +840,7 @@ export interface components {
             allergens: components["schemas"]["AllergenIntensityDTO"][];
         };
         AssignProfileDTO: {
-            /** Format: uuid */
-            schema_id: string;
-            allergens: components["schemas"]["AllergenDTO"][];
+            schema_ids: string[];
             intensity?: string;
         };
         CreateAllergyProfileSchemaDTO: {

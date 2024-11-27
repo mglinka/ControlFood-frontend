@@ -72,6 +72,43 @@ const BarcodeScannerPage: React.FC = () => {
                                 </ul>
                             </div>
                         )}
+
+                        {/* Nutritional Values Section */}
+                        {product.nutritionalValueDTOS && product.nutritionalValueDTOS.length > 0 && (
+                            <div className="mt-4">
+                                <h3 className="text-xl font-semibold mb-2">Nutritional Values</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="table-auto border-collapse border border-gray-200 w-full text-sm text-left">
+                                        <thead>
+                                        <tr className="bg-green-700 text-white text-center">
+                                            <th className="border border-gray-300 px-4 py-2">Nutritional Group</th>
+                                            <th className="border border-gray-300 px-4 py-2">Nutritional Value</th>
+                                            <th className="border border-gray-300 px-4 py-2">Per 100g/ml</th>
+                                            <th className="border border-gray-300 px-4 py-2">% NRV</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody className="text-gray-700">
+                                        {product.nutritionalValueDTOS.map((value, index) => (
+                                            <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                                                <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                                    {value.nutritionalValueName?.group?.groupName || "Unknown Group"}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                                    {value.nutritionalValueName?.name || "Unknown Value"}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-2 text-center">
+                                                    {value.quantity !== undefined ? value.quantity : "-"} {value.unit?.name || "No Unit"}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-2 text-center">
+                                                    {value.nrv !== undefined ? `${value.nrv.toFixed(1)}%` : "-"}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <p className="text-gray-600">No product data available. Scan a barcode to see details.</p>

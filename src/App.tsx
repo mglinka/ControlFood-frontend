@@ -12,11 +12,11 @@ import MyAccountPage from "./pages/MyAccountPage.tsx";
 import CreateProductPage from "./pages/CreateProductPage.tsx";
 import AllergensPage from "./pages/AllergensPage.tsx";
 import MainPage from "./pages/MainPage.tsx";
-import SpProductsPage from "./pages/SpecialistProudctsPage.tsx";
 import Breadcrumbs from "./components/Breadcrumbs";
 import AccountsPage from "./pages/AccountsPage.tsx";
 import AccessLevelsPage from "./pages/AccessLevelsPage.tsx";
 import SchemasPage from "./pages/SchemasPage.tsx";
+import SpecialistProductsPage from "./pages/SpecialistProudctsPage.tsx";
 
 function App() {
 
@@ -33,7 +33,7 @@ function App() {
                                 <Route path="/login" element={<LoginPage />} />
                                 <Route path="/profile" element={<AllergyProfilePage />} />
                                 <Route path="/products" element={<ProductsPage />} />
-                                <Route path="/products-specialist" element={<SpProductsPage />} />
+                                <Route path="/products-specialist" element={<SpecialistProductsPage />} />
                                 <Route path="/scanner" element={<BarcodeScannerPage />} />
                                 <Route path="/my-account" element={<MyAccountPage />} />
                                 <Route path="/create-product" element={<CreateProductPage />} />

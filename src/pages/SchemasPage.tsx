@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { components } from "../controlfood-backend-schema";
-import { getAllAllergyProfileSchemas, getAllAllergens, deleteAllergyProfileSchema } from "../api/api.ts";
+import {
+    getAllAllergyProfileSchemas,
+    getAllAllergens,
+    deleteAllergyProfileSchema,
+    editAllergyProfileSchema
+} from "../api/api.ts";
 import { CreateAllergyProfileSchemaForm } from "../forms/CreateAllergyProfileSchemaForm";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaPen, FaTrash, FaPlus } from 'react-icons/fa'; // Import icons from FontAwesome
+import { FaPen, FaTrash, FaPlus } from 'react-icons/fa'; // Added FaTimes for chip close icon
 
 const SchemasPage: React.FC = () => {
     const [allergyProfileSchemas, setAllergyProfileSchemas] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"][]>([]);
@@ -14,37 +19,43 @@ const SchemasPage: React.FC = () => {
     const [selectedSchema, setSelectedSchema] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"] | null>(null);
     const [isFormVisible, setFormVisible] = useState<boolean>(false);
 
+    // For editing schema
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editSchemaId, setEditSchemaId] = useState("");
+    const [editSchemaName, setEditSchemaName] = useState("");
+    const [editAllergens, setEditAllergens] = useState<Set<string>>(new Set()); // Using a Set to track selected allergens
+
+    const fetchAllergyProfileSchemas = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await getAllAllergyProfileSchemas();
+            setAllergyProfileSchemas(response.data);
+        } catch (error) {
+            console.error("Error fetching allergy profiles:", error);
+            setError("Error fetching allergy profiles. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchAllergens = async () => {
+        try {
+            const response = await getAllAllergens();
+            setAllergens(response);
+        } catch (error) {
+            console.error("Error fetching allergens:", error);
+            setError("Error fetching allergens.");
+        }
+    };
+
     useEffect(() => {
-        const fetchAllergyProfileSchemas = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const response = await getAllAllergyProfileSchemas();
-                setAllergyProfileSchemas(response.data);
-            } catch (error) {
-                console.error("Error fetching allergy profiles:", error);
-                setError("Error fetching allergy profiles. Please try again later.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const fetchAllergens = async () => {
-            try {
-                const response = await getAllAllergens();
-                setAllergens(response);
-            } catch (error) {
-                console.error("Error fetching allergens:", error);
-                setError("Error fetching allergens.");
-            }
-        };
-
         fetchAllergyProfileSchemas();
         fetchAllergens();
     }, []);
 
-    const handleSchemaCreate = (newSchema: { name?: string; allergens?: components["schemas"]["GetAllergenDTO"][] }) => {
+    const handleSchemaCreate = async (newSchema: { name?: string; allergens?: components["schemas"]["GetAllergenDTO"][] }) => {
         if (!newSchema.name || !newSchema.allergens) {
             toast.error("Name and allergens are required.");
             return;
@@ -58,14 +69,19 @@ const SchemasPage: React.FC = () => {
             },
         ]);
 
-        // Close the form modal
         setFormVisible(false);
+        await fetchAllergyProfileSchemas();
     };
 
     const handleDeleteSchema = async (schemaId: string) => {
+        if (!schemaId) {
+            toast.error("Invalid schema ID.");
+            return;
+        }
+
         try {
             await deleteAllergyProfileSchema(schemaId);
-            setAllergyProfileSchemas((prevSchemas) => prevSchemas.filter((schema) => schema.schema_id !== schemaId));
+            fetchAllergyProfileSchemas(); // Re-fetch the schemas to get the updated list
             setSelectedSchema(null); // Close the modal after deletion
             toast.success("Allergy profile schema deleted successfully!");
         } catch (error) {
@@ -74,8 +90,56 @@ const SchemasPage: React.FC = () => {
         }
     };
 
-    const handleEditSchema = (schemaId: string) => {
-        toast.info(`Editing schema ${schemaId} is not implemented yet.`);
+    const handleEditSchema = (schemaId: string, name: string, allergens: components["schemas"]["GetAllergenDTO"][]) => {
+        setEditSchemaId(schemaId);
+        setEditSchemaName(name);
+
+        // Set the selected allergens as a Set for easier management
+        const selectedAllergens = new Set(allergens
+            .map((allergen) => allergen.allergen_id)
+            .filter((id): id is string => id !== undefined) // Ensure id is a string, not undefined
+        );
+
+        setEditAllergens(selectedAllergens);
+        setIsEditModalOpen(true);  // Open the modal
+    };
+
+    const handleEditSubmit = async () => {
+        const payload = {
+            schema_id: editSchemaId,
+            name: editSchemaName,
+            allergens: Array.from(editAllergens).map((allergen_id) => ({ allergen_id })), // Convert Set to array of objects
+        };
+
+        try {
+            await editAllergyProfileSchema(payload); // Make the API request to update the schema
+            toast.success("Schema updated successfully!");
+
+            // Re-fetch the allergy profile schemas to get the updated information
+            await fetchAllergyProfileSchemas(); // Refresh the list of schemas
+
+            // Update selected schema to reflect the changes immediately in the modal
+            setSelectedSchema((prev) => {
+                if (prev && prev.schema_id === editSchemaId) {
+                    return { ...prev, name: editSchemaName, allergens: Array.from(editAllergens).map((id) => ({ allergen_id: id })) };
+                }
+                return prev;
+            });
+
+            setIsEditModalOpen(false); // Close the edit modal
+        } catch (error) {
+            toast.error("Failed to update schema.");
+        }
+    };
+
+    const toggleAllergenSelection = (allergen_id: string) => {
+        const newSelectedAllergens = new Set(editAllergens);
+        if (newSelectedAllergens.has(allergen_id)) {
+            newSelectedAllergens.delete(allergen_id);
+        } else {
+            newSelectedAllergens.add(allergen_id);
+        }
+        setEditAllergens(newSelectedAllergens);
     };
 
     return (
@@ -85,7 +149,6 @@ const SchemasPage: React.FC = () => {
             {loading && <div className="text-center text-xl text-blue-600">Loading...</div>}
             {error && <div className="text-center text-red-600">{error}</div>}
 
-            {/* Show the "Create New Allergy Profile" button */}
             <div className="text-left mb-6">
                 <button
                     onClick={() => setFormVisible(true)}
@@ -95,7 +158,6 @@ const SchemasPage: React.FC = () => {
                 </button>
             </div>
 
-            {/* Show the form if it's visible */}
             {isFormVisible && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
@@ -108,13 +170,12 @@ const SchemasPage: React.FC = () => {
                         <CreateAllergyProfileSchemaForm
                             onCreate={handleSchemaCreate}
                             allergens={allergens}
-                            onClose={() => setFormVisible(false)} // Close the form when done
+                            onClose={() => setFormVisible(false)}
                         />
                     </div>
                 </div>
             )}
 
-            {/* Display the list of allergy profile schemas */}
             {!isFormVisible && !loading && !error && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {allergyProfileSchemas.map((allergyProfileSchema) => (
@@ -131,13 +192,12 @@ const SchemasPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Modal for selected schema */}
             {selectedSchema && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
                         <button
                             className="absolute top-2 right-2 text-gray-500 text-3xl"
-                            onClick={() => setSelectedSchema(null)} // Close the details modal
+                            onClick={() => setSelectedSchema(null)}
                         >
                             &times;
                         </button>
@@ -156,7 +216,7 @@ const SchemasPage: React.FC = () => {
 
                         <div className="absolute bottom-6 right-6 flex gap-4">
                             <button
-                                onClick={() => handleEditSchema(selectedSchema?.schema_id as string)}
+                                onClick={() => handleEditSchema(selectedSchema?.schema_id as string, selectedSchema?.name as string, selectedSchema?.allergens || [])}
                                 className="bg-orange-500 text-white p-3 rounded-full hover:bg-orange-600"
                             >
                                 <FaPen className="w-5 h-5 text-white"/>
@@ -172,7 +232,52 @@ const SchemasPage: React.FC = () => {
                 </div>
             )}
 
-            <ToastContainer/>
+            {isEditModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-500 text-xl"
+                            onClick={() => setIsEditModalOpen(false)}
+                        >
+                            &times;
+                        </button>
+                        <h2 className="text-xl font-semibold text-center mb-4">Edit Allergy Profile Schema</h2>
+
+                        <div>
+                            <input
+                                type="text"
+                                value={editSchemaName}
+                                onChange={(e) => setEditSchemaName(e.target.value)}
+                                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+                                placeholder="Schema Name"
+                            />
+                            <div>
+                                <h3 className="font-semibold mb-2">Select Allergens</h3>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {allergens.map((allergen) => (
+                                        <button
+                                            key={allergen.allergen_id}
+                                            onClick={() => toggleAllergenSelection(allergen.allergen_id as string)}
+                                            className={`px-4 py-2 rounded-full text-sm border ${editAllergens.has(allergen.allergen_id as string) ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}
+                                        >
+                                            {allergen.name}
+
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleEditSubmit}
+                                className="bg-green-500 text-white p-3 rounded-full hover:bg-green-600 w-full"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <ToastContainer />
         </div>
     );
 };

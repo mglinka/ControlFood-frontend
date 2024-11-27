@@ -195,78 +195,120 @@ const ProductsPage: React.FC = () => {
 
             {selectedProduct && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
+                    <div
+                        className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl h-[80vh] md:h-auto md:max-h-[80vh] overflow-hidden relative flex flex-col md:flex-row gap-6"
+                    >
                         <button
                             onClick={closeModal}
                             className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl p-2"
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-bold mb-4 text-center">Product Details</h2>
 
-                        <div className="w-48 h-48 mx-auto mb-4 overflow-hidden rounded-lg">
-                            <img
-                                src={selectedProduct.labelDTO?.image ? `data:image/jpeg;base64,${selectedProduct.labelDTO.image}` : placeholderImage}
-                                alt={selectedProduct.productName || "Product Image"}
-                                className="object-contain w-full h-full"
-                            />
+                        <div className="flex-1 overflow-y-auto pr-0 md:pr-4">
+                            <div className="w-32 h-32 md:w-48 md:h-48 mx-auto mb-4 overflow-hidden rounded-lg">
+                                <img
+                                    src={selectedProduct.labelDTO?.image ? `data:image/jpeg;base64,${selectedProduct.labelDTO.image}` : placeholderImage}
+                                    alt={selectedProduct.productName || "Product Image"}
+                                    className="object-contain w-full h-full"
+                                />
+                            </div>
+
+                            <div className="text-gray-700 space-y-4">
+                                <div className="text-center">
+                                    <h3 className="font-semibold text-lg">Product Name:</h3>
+                                    <p>{selectedProduct.productName || "Unnamed Product"}</p>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Allergens:</h3>
+                                    {selectedProduct.labelDTO?.allergens ? (
+                                        selectedProduct.labelDTO.allergens.split(',').map(allergen => {
+                                            const allergenTrimmed = allergen.trim();
+                                            const intensity = getAllergenIntensity(allergenTrimmed);
+                                            const bgColor = intensityColors[intensity] || 'bg-gray-300';
+
+                                            return (
+                                                <div
+                                                    key={allergenTrimmed}
+                                                    className={`flex justify-start items-center rounded-lg ${bgColor} text-white p-2 my-1`}
+                                                >
+                                                    <span>{allergenTrimmed}</span>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p>No allergens listed.</p>
+                                    )}
+                                </div>
+
+                                {selectedProduct.labelDTO?.allergens && (
+                                    <div
+                                        className="flex items-center justify-center mt-4 p-2 border border-red-400 bg-red-100 rounded-lg">
+                                        <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 mr-2"/>
+                                        <span className="text-red-700">This product contains allergens. Please check carefully!</span>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <h3 className="font-semibold">Ingredients:</h3>
+                                    {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
+                                        <ul className="list-disc list-inside ml-4">
+                                            {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
+                                                <li key={index}>{ingredient.name}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>No ingredients listed.</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Description:</h3>
+                                    <p>{selectedProduct.productDescription || "No description available."}</p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="max-h-60 overflow-y-auto">
-                            <div className="mt-2 text-center text-gray-600">
-                                <h3 className="font-semibold">Product Name:</h3>
-                                <p>{selectedProduct.productName || "Unnamed Product"}</p>
-                            </div>
-
-                            <div className="mt-2 text-center text-gray-600">
-                                <h3 className="font-semibold">Allergens:</h3>
-                                {selectedProduct.labelDTO?.allergens ? (
-                                    selectedProduct.labelDTO.allergens.split(',').map(allergen => {
-                                        const allergenTrimmed = allergen.trim();
-                                        const intensity = getAllergenIntensity(allergenTrimmed);
-                                        const bgColor = intensityColors[intensity] || 'bg-gray-300'; // Fallback color
-
-                                        return (
-                                            <div key={allergenTrimmed}
-                                                 className={`flex justify-center items-center rounded-lg ${bgColor} text-white p-2 my-1`}>
-                                                <span>{allergenTrimmed}</span>
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <p>No allergens listed.</p>
-                                )}
-                            </div>
-
-                            {selectedProduct.labelDTO?.allergens && (
-                                <div
-                                    className="flex items-center justify-center mt-4 p-2 border border-red-400 bg-red-100 rounded-lg">
-                                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 mr-2"/>
-                                    <span className="text-red-700">This product contains allergens. Please check carefully!</span>
-                                </div>
-                            )}
-
-                            <div className="mt-2 text-center text-gray-600">
-                                <h3 className="font-semibold">Ingredients:</h3>
-                                {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
-                                    <ul className="list-disc list-inside">
-                                        {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
-                                            <li key={index}>{ingredient.name}</li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p>No ingredients listed.</p>
-                                )}
-                            </div>
-
-                            <div className="mt-2 text-center text-gray-700">
-                                <h3 className="font-semibold">Description:</h3>
-                                <p>{selectedProduct.productDescription || "No description available."}</p>
+                        <div className="flex-1 overflow-y-auto">
+                            <h3 className="text-center font-semibold text-lg mb-4">Nutritional Values</h3>
+                            <div className="overflow-x-auto">
+                                <table
+                                    className="table-auto border-collapse border border-gray-200 w-full text-sm text-left">
+                                    <thead>
+                                    <tr className="bg-green-700 text-white text-center">
+                                        <th className="border border-gray-300 px-4 py-2">Nutritional Group</th>
+                                        <th className="border border-gray-300 px-4 py-2">Nutritional Value</th>
+                                        <th className="border border-gray-300 px-4 py-2">Per 100g/ml</th>
+                                        <th className="border border-gray-300 px-4 py-2">% NRV</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="text-gray-700">
+                                    {selectedProduct?.nutritionalValueDTOS.map((value, index) => (
+                                        <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                                            <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                                {value.nutritionalValueName?.group?.groupName || "Unknown Group"}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-2 font-semibold">
+                                                {value.nutritionalValueName?.name || "Unknown Value"}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-2 text-center">
+                                                {value.quantity !== undefined ? value.quantity : "-"} {value.unit?.name || "No Unit"}
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-2 text-center">
+                                                {value.nrv !== undefined ? `${value.nrv.toFixed(1)}%` : "-"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
+
             )}
+
         </div>
     );
 };
