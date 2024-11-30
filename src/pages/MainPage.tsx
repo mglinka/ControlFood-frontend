@@ -21,10 +21,12 @@ const MainPage: React.FC = () => {
 
     return (
         <div className="relative">
+            {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <LocalImage />
             </div>
 
+            {/* Main Content */}
             <div className="z-10 flex flex-col items-start p-4 sm:p-6 lg:p-8 space-y-10 w-full sm:w-[60vw] md:w-[50vw] lg:w-[45vw] absolute right-0 top-[60%] mt-20">
                 {/* First Box: Browse Products */}
                 <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
@@ -33,17 +35,17 @@ const MainPage: React.FC = () => {
                     ) : (
                         <MdShoppingCart size={40} className="text-gray-800" />
                     )}
-                    <div className="flex-1">
-                        <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                    <div className="flex-1 overflow-hidden">
+                        <h3 className="mb-4 text-xl font-semibold text-gray-800 truncate">
                             {role === "ROLE_ADMIN" ? "Zarządzanie kontami" : "Przeglądanie produktów"}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 overflow-hidden text-ellipsis line-clamp-3">
                             {role === "ROLE_ADMIN" ? (
                                 <>Jako administrator masz pełną odpowiedzialność za zarządzanie kontami użytkowników w systemie ControlFood.</>
                             ) : role === "ROLE_USER" ? (
                                 <>Jako użytkownik, masz możliwość przeglądania szerokiej gamy produktów, które pasują do Twoich preferencji i potrzeb zdrowotnych.</>
                             ) : role === "ROLE_SPECIALIST" ? (
-                                <>Jako specjalista masz możliwość nie tylko przeglądania szczegółowego katalogu produktów, ale również wzbogacania go o nowe pozycje. </>
+                                <>Jako specjalista masz możliwość nie tylko przeglądania szczegółowego katalogu produktów, ale również wzbogacania go o nowe pozycje.</>
                             ) : (
                                 <>Welcome</>
                             )}
@@ -54,15 +56,15 @@ const MainPage: React.FC = () => {
                 {/* Second Box: Create and Edit Allergy Profile */}
                 <div className="h-[160px] w-full p-6 sm:p-8 bg-white bg-opacity-80 backdrop-blur-md border-2 border-gray-300 rounded-lg shadow-lg flex items-center space-x-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
                     {role === "ROLE_SPECIALIST" ? (
-                        <MdPersonAdd size={40} className="text-gray-800"/>
+                        <MdPersonAdd size={40} className="text-gray-800" />
                     ) : (
                         <MdPerson size={40} className="text-gray-800" />
                     )}
-                    <div className="flex-1">
-                        <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                    <div className="flex-1 overflow-hidden">
+                        <h3 className="mb-4 text-xl font-semibold text-gray-800 truncate">
                             {role === "ROLE_ADMIN" ? "Poziomy dostępu" : "Profil alergiczny"}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 overflow-hidden text-ellipsis line-clamp-3">
                             {role === "ROLE_ADMIN" ? (
                                 <>Zarządzaj poziomami dostępu dla poszczególnych użytkowników. Przypisuj odpowiednie role (np. użytkownik, specjalista, administrator). Dzięki temu zapewnisz prawidłowe i bezpieczne korzystanie z systemu.</>
                             ) : role === "ROLE_USER" ? (
@@ -83,11 +85,11 @@ const MainPage: React.FC = () => {
                     ) : (
                         <MdQrCodeScanner size={40} className="text-gray-800" />
                     )}
-                    <div className="flex-1">
-                        <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                    <div className="flex-1 overflow-hidden">
+                        <h3 className="mb-4 text-xl font-semibold text-gray-800 truncate">
                             {role === "ROLE_ADMIN" ? "Funkcjonalności" : "Skaner kodów EAN"}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 overflow-hidden text-ellipsis line-clamp-3">
                             {role === "ROLE_ADMIN" ? (
                                 <>Jako administrator możesz blokować i odblokowywać konta użytkowników, co pozwala na kontrolowanie dostępu i zapewnienie bezpieczeństwa systemu.</>
                             ) : role === "ROLE_USER" ? (

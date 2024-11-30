@@ -171,6 +171,15 @@ export const assignAllergyProfile = async (data: AssignProfileDTO) => {
     }
 };
 
+export const getCategories = async () => {
+    const response = await axiosInstance.get("/categories");
+    return response.data;
+}
+
+export const getProductsByCategory = async (categoryName:string) => {
+    const response = await axiosInstance.get(`/products/category?categoryName=${encodeURIComponent(categoryName)}`);
+    return response.data;
+}
 
 
 

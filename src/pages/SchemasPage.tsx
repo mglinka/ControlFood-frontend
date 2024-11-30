@@ -9,7 +9,8 @@ import {
 import { CreateAllergyProfileSchemaForm } from "../forms/CreateAllergyProfileSchemaForm";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaPen, FaTrash, FaPlus } from 'react-icons/fa'; // Added FaTimes for chip close icon
+import { FaPen, FaTrash, FaPlus } from 'react-icons/fa';
+import {FiCheckCircle} from "react-icons/fi"; // Added FaTimes for chip close icon
 
 const SchemasPage: React.FC = () => {
     const [allergyProfileSchemas, setAllergyProfileSchemas] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"][]>([]);
@@ -19,7 +20,6 @@ const SchemasPage: React.FC = () => {
     const [selectedSchema, setSelectedSchema] = useState<components["schemas"]["GetAllergyProfileSchemaDTO"] | null>(null);
     const [isFormVisible, setFormVisible] = useState<boolean>(false);
 
-    // For editing schema
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editSchemaId, setEditSchemaId] = useState("");
     const [editSchemaName, setEditSchemaName] = useState("");
@@ -57,7 +57,7 @@ const SchemasPage: React.FC = () => {
 
     const handleSchemaCreate = async (newSchema: { name?: string; allergens?: components["schemas"]["GetAllergenDTO"][] }) => {
         if (!newSchema.name || !newSchema.allergens) {
-            toast.error("Name and allergens are required.");
+            toast.error("Nazwa szablonu i alergeny są wymagane");
             return;
         }
 
@@ -75,7 +75,7 @@ const SchemasPage: React.FC = () => {
 
     const handleDeleteSchema = async (schemaId: string) => {
         if (!schemaId) {
-            toast.error("Invalid schema ID.");
+            toast.error("nieodpowiedni format");
             return;
         }
 
@@ -83,14 +83,18 @@ const SchemasPage: React.FC = () => {
             await deleteAllergyProfileSchema(schemaId);
             fetchAllergyProfileSchemas(); // Re-fetch the schemas to get the updated list
             setSelectedSchema(null); // Close the modal after deletion
-            toast.success("Allergy profile schema deleted successfully!");
+            toast.success("Szablon został pomyślnie usunięty");
         } catch (error) {
             console.error("Error deleting allergy profile schema:", error);
-            toast.error("Failed to delete allergy profile schema. Please try again.");
+            toast.error("Nie udało się usunąć szablonu");
         }
     };
 
     const handleEditSchema = (schemaId: string, name: string, allergens: components["schemas"]["GetAllergenDTO"][]) => {
+        // Zamyka modal z informacjami o szablonie
+        setSelectedSchema(null);
+
+        // Ustawia dane do edycji
         setEditSchemaId(schemaId);
         setEditSchemaName(name);
 
@@ -101,7 +105,7 @@ const SchemasPage: React.FC = () => {
         );
 
         setEditAllergens(selectedAllergens);
-        setIsEditModalOpen(true);  // Open the modal
+        setIsEditModalOpen(true);  // Open the edit modal
     };
 
     const handleEditSubmit = async () => {
@@ -113,7 +117,7 @@ const SchemasPage: React.FC = () => {
 
         try {
             await editAllergyProfileSchema(payload); // Make the API request to update the schema
-            toast.success("Schema updated successfully!");
+            toast.success("Edycja szablonu powiodła się");
 
             // Re-fetch the allergy profile schemas to get the updated information
             await fetchAllergyProfileSchemas(); // Refresh the list of schemas
@@ -128,7 +132,7 @@ const SchemasPage: React.FC = () => {
 
             setIsEditModalOpen(false); // Close the edit modal
         } catch (error) {
-            toast.error("Failed to update schema.");
+            toast.error("Edycja szablonu nie powiodłą się");
         }
     };
 
@@ -144,9 +148,9 @@ const SchemasPage: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-semibold mb-6 text-center">Allergy Profile Schemas</h1>
+            <h1 className="text-2xl font-semibold mb-6 text-center">Szablony profili alergicznych</h1>
 
-            {loading && <div className="text-center text-xl text-blue-600">Loading...</div>}
+            {loading && <div className="text-center text-xl text-blue-600">Ładowanie...</div>}
             {error && <div className="text-center text-red-600">{error}</div>}
 
             <div className="text-left mb-6">
@@ -201,20 +205,40 @@ const SchemasPage: React.FC = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-xl font-semibold text-center mb-4">{selectedSchema.name}</h2>
-                        <h3 className="font-semibold text-lg mt-4">Allergens:</h3>
-                        <ul className="list-disc pl-5">
-                            {selectedSchema.allergens?.map((allergen, index) => {
-                                const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
-                                return allergenDetails ? (
-                                    <li key={index}>{allergenDetails.name}</li>
-                                ) : (
-                                    <li key={index}>Unknown Allergen</li>
-                                );
-                            })}
-                        </ul>
 
-                        <div className="absolute bottom-6 right-6 flex gap-4">
+                        {/* Sekcja z nazwą */}
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-center">{selectedSchema.name}</h2>
+                        </div>
+
+                        {/* Sekcja z alergenami */}
+                        <div className="mb-6">
+                            <h3 className="font-semibold text-lg mb-2">Alergeny:</h3>
+                            <div className="flex flex-wrap gap-4">
+                                {selectedSchema.allergens?.map((allergen, index) => {
+                                    const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
+                                    return allergenDetails ? (
+                                        <span
+                                            key={index}
+                                            className="inline-block px-6 py-3 rounded-full bg-white border-2 border-orange-500 text-black text-lg font-semibold"
+                                        >
+                                {allergenDetails.name}, {allergenDetails.allergenType}
+                            </span>
+
+                                    ) : (
+                                        <span
+                                            key={index}
+                                            className="inline-block px-6 py-3 rounded-full bg-white border-2 border-orange-500 text-black text-lg font-semibold"
+                                        >
+                                alergen nieznany
+                            </span>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Sekcja z przyciskami */}
+                        <div className="flex justify-end gap-4 mt-6">
                             <button
                                 onClick={() => handleEditSchema(selectedSchema?.schema_id as string, selectedSchema?.name as string, selectedSchema?.allergens || [])}
                                 className="bg-orange-500 text-white p-3 rounded-full hover:bg-orange-600"
@@ -232,6 +256,7 @@ const SchemasPage: React.FC = () => {
                 </div>
             )}
 
+
             {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
@@ -241,43 +266,60 @@ const SchemasPage: React.FC = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-xl font-semibold text-center mb-4">Edit Allergy Profile Schema</h2>
+                        <h2 className="text-xl font-semibold text-center mb-4">Edytuj szablon profilu alergicznego</h2>
 
-                        <div>
+                        <div className="relative flex flex-col space-y-4">
+                            {/* Pole nazwy */}
                             <input
                                 type="text"
                                 value={editSchemaName}
                                 onChange={(e) => setEditSchemaName(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                                 placeholder="Schema Name"
                             />
+
+                            {/* Sekcja z alergenami */}
                             <div>
-                                <h3 className="font-semibold mb-2">Select Allergens</h3>
-                                <div className="flex flex-wrap gap-2 mb-4">
+                                <h3 className="font-semibold mb-2">Wybierz alergeny</h3>
+                                <div
+                                    className="flex flex-wrap gap-2 p-2 border rounded-md overflow-y-auto max-h-60"
+                                    style={{
+                                        scrollbarWidth: "thin",
+                                        scrollbarColor: "#d1d5db #f9fafb"
+                                    }} // Opcjonalne przewijanie
+                                >
                                     {allergens.map((allergen) => (
                                         <button
                                             key={allergen.allergen_id}
                                             onClick={() => toggleAllergenSelection(allergen.allergen_id as string)}
-                                            className={`px-4 py-2 rounded-full text-sm border ${editAllergens.has(allergen.allergen_id as string) ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}
+                                            className={`px-4 py-2 rounded-full text-sm border 
+                        ${editAllergens.has(allergen.allergen_id as string)
+                                                ? "bg-orange-500 text-white border-orange-500"
+                                                : "bg-gray-200 border-gray-300"}`}
                                         >
                                             {allergen.name}
-
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                            <button
-                                onClick={handleEditSubmit}
-                                className="bg-orange-500 text-white p-3 rounded-full hover:bg-orange-600 w-full"
-                            >
-                                Save Changes
-                            </button>
+
+                            {/* Przyciski akcji */}
+                            <div className="flex justify-end mt-4">
+                                <button
+                                    onClick={handleEditSubmit}
+                                    className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transform transition-all duration-300 hover:scale-110"
+                                >
+                                    <FiCheckCircle className="text-2xl"/>
+                                </button>
+                            </div>
                         </div>
+
+
                     </div>
                 </div>
             )}
 
-            <ToastContainer />
+            <ToastContainer/>
         </div>
     );
 };

@@ -6,11 +6,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../utils/toastify.css";
 import { z } from "zod";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";  // Import ikon z React Icons
-import { FiCheckCircle, FiLoader } from "react-icons/fi"; // Import the FiLoader spinner icon
+import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
+import { FiCheckCircle } from "react-icons/fi";
+
+type CreateAllergenDTO = components["schemas"]["CreateAllergenDTO"];
 
 export function CreateAllergenForm() {
-    const [createAllergen, setCreateAllergen] = useState<{ name: string }>({ name: "" }); // Zmieniono typ stanu na { name: string }
     const [loading, setLoading] = useState(false);
     const [allergens, setAllergens] = useState<components["schemas"]["GetAllergenDTO"][]>([]);
     const [selectedAllergen, setSelectedAllergen] = useState<components["schemas"]["GetAllergenDTO"] | null>(null);
@@ -18,12 +19,24 @@ export function CreateAllergenForm() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [confirmAction, setConfirmAction] = useState<"edit" | "delete" | null>(null);
 
+    // Dodanie osobnych pól stanu dla nazwy alergenu do tworzenia i edytowania
+    const [createAllergenName, setCreateAllergenName] = useState<string>("");
+    const [editAllergenName, setEditAllergenName] = useState<string>("");
+
+    const [createAllergen, setCreateAllergen] = useState<CreateAllergenDTO>({
+        name: "",
+        type: "INTOLERANT_INGREDIENT",
+    });
+
     const createAllergenSchema = z.object({
         name: z
             .string()
             .min(1, { message: "Allergen name is required." })
             .max(50, { message: "Allergen name cannot exceed 50 characters." })
-            .regex(/^[A-Za-ząćęłńóśżźĄĆĘŁŃÓŚŻŹ\s]+$/, { message: "Allergen name can only contain letters (including Polish characters) and spaces." })
+            .regex(/^[A-Za-ząćęłńóśżźĄĆĘŁŃÓŚŻŹ\s]+$/, { message: "Allergen name can only contain letters (including Polish characters) and spaces." }),
+        type: z.enum(["ALLERGEN", "INTOLERANT_INGREDIENT"], {
+            errorMap: () => ({ message: "Invalid allergen type." }),
+        }),
     });
 
     useEffect(() => {
@@ -35,14 +48,28 @@ export function CreateAllergenForm() {
             const allergensData = await getAllAllergens();
             setAllergens(allergensData);
         } catch (error) {
-            console.log("Error fetching allergens:", error);
-            toast.error("Failed to fetch allergens.");
+            console.log("Error fetching allergens:", error, loading);
+            toast.error("Nie udało się wyświetlić alergenów");
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setCreateAllergen((prev) => ({ ...prev, [name]: value || "" })); // Zapewniamy, że name nie będzie undefined
+
+        // Jeśli zmienia się 'name' w formularzu tworzenia alergenu
+        if (name === "createName") {
+            setCreateAllergenName(value);
+        }
+
+        // Jeśli zmienia się 'name' w formularzu edytowania alergenu
+        if (name === "editName") {
+            setEditAllergenName(value);
+        }
+
+        setCreateAllergen((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -50,23 +77,29 @@ export function CreateAllergenForm() {
         setLoading(true);
 
         try {
-            createAllergenSchema.parse(createAllergen);
-            await axiosInstance.post("/allergens/add", createAllergen);
-            toast.success("Allergen created successfully!");
-            setCreateAllergen({ name: "" }); // Resetowanie stanu po sukcesie
-            setShowCreateModal(false); // Zamknięcie modal po utworzeniu alergenu
+            // Walidacja danych
+            createAllergenSchema.parse({ name: createAllergenName, type: createAllergen.type });
+
+            // Wysłanie danych na backend
+            await axiosInstance.post("/allergens/add", {
+                name: createAllergenName,
+                type: createAllergen.type,
+            });
+
+            toast.success("Alergen został stworzony pomyślnie");
+            setCreateAllergenName("");
+            setCreateAllergen({ name: "", type: "ALLERGEN" });
+            setShowCreateModal(false);
             await fetchAllergens();
         } catch (err) {
             if (err instanceof z.ZodError) {
-                const fieldErrors: { name?: string } = {};
-                err.errors.forEach((error) => {
-                    if (error.path[0] === "name") {
-                        fieldErrors.name = error.message;
-                    }
-                });
+                const fieldErrors = err.errors.reduce((acc, error) => {
+                    if (error.path[0] === "name") acc.name = error.message;
+                    return acc;
+                }, {} as { name?: string });
                 toast.error(fieldErrors.name);
             } else {
-                toast.error("Failed to create allergen. Please try again.");
+                toast.error("Nie udało się stworzyć alergenu");
             }
         } finally {
             setLoading(false);
@@ -74,19 +107,21 @@ export function CreateAllergenForm() {
     };
 
     const handleEditSave = async () => {
-        if (selectedAllergen && createAllergen.name.trim()) {
+        if (selectedAllergen) {
             try {
-                await axiosInstance.put(`/allergens/edit/${selectedAllergen.allergen_id}`, { name: createAllergen.name });
-                toast.success("Allergen updated successfully!");
+                await axiosInstance.put(`/allergens/edit/${selectedAllergen.allergen_id}`, {
+                    name: editAllergenName,
+                    type: selectedAllergen.allergenType,
+                });
+
+                toast.success("Edycja alergenu powiodła się");
                 setShowActionModal(false);
                 setConfirmAction(null);
                 fetchAllergens();
             } catch (error) {
                 console.error("Error updating allergen:", error);
-                toast.error("Failed to update allergen. Please try again.");
+                toast.error("Edycja alergenu nie powiodła się");
             }
-        } else {
-            toast.error("Allergen name cannot be empty.");
         }
     };
 
@@ -94,21 +129,23 @@ export function CreateAllergenForm() {
         if (selectedAllergen && selectedAllergen.allergen_id) {
             try {
                 await axiosInstance.delete(`/allergens/remove/${selectedAllergen.allergen_id}`);
-                toast.success("Allergen deleted successfully!");
+                toast.success("Usunięcie alergenu powiodło się");
                 fetchAllergens();
                 setShowActionModal(false);
                 setConfirmAction(null);
                 setSelectedAllergen(null);
             } catch (error) {
                 console.error("Error deleting allergen:", error);
-                toast.error("Failed to delete allergen.");
+                toast.error("Usunięcie alergenu nie powiodło się");
             }
         }
     };
 
     const handleSelectAllergen = (allergen: components["schemas"]["GetAllergenDTO"]) => {
         setSelectedAllergen(allergen);
+        setEditAllergenName(allergen.name as string); // Używamy editAllergenName w trybie edycji
         setShowActionModal(true);
+        setConfirmAction("edit");
     };
 
     const handleCloseModal = () => {
@@ -117,35 +154,52 @@ export function CreateAllergenForm() {
         setSelectedAllergen(null);
     };
 
+    const allergensType1 = allergens.filter((allergen) => allergen.allergenType === "ALLERGEN");
+    const allergensType2 = allergens.filter((allergen) => allergen.allergenType === "INTOLERANT_INGREDIENT");
+
     return (
-        <div className="flex flex-col md:flex-row justify-between p-6">
-            {/* Left Column - Allergen Actions */}
-            <div className="w-full md:w-1/2 md:pr-4 mb-6 md:mb-0">
-                <h2 className="text-2xl font-bold mb-4 text-orange-600">Allergen Actions</h2>
+        <div className="flex w-full p-6">
+            <div className="pr-28 mb-6">
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-orange-500 text-white p-4 rounded-full flex items-center"
+                    className="bg-orange-500 text-white p-4 rounded-full flex items-center justify-center w-full"
                 >
-                    <FaPlus className="text-white text-2xl" /> {/* Add icon for creating allergen */}
+                    <FaPlus className="text-white text-2xl" />
                 </button>
             </div>
 
-            {/* Right Column - Allergens List */}
-            <div className="w-full md:w-1/2 md:pl-4">
-                <h3 className="text-xl font-semibold mb-4 text-orange-600">Allergens List</h3>
-                <div className="flex flex-wrap gap-3">
-                    {allergens.length > 0 ? (
-                        allergens.map((allergen) => (
+            <div className="w-[80%]">
+                <h3 className="text-xl font-semibold mb-4 text-orange-600">Alergeny</h3>
+                <div className="flex flex-wrap gap-4">
+                    {allergensType1.length > 0 ? (
+                        allergensType1.map((allergen) => (
                             <div
                                 key={allergen.allergen_id}
-                                className="cursor-pointer px-4 py-2 bg-blue-100 rounded-full text-blue-700 hover:bg-blue-200 transition-all duration-300"
+                                className="cursor-pointer bg-white text-black border border-orange-600 px-6 py-2 rounded-full hover:scale-110 transition-all duration-300 ease-in-out"
                                 onClick={() => handleSelectAllergen(allergen)}
                             >
                                 {allergen.name}
                             </div>
                         ))
                     ) : (
-                        <p>No allergens available.</p>
+                        <p>Brak dostępnych alergenów</p>
+                    )}
+                </div>
+
+                <h3 className="text-xl font-semibold mb-4 text-orange-600 mt-8">Nietolerowane składniki</h3>
+                <div className="flex flex-wrap gap-4">
+                    {allergensType2.length > 0 ? (
+                        allergensType2.map((allergen) => (
+                            <div
+                                key={allergen.allergen_id}
+                                className="cursor-pointer bg-white text-black border border-orange-600 px-6 py-2 rounded-full hover:scale-110 transition-all duration-300 ease-in-out"
+                                onClick={() => handleSelectAllergen(allergen)}
+                            >
+                                {allergen.name}
+                            </div>
+                        ))
+                    ) : (
+                        <p>Brak dostępnych nietolerowanych składników</p>
                     )}
                 </div>
             </div>
@@ -154,83 +208,98 @@ export function CreateAllergenForm() {
 
             {showCreateModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    {/* Modal Content */}
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto relative">
+                    <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg mx-auto relative">
                         <button
                             onClick={() => setShowCreateModal(false)}
                             className="absolute top-2 right-2 text-black text-3xl"
                         >
                             &times;
                         </button>
-                        <h3 className="text-xl font-semibold mb-4 text-orange-600">Create Allergen</h3>
-                        <form onSubmit={handleSubmit} className=" flex-col space-y-4">
+                        <h3 className="text-xl font-semibold mb-4 text-black">Stwórz alergen lub nietolerowany składnik</h3>
+                        <form onSubmit={handleSubmit} className="flex-col space-y-4 mb-16">
                             <input
                                 type="text"
-                                name="name"
-                                value={createAllergen.name}
+                                name="createName"
+                                value={createAllergenName}
                                 onChange={handleChange}
-                                placeholder="Allergen Name"
+                                placeholder="nazwa"
                                 required
                                 className="p-3 border rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
-                            <button
-                                type="submit"
-                                className="bg-orange-500 text-white px-6 py-2 rounded flex items-center justify-center ml-auto"
-                                disabled={loading}
+                            <select
+                                name="type"
+                                value={createAllergen.type}
+                                onChange={handleChange}
+                                required
+                                className="p-3 border rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                             >
-                                {loading ? (
-                                    <FiLoader className="animate-spin text-2xl" /> // Show spinning loader when submitting
-                                ) : (
-                                    <FiCheckCircle className="text-2xl" />
-                                )}
-                            </button>
+                                <option value="ALLERGEN">Alergen</option>
+                                <option value="INTOLERANT_INGREDIENT">Nietolerowany składnik</option>
+                            </select>
                         </form>
+
+                        <div className="absolute bottom-6 right-6 flex gap-4">
+                            <button
+                                onClick={handleSubmit}
+                                type="submit"
+                                className="bg-orange-500 text-white p-4 rounded-full w-14 h-14 flex items-center justify-center shadow-md hover:scale-110 transition-all duration-300 ease-in-out"
+                            >
+                                <FiCheckCircle className="text-2xl" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* Modal for Edit/Delete */}
             {showActionModal && selectedAllergen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded shadow-lg relative">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg mx-auto relative">
                         <button
                             onClick={handleCloseModal}
-                            className="absolute top-2 right-2 text-orange-600 text-xl"
+                            className="absolute top-2 right-2 text-black text-3xl"
                         >
-                            <FaTrash size={24} /> {/* Close icon */}
+                            &times;
                         </button>
-                        <h3 className="text-xl font-semibold mb-4 text-orange-600">
-                            {confirmAction === "edit" ? "Edit Allergen" : "Confirm Deletion"}
+                        <h3 className="text-xl font-semibold mb-4 text-black">
+                            {confirmAction === "edit" ? "Edytuj " : "Czy na pewno chcesz usunąć alergen?"}
                         </h3>
-                        <div>
-                            {confirmAction === "edit" ? (
-                                <div className="space-y-4">
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={createAllergen.name}
-                                        onChange={handleChange}
-                                        placeholder="Allergen Name"
-                                        className="p-3 border rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    />
-                                    <button
-                                        onClick={handleEditSave}
-                                        className="bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600"
-                                    >
-                                        <FaEdit size={20} />
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="text-center">
-                                    <p>Are you sure you want to delete {selectedAllergen.name}?</p>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 mt-4"
-                                    >
-                                        <FaTrash size={20} />
-                                    </button>
-                                </div>
-                            )}
+                        {confirmAction === "edit" && (
+                            <div className="flex-col space-y-4 mb-16">
+                                <input
+                                    type="text"
+                                    name="editName"
+                                    value={editAllergenName}
+                                    onChange={handleChange}
+                                    placeholder="nazwa alergenu"
+                                    required
+                                    className="p-3 border rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                />
+                                <select
+                                    name="type"
+                                    value={createAllergen.type}
+                                    onChange={handleChange}
+                                    required
+                                    className="p-3 border rounded-md w-full shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                >
+                                    <option value="ALLERGEN">Alergen</option>
+                                    <option value="INTOLERANT_INGREDIENT">Nietolerowany składnik</option>
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="absolute bottom-6 right-6 flex gap-4">
+                            <button
+                                onClick={handleEditSave}
+                                className="bg-orange-500 text-white p-4 rounded-full w-14 h-14 flex items-center justify-center"
+                            >
+                                <FaPen className="text-2xl" />
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="bg-red-500 text-white p-4 rounded-full w-14 h-14 flex items-center justify-center"
+                            >
+                                <FaTrash className="text-2xl" />
+                            </button>
                         </div>
                     </div>
                 </div>

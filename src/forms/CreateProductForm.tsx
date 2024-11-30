@@ -75,9 +75,6 @@ export function CreateProductForm() {
         labelDTO: { storage: "", durability: "", instructionsAfterOpening: "", preparation: "", allergens: "", image: "" },
         portionDTO: { portionQuantity: undefined, unitDTO: { name: "" } },
         compositionDTO: { ingredientDTOS: [{ name: "" }], additionDTOS: [{ name: "" }], flavourDTO: { name: "" } },
-        nutritionalIndexDTOS: [],
-        productIndexDTOS: [],
-        ratingDTOS: [],
         nutritionalValueDTOS: [],
     });
 
@@ -318,7 +315,7 @@ export function CreateProductForm() {
             CreateProductSchema.parse(createProduct);
 
             await axiosInstance.post('/products/add', createProduct);
-            toast.success('Product created successfully!');
+            toast.success('Stworzenie produktu powiodło się');
 
             setCreateProduct({
                 ean: "",
@@ -332,9 +329,6 @@ export function CreateProductForm() {
                 labelDTO: { storage: "", durability: "", instructionsAfterOpening: "", preparation: "", allergens: "", image: "" },
                 portionDTO: { portionQuantity: undefined, unitDTO: { name: "" } },
                 compositionDTO: { ingredientDTOS: [], additionDTOS: [], flavourDTO: { name: "" } },
-                nutritionalIndexDTOS: [],
-                productIndexDTOS: [],
-                ratingDTOS: [],
                 nutritionalValueDTOS: [],
             });
 
@@ -363,10 +357,10 @@ export function CreateProductForm() {
         <>
             <ToastContainer />
             <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg space-y-6">
-                <h2 className="text-3xl font-bold text-center mb-6">Create Product</h2>
+                <h2 className="text-3xl font-bold text-center mb-6">Stwórz produkt</h2>
 
                 <div className="mb-6">
-                    <label className="block mb-1 text-sm font-semibold text-gray-600">EAN:</label>
+                    <label className="block mb-1 text-sm font-semibold text-gray-600">Kod EAN:</label>
                     <div className="relative">
                         <input
                             type="text"
@@ -384,37 +378,37 @@ export function CreateProductForm() {
 
 
                 <div className="mb-6">
-                    <h3 className="text-2xl font-semibold mb-3">Producer Information</h3>
-                    <label className="block mb-1">Name:</label>
+                    <h3 className="text-2xl font-semibold mb-3">Informacje o producencie</h3>
+                    <label className="block mb-1">Nazwa producenta:</label>
                     <input
                         type="text"
                         name="producerDTO.name"
-                        value={createProduct.producerDTO.name}
+                        value={createProduct.producerDTO?.name}
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Address:</label>
+                    <label className="block mb-1">Adres:</label>
                     <input
                         type="text"
                         name="producerDTO.address"
-                        value={createProduct.producerDTO.address}
+                        value={createProduct.producerDTO?.address}
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Country Code:</label>
+                    <label className="block mb-1">Kod kraju:</label>
                     <input
                         type="number"
                         name="producerDTO.countryCode"
-                        value={createProduct.producerDTO.countryCode !== undefined ? createProduct.producerDTO.countryCode : ""}
+                        value={createProduct.producerDTO?.countryCode !== undefined ? createProduct.producerDTO.countryCode : ""}
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                         required
                     />
-                    <label className="block mb-1">Contact:</label>
+                    <label className="block mb-1">Email:</label>
                     <input
                         type="text"
                         name="producerDTO.contact"
-                        value={createProduct.producerDTO.contact}
+                        value={createProduct.producerDTO?.contact}
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
@@ -422,7 +416,7 @@ export function CreateProductForm() {
                     <input
                         type="text"
                         name="producerDTO.nip"
-                        value={createProduct.producerDTO.nip}
+                        value={createProduct.producerDTO?.nip}
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
@@ -430,14 +424,14 @@ export function CreateProductForm() {
                     <input
                         type="number"
                         name="producerDTO.rmsd"
-                        value={createProduct.producerDTO.rmsd}
+                        value={createProduct.producerDTO?.rmsd}
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-1 font-semibold">Product Name:</label>
+                    <label className="block mb-1 font-semibold">Nazwa produktu:</label>
                     <input
                         type="text"
                         name="productName"
@@ -449,7 +443,7 @@ export function CreateProductForm() {
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-1 font-semibold">Product Description:</label>
+                    <label className="block mb-1 font-semibold">Opis produktu:</label>
                     <textarea
                         name="productDescription"
                         value={createProduct.productDescription}
@@ -459,7 +453,7 @@ export function CreateProductForm() {
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-1 font-semibold">Product Quantity:</label>
+                    <label className="block mb-1 font-semibold">Ilość produktu:</label>
                     <input
                         type="number"
                         name="productQuantity"
@@ -470,28 +464,29 @@ export function CreateProductForm() {
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-1 font-semibold">Unit:</label>
+                    <label className="block mb-1 font-semibold">Jednostka:</label>
                     <Select
                         options={unitOptions}
                         onChange={handleUnitChange}
+                        placeholder="wybierz"
                     />
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-1 font-semibold">Package Type:</label>
+                    <label className="block mb-1 font-semibold">Opakowanie:</label>
                     <Select
                         options={packageTypes.map((type) => ({
                             label: type.name,
                         }))}
                         onChange={handlePackageTypeChange}
-                        placeholder="Select a Package Type"
+                        placeholder="wybierz"
                         className="react-select-container"
                         classNamePrefix="react-select"
                     />
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-1 font-semibold">Country:</label>
+                    <label className="block mb-1 font-semibold">Kraj:</label>
                     <input
                         type="text"
                         name="country"
@@ -502,8 +497,8 @@ export function CreateProductForm() {
                 </div>
 
                 <div className="mb-6">
-                    <h3 className="text-2xl font-semibold mb-3">Label Information</h3>
-                    <label className="block mb-1">Storage:</label>
+                    <h3 className="text-2xl font-semibold mb-3">Informacje na etykiecie</h3>
+                    <label className="block mb-1">Przechowywanie:</label>
                     <input
                         type="text"
                         name="labelDTO.storage"
@@ -519,7 +514,7 @@ export function CreateProductForm() {
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Instructions After Opening:</label>
+                    <label className="block mb-1">Instrukcje po otworzeniu:</label>
                     <input
                         type="text"
                         name="labelDTO.instructionsAfterOpening"
@@ -527,7 +522,7 @@ export function CreateProductForm() {
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Preparation:</label>
+                    <label className="block mb-1">Przygotowanie:</label>
                     <input
                         type="text"
                         name="labelDTO.preparation"
@@ -535,7 +530,7 @@ export function CreateProductForm() {
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Allergens:</label>
+                    <label className="block mb-1">Alergeny:</label>
                     <input
                         type="text"
                         name="labelDTO.allergens"
@@ -543,19 +538,12 @@ export function CreateProductForm() {
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Image URL:</label>
-                    <input
-                        type="text"
-                        name="labelDTO.image"
-                        value={createProduct.labelDTO?.image}
-                        onChange={handleChange}
-                        className="border rounded-lg p-3 w-full"
-                    />
+
                 </div>
 
                 <div className="mb-6">
-                    <h3 className="text-2xl font-semibold mb-3">Portion Information</h3>
-                    <label className="block mb-1">Portion Quantity:</label>
+                    <h3 className="text-2xl font-semibold mb-3">Informacje o porcji</h3>
+                    <label className="block mb-1">Ilość porcji:</label>
                     <input
                         type="number"
                         name="portionDTO.portionQuantity"
@@ -563,14 +551,15 @@ export function CreateProductForm() {
                         onChange={handleChange}
                         className="border rounded-lg p-3 w-full"
                     />
-                    <label className="block mb-1">Portion Unit:</label>
+                    <label className="block mb-1">Jednostka porcji:</label>
                     <Select
                         options={unitOptions}
                         onChange={handleUnitChange}
+                        placeholder="wybierz"
                     />
                 </div>
                 <div className="mb-6">
-                    <label className="block mb-1">Ingredients:</label>
+                    <label className="block mb-1">Składniki:</label>
                     {createProduct.compositionDTO?.ingredientDTOS?.map((ingredient, index) => (
                         <div key={index} className="flex mb-2">
                             <input
@@ -578,7 +567,7 @@ export function CreateProductForm() {
                                 value={ingredient.name}
                                 onChange={(e) => handleIngredientChange(index, e.target.value)}
                                 className="border rounded-lg p-3 w-full mr-2"
-                                placeholder="Ingredient name"
+                                placeholder="nazwa składnika"
                             />
                         </div>
                     ))}
@@ -592,7 +581,7 @@ export function CreateProductForm() {
 
 
                 <div className="mb-6">
-                    <label className="block mb-1">Additions:</label>
+                    <label className="block mb-1">Dodatki:</label>
                     {createProduct.compositionDTO?.additionDTOS?.map((addition, index) => (
                         <div key={index} className="flex mb-2">
                             <input
@@ -600,7 +589,7 @@ export function CreateProductForm() {
                                 value={addition.name}
                                 onChange={(e) => handleAdditionChange(index, e.target.value)}
                                 className="border rounded-lg p-3 w-full mr-2"
-                                placeholder="Addition name"
+                                placeholder="nazwa dodatku"
                             />
                         </div>
                     ))}
@@ -617,16 +606,16 @@ export function CreateProductForm() {
 
 
                 <div className="mb-6">
-                    <h2 className="text-2xl font-semibold mb-3">Nutritional Values</h2>
+                    <h2 className="text-2xl font-semibold mb-3">Wartości odżywcze</h2>
                     {createProduct.nutritionalValueDTOS?.map((nutritionalValue, index) => (
                         <div key={index} className="nutritional-value-input border rounded-lg p-4 mb-4">
-                            <label className="block mb-1">Nutritional Value Name:</label>
+                            <label className="block mb-1">Nazwa wartości odżywczej:</label>
                             <select
                                 value={nutritionalValue.nutritionalValueName?.name || ""}
                                 onChange={(e) => handleNutritionalValueChange(index, 'nutritionalValueName', {name: e.target.value})}
                                 className="border rounded-lg p-3 w-full mb-2"
                             >
-                                <option value="">Select Nutritional Value Name</option>
+                                <option value="">wybierz</option>
                                 {nutritionalValueNames.map((nv) => (
                                     <option key={nv.name} value={nv.name}>
                                         {nv.name}
@@ -635,7 +624,7 @@ export function CreateProductForm() {
                             </select>
 
 
-                            <label className="block mb-1">Group Name:</label>
+                            <label className="block mb-1">Nazwa grupy wartości odżywczej:</label>
                             <select
                                 value={nutritionalValue.nutritionalValueName?.group?.groupName || ""}
                                 onChange={(e) =>
@@ -646,7 +635,7 @@ export function CreateProductForm() {
                                 }
                                 className="border rounded-lg p-3 w-full mb-2"
                             >
-                                <option value="">Select Group Name</option>
+                                <option value="">wybierz</option>
                                 {nutritionalValueGroups.map((group) => (
                                     <option key={group.groupName} value={group.groupName}>
                                         {group.groupName}
@@ -654,16 +643,16 @@ export function CreateProductForm() {
                                 ))}
                             </select>
 
-                            <label className="block mb-1">Quantity:</label>
+                            <label className="block mb-1">Ilość:</label>
                             <input
                                 type="number"
-                                placeholder="Quantity"
+                                placeholder="Ilość"
                                 value={nutritionalValue.quantity || ""}
                                 onChange={(e) => handleNutritionalValueChange(index, 'quantity', Number(e.target.value))}
                                 className="border rounded-lg p-3 w-full mb-2"
                             />
 
-                            <label className="block mb-1">Unit:</label>
+                            <label className="block mb-1">Jednostka:</label>
                             <select
                                 value={nutritionalValue.unit?.name || ""}
                                 onChange={(e) =>
@@ -671,7 +660,7 @@ export function CreateProductForm() {
                                 }
                                 className="border rounded-lg p-3 w-full mb-2"
                             >
-                                <option value="">Select Unit</option>
+                                <option value="">wybierz</option>
                                 {unitOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}

@@ -111,7 +111,9 @@ const SpecialistProductsPage: React.FC = () => {
             ) : error ? (
                 <div>{error}</div>
             ) : products.length === 0 ? (
-                <p>No products available.</p>
+                <div className="flex justify-center items-center h-screen">
+                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600"/>
+                </div>
             ) : (
                 <div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -167,7 +169,7 @@ const SpecialistProductsPage: React.FC = () => {
                             &times;
                         </button>
 
-                        <h2 className="text-2xl font-bold mb-4 text-center md:col-span-2">Product Details</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-center md:col-span-2">Informacje o produkcie</h2>
 
                         {/* Flex container for both columns */}
                         <div className="flex w-full space-x-6 overflow-auto">
@@ -183,28 +185,28 @@ const SpecialistProductsPage: React.FC = () => {
                                 </div>
 
                                 <div className="mt-2 text-center text-gray-600">
-                                    <h3 className="font-semibold">Product Name:</h3>
+                                    <h3 className="font-semibold">Nazwa produktu:</h3>
                                     <p>{selectedProduct.productName || "Unnamed Product"}</p>
                                 </div>
 
                                 <div className="mt-2 text-center text-gray-600">
-                                    <h3 className="font-semibold">Allergens:</h3>
+                                    <h3 className="font-semibold">Alergeny:</h3>
                                     {selectedProduct.labelDTO?.allergens ? (
                                         <div className="flex flex-wrap justify-center space-x-2">
                                             {/* Layout Chips for allergens */}
                                             {selectedProduct.labelDTO.allergens.split(',').map((allergen, index) => (
-                                                <span key={index} className="bg-orange-200 text-black text-sm font-semibold px-4 py-2 rounded-full">
+                                                <span key={index} className="bg-gray-200 text-black text-sm font-semibold px-4 py-2 rounded-full">
                                         {allergen.trim()}
                                     </span>
                                             ))}
                                         </div>
                                     ) : (
-                                        <p>No allergens listed.</p>
+                                        <p>Brak alergenów w produkcie</p>
                                     )}
                                 </div>
 
                                 <div className="mt-2 text-center text-gray-600">
-                                    <h3 className="font-semibold">Ingredients:</h3>
+                                    <h3 className="font-semibold">Składniki:</h3>
                                     {selectedProduct.compositionDTO?.ingredientDTOS && selectedProduct.compositionDTO.ingredientDTOS.length > 0 ? (
                                         <ul className="list-disc list-inside">
                                             {selectedProduct.compositionDTO.ingredientDTOS.map((ingredient, index) => (
@@ -212,26 +214,26 @@ const SpecialistProductsPage: React.FC = () => {
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p>No ingredients listed.</p>
+                                        <p>Brak składników w produkcie</p>
                                     )}
                                 </div>
 
                                 <div className="mt-2 text-center text-gray-700">
-                                    <h3 className="font-semibold">Description:</h3>
+                                    <h3 className="font-semibold">Opis produktu:</h3>
                                     <p>{selectedProduct.productDescription || "No description available."}</p>
                                 </div>
                             </div>
 
                             {/* Right Column - Nutritional Values Table */}
                             <div className="w-3/5 overflow-y-auto pl-4 space-y-4">
-                                <h3 className="text-center font-semibold text-lg mb-4">Nutritional Values</h3>
+                                <h3 className="text-center font-semibold text-lg mb-4">Wartości odżywcze</h3>
                                 <div className="overflow-x-auto">
                                     <table className="table-auto border-collapse border border-gray-200 w-full text-sm text-left rounded-lg shadow-md overflow-hidden">
                                         <thead className="bg-gradient-to-r from-orange-600 to-orange-500 text-white">
                                         <tr className="text-center">
-                                            <th className="border border-gray-300 px-4 py-3 rounded-tl-lg">Nutritional Group</th>
-                                            <th className="border border-gray-300 px-4 py-3">Nutritional Value</th>
-                                            <th className="border border-gray-300 px-4 py-3">Per 100g/ml</th>
+                                            <th className="border border-gray-300 px-4 py-3 rounded-tl-lg">Grupa wartości odżywczej</th>
+                                            <th className="border border-gray-300 px-4 py-3">Wartość odżywcza</th>
+                                            <th className="border border-gray-300 px-4 py-3">100g/ml</th>
                                             <th className="border border-gray-300 px-4 py-3 rounded-tr-lg">% NRV</th>
                                         </tr>
                                         </thead>

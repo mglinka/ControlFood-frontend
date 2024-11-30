@@ -372,6 +372,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/products/category": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProductsByCategory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/products/by-ean/{ean}": {
         parameters: {
             query?: never;
@@ -380,6 +396,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getProductByEan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/package-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllPackageTypes"];
         put?: never;
         post?: never;
         delete?: never;
@@ -412,6 +444,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getAllNutritionalValueGroupNames"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllCategories"];
         put?: never;
         post?: never;
         delete?: never;
@@ -657,12 +705,15 @@ export interface components {
             version?: number;
             /** @enum {string} */
             name?: "ROLE_ADMIN" | "ROLE_USER" | "ROLE_SPECIALIST";
-            authority?: string;
             roleName?: string;
+            authority?: string;
         };
         AllergenIntensityDTO: {
             allergen_id: string;
+            name?: string;
             intensity?: string;
+            /** @enum {string} */
+            allergenType?: "ALLERGEN" | "INTOLERANT_INGREDIENT";
         };
         UpdateAllergyProfileDTO: {
             allergens?: components["schemas"]["AllergenIntensityDTO"][];
@@ -672,6 +723,8 @@ export interface components {
             allergen_id?: string;
             name?: string;
             intensity?: string;
+            /** @enum {string} */
+            type?: "ALLERGEN" | "INTOLERANT_INGREDIENT";
         };
         GetAllergyProfileDTO: {
             /** Format: uuid */
@@ -695,6 +748,8 @@ export interface components {
             /** Format: uuid */
             allergen_id?: string;
             name?: string;
+            /** @enum {string} */
+            allergenType?: "ALLERGEN" | "INTOLERANT_INGREDIENT";
         };
         AdditionDTO: {
             name?: string;
@@ -706,21 +761,18 @@ export interface components {
         };
         CreateProductDTO: {
             ean: string;
-            productName: string;
+            productName?: string;
             productDescription?: string;
             /** Format: int32 */
             productQuantity?: number;
-            country: string;
+            country?: string;
             unitDTO: components["schemas"]["UnitDTO"];
-            producerDTO: components["schemas"]["ProducerDTO"];
-            packageTypeDTO: components["schemas"]["PackageTypeDTO"];
+            producerDTO?: components["schemas"]["ProducerDTO"];
+            packageTypeDTO?: components["schemas"]["PackageTypeDTO"];
             compositionDTO?: components["schemas"]["CompositionDTO"];
-            nutritionalIndexDTOS: components["schemas"]["NutritionalIndexDTO"][];
-            productIndexDTOS?: components["schemas"]["ProductIndexDTO"][];
             labelDTO?: components["schemas"]["LabelDTO"];
             portionDTO?: components["schemas"]["PortionDTO"];
-            ratingDTOS?: components["schemas"]["RatingDTO"][];
-            nutritionalValueDTOS: components["schemas"]["NutritionalValueDTO"][];
+            nutritionalValueDTOS?: components["schemas"]["NutritionalValueDTO"][];
         };
         FlavourDTO: {
             name?: string;
@@ -729,17 +781,12 @@ export interface components {
             name?: string;
         };
         LabelDTO: {
-            storage: string;
-            durability: string;
+            storage?: string;
+            durability?: string;
             instructionsAfterOpening?: string;
             preparation?: string;
             allergens?: string;
             image?: string;
-        };
-        NutritionalIndexDTO: {
-            /** Format: int32 */
-            indexValue?: number;
-            legend?: string;
         };
         NutritionalValueDTO: {
             nutritionalValueName?: components["schemas"]["NutritionalValueNameDTO"];
@@ -767,8 +814,8 @@ export interface components {
             unitDTO?: components["schemas"]["UnitDTO"];
         };
         ProducerDTO: {
-            name: string;
-            address: string;
+            name?: string;
+            address?: string;
             /** Format: int32 */
             countryCode?: number;
             contact?: string;
@@ -776,19 +823,14 @@ export interface components {
             /** Format: int32 */
             rmsd?: number;
         };
-        ProductIndexDTO: {
-            indexName?: string;
-            /** Format: int32 */
-            indexValue?: number;
-        };
-        RatingDTO: {
-            groupName?: string;
-            name?: string;
-            products?: string[];
-        };
         UnitDTO: {
             /** @example ml */
             name: string;
+        };
+        GetCategoryDTO: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
         };
         GetProductDTO: {
             /** Format: uuid */
@@ -816,6 +858,7 @@ export interface components {
             labelDTO?: components["schemas"]["LabelDTO"];
             compositionDTO?: components["schemas"]["CompositionDTO"];
             nutritionalValueDTOS: components["schemas"]["NutritionalValueDTO"][];
+            categoryDTO?: components["schemas"]["GetCategoryDTO"];
         };
         RequestChangePassword: {
             currentPassword?: string;
@@ -849,6 +892,8 @@ export interface components {
         };
         CreateAllergenDTO: {
             name: string;
+            /** @enum {string} */
+            type: "ALLERGEN" | "INTOLERANT_INGREDIENT";
         };
         RoleDTO: {
             name?: string;
@@ -1414,6 +1459,28 @@ export interface operations {
             };
         };
     };
+    getProductsByCategory: {
+        parameters: {
+            query: {
+                categoryName: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GetProductDTO"][];
+                };
+            };
+        };
+    };
     getProductByEan: {
         parameters: {
             query?: never;
@@ -1432,6 +1499,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetProductDTO"];
+                };
+            };
+        };
+    };
+    getAllPackageTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PackageTypeDTO"][];
                 };
             };
         };
@@ -1472,6 +1559,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["NutritionalValueGroupDTO"][];
+                };
+            };
+        };
+    };
+    getAllCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GetCategoryDTO"][];
                 };
             };
         };

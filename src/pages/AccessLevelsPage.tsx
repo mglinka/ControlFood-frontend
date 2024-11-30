@@ -16,6 +16,7 @@ const AccessLevelsPage: React.FC = () => {
     const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
+
     const fetchAccessLevels = async () => {
         setLoading(true);
         setError(null);
@@ -43,7 +44,7 @@ const AccessLevelsPage: React.FC = () => {
 
     const handleRoleChange = async () => {
         if (!selectedAccountId || !selectedRole) {
-            toast.error('Please select a role.');
+            toast.error('Wybierz rolę');
             return;
         }
 
@@ -167,13 +168,13 @@ const AccessLevelsPage: React.FC = () => {
                                         className="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 mr-2"
                                         onClick={handleCloseModal}
                                     >
-                                        Cancel
+                                        Anuluj
                                     </button>
                                     <button
                                         className="bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-600"
                                         onClick={handleRoleChange}
                                     >
-                                        Save Changes
+                                        Zapisz zmiany
                                     </button>
                                 </div>
                             </div>

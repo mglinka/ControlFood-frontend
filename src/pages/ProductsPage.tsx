@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {getAllergyProfileByAccountId, getAllProducts} from '../api/api.ts';
+import {getAllergyProfileByAccountId, getAllProducts, getCategories, getProductsByCategory} from '../api/api.ts';
 import {components} from "../controlfood-backend-schema";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faSpinner} from '@fortawesome/free-solid-svg-icons';
+import {faChevronDown, faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {authService} from "../utils/authService.ts";
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
@@ -12,6 +12,8 @@ const ProductsPage: React.FC = () => {
 
     const [products, setProducts] = useState<components["schemas"]["GetProductDTO"][]>([]);
     const [selectedProduct, setSelectedProduct] = useState<components["schemas"]["GetProductDTO"] | null>(null);
+    const [categories, setCategories] = useState<components["schemas"]["GetCategoryDTO"][]>([])
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(0);
@@ -39,11 +41,30 @@ const ProductsPage: React.FC = () => {
                 setAllergenProfile(profileData.allergens);
             } catch (error) {
                 console.error('Error fetching allergy profile:', error);
-                setError('Error fetching allergy profile.');
             }
+        };
+        const fetchCategories = async ()=>{
+
+            setLoading(true);
+            setError(null);
+            try {
+                const data = await getCategories();
+                console.log('Marta Fetched Data:', data);
+
+
+                setCategories(data);
+                console.log(data)
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                setError('Error fetching products. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+
         };
 
         fetchAllergyProfile();
+        fetchCategories();
     }, []);
 
     useEffect(() => {
@@ -69,8 +90,31 @@ const ProductsPage: React.FC = () => {
             }
         };
 
+
+
         fetchProducts();
     }, [page]);
+
+    useEffect(() => {
+        if (!selectedCategory) return;
+
+        const fetchProductsByCategory = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                console.log("Olll", selectedCategory)
+                const data = await getProductsByCategory(selectedCategory);
+                setProducts(data);
+            } catch (error) {
+                console.error("Error fetching products by category:", error);
+                setError("Error fetching products by category. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProductsByCategory();
+    }, [selectedCategory]);
 
     useEffect(() => {
         const timeId = setTimeout(() => {
@@ -121,57 +165,98 @@ const ProductsPage: React.FC = () => {
 
     return (
         <div className="p-6">
-            <div className="relative w-full my-4">
-                <input
-                    onChange={(event) => {
-                        setSearchQuery(event.target.value);
-                        setPage(0);
-                    }}
-                    className="w-full px-6 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black placeholder-gray-400 pl-12"
-                    type="text"
-                    placeholder="Szukaj"
-                />
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <FontAwesomeIcon icon={faSearch} className="w-5 h-5"/>
-            </span>
+            <div className="relative w-full my-4 flex items-center">
+                {/* Search Input */}
+                <div className="relative w-3/4">
+                    <input
+                        onChange={(event) => {
+                            setSearchQuery(event.target.value);
+                            setPage(0);
+                        }}
+                        className="w-full px-6 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black placeholder-gray-400 pl-12"
+                        type="text"
+                        placeholder="Szukaj"
+                    />
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <FontAwesomeIcon icon={faSearch} className="w-5 h-5"/>
+      </span>
+                </div>
+
+                {/* Category Selector */}
+                <div className="relative w-1/4 ml-4">
+                    <select
+                        onChange={(event) => {
+                            const selectedCategoryId = event.target.value;
+                            // Find the category name based on the selected category ID
+                            const selectedCategory = categories.find(category => category.id === selectedCategoryId);
+                            if (selectedCategory) {
+                                console.log("Selected Category Name:", selectedCategory.name);
+                                setSelectedCategory(selectedCategory.name as string);  // Store category name in state
+                            }
+                            setPage(0);
+                        }}
+                        className="w-full px-4 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black appearance-none cursor-pointer"
+                        style={{
+                            WebkitAppearance: "none",
+                            MozAppearance: "none",
+                            appearance: "none",
+                        }}
+                    >
+                        <option value="" className="rounded-lg">
+                            Wybierz kategorię
+                        </option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id} className="rounded-lg">
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* Strzałka wskazująca rozwijanie */}
+                    <span
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+        <FontAwesomeIcon icon={faChevronDown} className="w-4 h-4"/>
+      </span>
+                </div>
             </div>
 
 
-            {loading ? (
-                <div className="flex justify-center items-center h-screen">
-                    <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600"/>
-                </div>
-            ) : error ? (
-                <div>{error}</div>
-            ) : products.length === 0 ? (
-                <p>No products available.</p>
-            ) : (
-                <div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {products.map(product => (
-                            <div
-                                key={product.id}
-                                className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col cursor-pointer"
-                                onClick={() => setSelectedProduct(product)}
-                            >
-                                <div className="flex flex-col items-center flex-grow">
-                                    <div className="w-32 h-32 mb-4 overflow-hidden rounded-lg">
-                                        <img
-                                            src={product.labelDTO?.image ? `data:image/jpeg;base64,${product.labelDTO.image}` : placeholderImage}
-                                            alt={product.productName || "Product Image"}
-                                            className="object-contain w-full h-full"
-                                        />
-                                    </div>
-                                    <h2 className="font-semibold text-lg text-center">{product.productName || "Unnamed Product"}</h2>
-                                    <p className="mt-2 text-center text-gray-600">{product.productDescription || "No description available."}</p>
+    {
+        loading ? (
+            <div className="flex justify-center items-center h-screen">
+                <FontAwesomeIcon icon={faSpinner} spin className="text-xl text-gray-600"/>
+            </div>
+        ) : error ? (
+            <div>{error}</div>
+        ) : products.length === 0 ? (
+            <p>No products available.</p>
+        ) : (
+            <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {products.map(product => (
+                        <div
+                            key={product.id}
+                            className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col cursor-pointer"
+                            onClick={() => setSelectedProduct(product)}
+                        >
+                            <div className="flex flex-col items-center flex-grow">
+                                <div className="w-32 h-32 mb-4 overflow-hidden rounded-lg">
+                                    <img
+                                        src={product.labelDTO?.image ? `data:image/jpeg;base64,${product.labelDTO.image}` : placeholderImage}
+                                        alt={product.productName || "Product Image"}
+                                        className="object-contain w-full h-full"
+                                    />
                                 </div>
+                                <h2 className="font-semibold text-lg text-center">{product.productName || "Unnamed Product"}</h2>
+                                <p className="mt-2 text-center text-gray-600">{product.productDescription || "No description available."}</p>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
+                </div>
 
-                    <div className="flex justify-between mt-4">
-                        <button
-                            onClick={handlePreviousPage}
+                <div className="flex justify-between mt-4">
+                    <button
+                        onClick={handlePreviousPage}
                             disabled={page === 0}
                             className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
                         >
@@ -237,15 +322,29 @@ const ProductsPage: React.FC = () => {
                                                         bgColor = 'bg-red-600'; // Czerwony
                                                         break;
                                                     default:
-                                                        bgColor = 'bg-gray-300'; // Szary, jeśli brak intensywności
+                                                        bgColor = 'bg-gray-500';// Szary, jeśli brak intensywności
                                                 }
 
                                                 return (
                                                     <div
                                                         key={allergenTrimmed}
-                                                        className={`flex items-center justify-center px-4 py-2 rounded-full text-white ${bgColor} cursor-pointer hover:scale-105 transform transition duration-200 text-sm`}
+                                                        className={`relative group flex items-center justify-center px-4 py-2 rounded-full text-white ${bgColor} cursor-pointer hover:scale-105 transform transition duration-200 text-sm`}
                                                     >
                                                         <span className="font-semibold">{allergenTrimmed}</span>
+
+                                                        {/* Tooltip - pojawia się tylko dla kolorów innych niż szary */}
+                                                        {bgColor !== 'bg-gray-500' && (
+                                                            <div
+                                                                className="absolute bottom-full mb-2 w-max max-w-xs bg-gray-700 text-white text-xs rounded-md p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg pointer-events-none"
+                                                            >
+                                                                Intensywność {' '}
+                                                                {intensity === 'low'
+                                                                    ? 'niska'
+                                                                    : intensity === 'medium'
+                                                                        ? 'średnia'
+                                                                        : 'wysoka'}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 );
                                             })}
@@ -254,9 +353,6 @@ const ProductsPage: React.FC = () => {
                                         <p>Brak alergenów w produkcie.</p>
                                     )}
                                 </div>
-
-
-
 
                                 <div>
                                     <h3 className="font-semibold">Składniki:</h3>
@@ -298,7 +394,7 @@ const ProductsPage: React.FC = () => {
                                             key={index}
                                             className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
                                         >
-                                        <td className="border border-gray-400 px-4 py-2 font-semibold">
+                                            <td className="border border-gray-400 px-4 py-2 font-semibold">
                                                 {value.nutritionalValueName?.group?.groupName || "Unknown Group"}
                                             </td>
                                             <td className="border border-gray-400 px-4 py-2 font-semibold">

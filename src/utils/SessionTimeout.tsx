@@ -41,20 +41,20 @@ const SessionTimeout: React.FC = () => {
         showWarning ? (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center border border-gray-800">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Your session is about to expire</h2>
-                    <p className="mb-6 text-gray-700">Would you like to extend it?</p>
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Twoja sesja zaraz wygaśnie</h2>
+                    <p className="mb-6 text-gray-700">Czy chcesz ją przedłużyć?</p>
                     <div className="flex justify-center space-x-4">
                         <button
                             onClick={handleRefresh}
                             className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded"
                         >
-                            Refresh Session
+                            Odśwież
                         </button>
                         <button
                             onClick={handleLogout}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
                         >
-                            Logout
+                            Wyloguj
                         </button>
                     </div>
                 </div>

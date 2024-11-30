@@ -111,7 +111,7 @@ const BarcodeScannerPage: React.FC = () => {
                         )}
                     </div>
                 ) : (
-                    <p className="text-gray-600">Zeskanuj kod EAN</p>
+                    <p className="text-gray-600 font-bold ">Zeskanuj kod EAN</p>
                 )}
             </div>
         </div>

@@ -63,7 +63,7 @@ const AllergyProfilePage: React.FC = () => {
     };
 
     return (
-        <div className="p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-5xl mx-auto">
+        <div className="w-full p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-7xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6">Profil alergiczny</h1>
 
             {/* Show loading indicator while waiting for data */}
@@ -78,34 +78,28 @@ const AllergyProfilePage: React.FC = () => {
 
             {/* Show buttons if no profile and data is loaded */}
             {!loading && !hasProfile && !isSchemaView && !isCustomProfileView && (
-                <div className="text-center">
-                    <p className="text-xl mb-6">
-                        Would you like to select a template or create your own allergy profile?
+                <div className="text-center py-10 px-4">
+                    <p className="text-xl md:text-2xl mb-6 font-semibold text-gray-700">
+                        Czy wolisz skorzystać z gotowych szablonów, czy stworzyć swój własny profil alergiczny?
                     </p>
-                    <div
-                        className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 mt-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-6 sm:space-y-0 mt-6 justify-center items-center">
                         {/* Button 1 - Select Template */}
                         <button
                             onClick={handleStartWithSchemas}
-                            className="relative bg-white w-48 h-16 hover:bg-gray-100 text-black border-2 border-black rounded-full shadow-lg transition-transform transform hover:scale-105"
+                            className="relative w-56 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold text-lg border-2 border-transparent rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center"
                         >
-            <span className="absolute inset-0 flex items-center justify-center text-lg font-semibold">
-                Select Template
-            </span>
+                            Szablony
                         </button>
 
                         {/* Button 2 - Create Custom Profile */}
                         <button
                             onClick={handleStartWithCustomProfile}
-                            className="relative bg-white w-48 h-16 hover:bg-gray-100 text-black border-2 border-black rounded-full shadow-lg transition-transform transform hover:scale-105"
+                            className="relative w-56 h-16 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold text-lg border-2 border-transparent rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center"
                         >
-            <span className="absolute inset-0 flex items-center justify-center text-lg font-semibold">
-                Create Custom Profile
-            </span>
+                            Stwórz własny profil
                         </button>
                     </div>
                 </div>
-
             )}
 
             {/* Render UserProfileSchemas if schema view is active */}

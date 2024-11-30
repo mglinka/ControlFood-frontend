@@ -49,10 +49,10 @@ const AccountsPage: React.FC = () => {
 
             if (currentStatus) {
                 await disableAccount(accountId!);
-                toast.success('Account disabled successfully.');
+                toast.success('Konto zostało zablokowane pomyślnie');
             } else {
                 await enableAccount(accountId!);
-                toast.success('Account enabled successfully.');
+                toast.success('Konto zostało odblokowane pomyślnie');
             }
 
             await fetchAccounts();

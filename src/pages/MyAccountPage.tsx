@@ -45,7 +45,7 @@ const MyAccountPage: React.FC = () => {
     const handleUpdateProfile = async () => {
         try {
             await updateAccountInfo({ firstName, lastName });
-            toast.success('Profile updated successfully!');
+            toast.success('Edycja profilu powiodłą się');
             setIsEditingProfile(false);
             await handleGetAccountInfo();
         } catch (err: any) {
@@ -57,7 +57,7 @@ const MyAccountPage: React.FC = () => {
     // Funkcja zmieniająca hasło
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) {
-            toast.error('Passwords do not match!');
+            toast.error('Hasła nie są takie same');
             return;
         }
 
@@ -67,7 +67,7 @@ const MyAccountPage: React.FC = () => {
                 newPassword,
                 confirmationPassword: confirmPassword,
             });
-            toast.success('Password changed successfully!');
+            toast.success('Zmiana hasła powiodła się');
             setNewPassword('');
             setConfirmPassword('');
             setCurrentPassword('');
@@ -141,7 +141,7 @@ const MyAccountPage: React.FC = () => {
                                 onClick={() => setIsEditingProfile(false)}
                                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md"
                             >
-                                Cancel
+                                Anuluj
                             </button>
                             <button
                                 type="button"

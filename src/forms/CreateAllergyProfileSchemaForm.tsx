@@ -21,6 +21,7 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
         e.preventDefault();
         setLoading(true);
         setError(null);
+        console.log(error);
 
         if (!name || selectedAllergens.length === 0) {
             setError("Please provide a profile name and select at least one allergen.");
@@ -40,7 +41,7 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
 
         try {
             await createAllergyProfileSchema(requestBody);
-            toast.success("New allergy profile schema created successfully!");
+            toast.success("Nowy szablon został pomyślnie dodany");
             onCreate({ name, allergens: allergensPayload }); // This calls the parent function to update the list
 
             // Clear form state after submission
@@ -50,7 +51,7 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
             onClose(); // Close the form after submission
         } catch (error) {
             setError("Error creating allergy profile. Please try again.");
-            toast.error("Failed to create allergy profile schema.");
+            toast.error("Stworzenie szablonu nie powiodło się");
             console.error("Error:", error);
         } finally {
             setLoading(false);
@@ -75,21 +76,24 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter profile name"
+                placeholder="Wpisz nazwę szablonu"
                 className="p-3 border rounded-full w-full shadow-md"
                 required
             />
 
             {/* Allergens selection */}
             <div>
-                <h3 className="font-semibold text-lg mb-4">Select Allergens:</h3>
-                <div className="flex flex-wrap gap-2 sm:gap-4">
+                <h3 className="font-semibold text-lg mb-4">Wybierz alergeny:</h3>
+                <div
+                    className="flex flex-wrap gap-2 sm:gap-4 overflow-y-auto max-h-80 p-2 border rounded-lg"
+                    style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db #f9fafb" }} // Opcjonalne dla przewijania
+                >
                     {allergens.map((allergen) => (
                         <div
                             key={allergen.allergen_id}
                             onClick={() => handleAllergenChange(allergen.allergen_id as string)}
                             className={`cursor-pointer px-4 py-2 text-sm sm:text-base rounded-full border-2 transition-all duration-200 
-                            ${selectedAllergens.includes(allergen.allergen_id as string)
+                ${selectedAllergens.includes(allergen.allergen_id as string)
                                 ? "bg-orange-500 text-white border-orange-500"
                                 : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-orange-100"}`}
                         >
@@ -99,23 +103,21 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
                 </div>
             </div>
 
-            {/* Error message */}
-            {error && <div className="text-red-600">{error}</div>}
-
             {/* Submit button */}
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-4">
                 <button
                     type="submit"
-                    className="bg-orange-500 text-white px-6 py-2 rounded flex items-center justify-center"
+                    className="bg-orange-500 text-white px-4 py-3 rounded-full flex items-center justify-center shadow-md"
                     disabled={loading}
                 >
                     {loading ? (
-                        <FiLoader className="animate-spin text-2xl" /> // Show spinning loader when submitting
+                        <FiLoader className="animate-spin text-xl"/>
                     ) : (
-                        <FiCheckCircle className="text-2xl" />
+                        <FiCheckCircle className="text-xl"/>
                     )}
                 </button>
             </div>
+
         </form>
     );
 };

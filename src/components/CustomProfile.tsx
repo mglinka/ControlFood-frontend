@@ -8,25 +8,21 @@ import {ArrowLeftIcon, XCircleIcon} from "@heroicons/react/16/solid";
 import axios from "axios";
 import { FaPen, FaPlus } from 'react-icons/fa';
 import {FiCheckCircle} from "react-icons/fi";
+import {components} from "../controlfood-backend-schema";
 
-interface Allergy {
-    allergen_id: string;
-    name: string;
-}
 
-interface SelectedAllergy {
-    allergenId: string;
-    name: string;
-    intensity: string;
-}
+type Allergy = components["schemas"]["GetAllergenDTO"];
+type GetAllergenIntensityDTO = components["schemas"]["GetAllergenIntensityDTO"];
+
+
 
 interface CustomProfileProps {
     onBack: () => void; // Funkcja przekazana z nadrzędnego komponentu
 }
 const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
     const [allergies, setAllergies] = useState<Allergy[]>([]);
-    const [selectedAllergies, setSelectedAllergies] = useState<SelectedAllergy[]>([]);
-    const [initialSelectedAllergies, setInitialSelectedAllergies] = useState<SelectedAllergy[]>([]);
+    const [selectedAllergies, setSelectedAllergies] = useState<GetAllergenIntensityDTO[]>([]);
+    const [initialSelectedAllergies, setInitialSelectedAllergies] = useState<GetAllergenIntensityDTO[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [saveError, setSaveError] = useState<string | null>(null);
@@ -44,6 +40,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                     index === self.findIndex((a: Allergy) => a.allergen_id === allergy.allergen_id)
             );
             setAllergies(uniqueAllergies);
+            console.log("Marta", uniqueAllergies);
         } catch (err) {
             setError("Error fetching allergens");
             console.log(error, loading);
@@ -59,6 +56,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                 throw new Error("Account ID is not available.");
             }
             const response = await axiosInstance.get(`/allergy-profiles/byAccount/${accountId}`);
+            console.log("jess", response.data)
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -74,12 +72,18 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
         try {
             const allergyProfile = await fetchAllergyProfile();
             if (allergyProfile && allergyProfile.allergens) {
-                const selected = allergyProfile.allergens.map((allergen: any) => ({
-                    allergenId: allergen.allergenId || allergen.allergen_id,
+                const selected = allergyProfile.allergens.map((allergen: GetAllergenIntensityDTO) => ({
+                    allergen_id: allergen.allergen_id || allergen.allergen_id,
                     name: allergen.name,
                     intensity: allergen.intensity,
+                    type:allergen.type,
+
+
+
                 }));
 
+                console.log("Tutaj bęą", selected)
+                console.log("Tutaj bęą", allergies)
                 setSelectedAllergies(selected);
                 setInitialSelectedAllergies(selected);
                 setHasProfile(true);
@@ -87,7 +91,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                     prevAllergies.filter(
                         (allergy) =>
                             !selected.some(
-                                (selectedAllergy: SelectedAllergy) => selectedAllergy.allergenId === allergy.allergen_id
+                                (selectedAllergy: GetAllergenIntensityDTO) => selectedAllergy.allergen_id === allergy.allergen_id
                             )
                     )
                 );
@@ -103,6 +107,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
     useEffect(() => {
         loadProfileData();
+        console.log("Nie wime", selectedAllergies)
     }, []);
 
 
@@ -110,10 +115,27 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
 
     const handleAddAllergy = (allergy: Allergy, intensity: string) => {
-        if (selectedAllergies.some((a) => a.allergenId === allergy.allergen_id)) return;
+        // Sprawdź, czy allergy.name i allergy.allergen_id są zdefiniowane
+        if (!allergy.name || !allergy.allergen_id) {
+            console.error("Allergy name or allergen_id is undefined");
+            return;
+        }
 
-        const allergenToAdd: SelectedAllergy = { allergenId: allergy.allergen_id, name: allergy.name, intensity };
+        // Sprawdź, czy wybrany alergen już jest na liście
+        if (selectedAllergies.some((a) => a.allergen_id === allergy.allergen_id)) return;
+
+        const allergenToAdd: GetAllergenIntensityDTO = {
+            allergen_id: allergy.allergen_id,
+            name: allergy.name,
+            intensity, // Zakładamy, że intensity jest prawidłowe
+            type: allergy.allergenType ?? "ALLERGEN", // Domyślna wartość lub rzutowanie na poprawny typ
+        };
+
+
+        // Dodajemy alergen do listy
         setSelectedAllergies((prev) => [...prev, allergenToAdd]);
+
+        // Usuwamy alergen z listy dostępnych
         setAllergies((prev) => prev.filter((a) => a.allergen_id !== allergy.allergen_id));
 
         if (!isCreating) {
@@ -121,13 +143,14 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
         }
     };
 
+
     const handleRemoveAllergy = (id: string) => {
-        const removedAllergy = selectedAllergies.find((allergy) => allergy.allergenId === id);
+        const removedAllergy = selectedAllergies.find((allergy) => allergy.allergen_id === id);
         if (removedAllergy) {
-            setSelectedAllergies((prev) => prev.filter((selected) => selected.allergenId !== id));
+            setSelectedAllergies((prev) => prev.filter((selected) => selected.allergen_id !== id));
             setAllergies((prev) => [
                 ...prev,
-                { allergen_id: removedAllergy.allergenId, name: removedAllergy.name },
+                { allergen_id: removedAllergy.allergen_id, name: removedAllergy.name },
             ]);
         }
     };
@@ -140,8 +163,8 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
             }
 
             const requestBody = {
-                allergens: selectedAllergies.map(({ allergenId, intensity }) => ({
-                    allergen_id: allergenId,
+                allergens: selectedAllergies.map(({ allergen_id, intensity }) => ({
+                    allergen_id: allergen_id,
                     intensity,
                 })),
             };
@@ -156,7 +179,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                 setHasProfile(true);
             }
 
-            toast.success("Allergy profile updated successfully!");
+            toast.success("Edycja profilu powiodła się");
             setTimeout(async () => {
                 await loadProfileData();
             }, 3000);
@@ -175,21 +198,48 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
     };
 
 
-    const getIntensityColor = (intensity: string) => {
+    const intensityToBackgroundColor = (intensity: string) => {
         switch (intensity) {
             case "low":
-                return "border-yellow-600";
+                return "#ffd100"; // Jasno-żółty
             case "medium":
-                return "border-orange-600";
+                return "#ea6f0d"; // Pomarańczowy
             case "high":
-                return "border-red-600";
+                return "#EF4444"; // Czerwony
             default:
-                return "";
+                return "#FFFFFF"; // Domyślnie biały
         }
     };
 
+    const allergensByType = (allergies: Allergy[]) => {
+        return allergies.reduce(
+            (acc: { allergens: Allergy[]; intolerantIngredients: Allergy[] }, allergy: Allergy) => {
+                if (allergy.allergenType === "ALLERGEN") {
+                    acc.allergens.push(allergy);
+                } else if (allergy.allergenType === "INTOLERANT_INGREDIENT") {
+                    acc.intolerantIngredients.push(allergy);
+                }
+                return acc;
+            },
+            { allergens: [], intolerantIngredients: [] }
+        );
+    };
+
+    const { allergens: allergenList, intolerantIngredients: intolerantList } = allergensByType(allergies);
+
+    const splitSelectedAllergiesByType = (allergies: GetAllergenIntensityDTO[]) => {
+        const allergenList = allergies.filter(allergy => allergy.type === "ALLERGEN");
+        const intolerantList = allergies.filter(allergy => allergy.type === "INTOLERANT_INGREDIENT");
+        return { allergenList, intolerantList };
+    };
+
+    // Podział wybranych alergenów na dwie kategorie
+    const { allergenList: selectedAllergenList, intolerantList: selectedIntolerantList } = splitSelectedAllergiesByType(selectedAllergies);
+
+
+
     return (
-        <div className="p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-5xl mx-auto">
+        <div className="w-full p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-5xl mx-auto">
 
 
             <div className="mt-4 mb-6 space-x-4 flex">
@@ -239,68 +289,101 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                 )}
             </div>
 
-            {/* Allergies section */}
             <div className="flex flex-col md:flex-row md:space-x-6 justify-center">
+                {/* Allergens section */}
                 <div className="md:w-1/2 w-full mb-6 md:mb-0">
                     <h2 className="text-2xl font-semibold text-black mb-4 text-center">Alergeny</h2>
-                    <ul>
-                        {allergies.map((allergy) => (
-                            <li
-                                key={allergy.allergen_id}
-                                className="bg-white p-4 mb-4 rounded-xl shadow text-center"
-                            >
+                    {/* Allergen type categories */}
+                    <h3 className="text-xl font-semibold mb-4">Alergeny</h3>
+                    <div className="flex flex-wrap gap-6 justify-center">
+                        {allergenList.map((allergy) => (
+                            <div key={allergy.allergen_id}
+                                 className="bg-white p-4 px-6 rounded-full shadow-lg text-center border border-gray-300">
                                 <span className="font-semibold text-lg">{allergy.name}</span>
                                 {(isEditing || isCreating) && (
-                                    <div className="flex justify-center space-x-3 mt-2">
-                                        <button
-                                            onClick={() => handleAddAllergy(allergy, "low")}
-                                            className="w-8 h-8 rounded-full bg-yellow-500 hover:bg-yellow-600 border border-gray-300"
-                                            title="Low Intensity"
-                                        ></button>
-                                        <button
-                                            onClick={() => handleAddAllergy(allergy, "medium")}
-                                            className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 border border-gray-300"
-                                            title="Medium Intensity"
-                                        ></button>
-                                        <button
-                                            onClick={() => handleAddAllergy(allergy, "high")}
-                                            className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 border border-gray-300"
-                                            title="High Intensity"
-                                        ></button>
+                                    <div className="flex space-x-3">
+                                        <button onClick={() => handleAddAllergy(allergy, "low")}
+                                                className="w-8 h-8 rounded-full bg-yellow-500"></button>
+                                        <button onClick={() => handleAddAllergy(allergy, "medium")}
+                                                className="w-8 h-8 rounded-full bg-orange-500"></button>
+                                        <button onClick={() => handleAddAllergy(allergy, "high")}
+                                                className="w-8 h-8 rounded-full bg-red-500"></button>
                                     </div>
                                 )}
-                            </li>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
+
+                    <h3 className="text-xl font-semibold mb-4 mt-6">Składniki nietolerancyjne</h3>
+                    <div className="flex flex-wrap gap-6 justify-center">
+                        {intolerantList.map((allergy) => (
+                            <div key={allergy.allergen_id}
+                                 className="bg-white p-4 px-6 rounded-full shadow-lg text-center border border-gray-300">
+                                <span className="font-semibold text-lg">{allergy.name}</span>
+                                {(isEditing || isCreating) && (
+                                    <div className="flex space-x-3">
+                                        <button onClick={() => handleAddAllergy(allergy, "low")}
+                                                className="w-8 h-8 rounded-full bg-yellow-500"></button>
+                                        <button onClick={() => handleAddAllergy(allergy, "medium")}
+                                                className="w-8 h-8 rounded-full bg-orange-500"></button>
+                                        <button onClick={() => handleAddAllergy(allergy, "high")}
+                                                className="w-8 h-8 rounded-full bg-red-500"></button>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
+
                 <div className="md:w-1/2 w-full">
                     <h2 className="text-2xl font-semibold text-black mb-4 text-center">Wybrane alergeny</h2>
-                    <ul>
-                        {selectedAllergies.map(({ allergenId, name, intensity }) => (
-                            <li
-                                key={allergenId}
-                                className={`bg-white p-4 mb-4 rounded-xl shadow text-center border-l-4 ${getIntensityColor(
-                                    intensity
-                                )} flex items-center justify-between`}
-                            >
-                                <span className="font-semibold text-lg">{name}</span>
+
+                    {/* Sekcja Alergeny */}
+                    <h3 className="text-xl font-semibold mb-4">Alergeny</h3>
+                    <div className="flex flex-wrap gap-6 justify-center">
+                        {selectedAllergenList.map(({ allergen_id, name, intensity }) => (
+                            <div key={allergen_id}
+                                 className="p-4 px-6 rounded-full shadow-lg text-center flex items-center justify-center"
+                                 style={{ backgroundColor: intensityToBackgroundColor(intensity as string) }}>
+                                <span className="font-semibold text-lg text-white">{name}</span>
                                 {(isEditing || isCreating) && (
-                                    <button
-                                        onClick={() => handleRemoveAllergy(allergenId)}
-                                        className="text-red-600 hover:text-red-800 focus:outline-none"
-                                    >
-                                        <XCircleIcon className="h-8 w-8" aria-hidden="true" />
+                                    <button onClick={() => handleRemoveAllergy(allergen_id as string)}
+                                            className="text-black hover:text-gray-800 ml-2">
+                                        <XCircleIcon className="h-6 w-6" aria-hidden="true" />
                                     </button>
                                 )}
-                            </li>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
+
+                    {/* Sekcja Składniki nietolerowane */}
+                    <h3 className="text-xl font-semibold mb-4 mt-6">Składniki nietolerowane</h3>
+                    <div className="flex flex-wrap gap-6 justify-center">
+                        {selectedIntolerantList.map(({ allergen_id, name, intensity }) => (
+                            <div key={allergen_id}
+                                 className="p-4 px-6 rounded-full shadow-lg text-center flex items-center justify-center"
+                                 style={{ backgroundColor: intensityToBackgroundColor(intensity as string) }}>
+                                <span className="font-semibold text-lg text-white">{name}</span>
+                                {(isEditing || isCreating) && (
+                                    <button onClick={() => handleRemoveAllergy(allergen_id as string)}
+                                            className="text-black hover:text-gray-800 ml-2">
+                                        <XCircleIcon className="h-6 w-6" aria-hidden="true" />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
+
+
             </div>
+
 
             {saveError && <p className="text-red-500 mt-4">{saveError}</p>}
 
-            <ToastContainer />
+            <ToastContainer/>
         </div>
     );
 

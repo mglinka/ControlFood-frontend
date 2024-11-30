@@ -67,11 +67,11 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
             };
 
             await assignAllergyProfile(data);
-            toast.success("Profile assigned successfully!");
+            toast.success("Stworzenie profilu powiodło się");
             setTimeout(() => onProfileAssigned(), 900);
         } catch (error) {
             console.error("Failed to assign profile:", error);
-            toast.error("Failed to assign profile. Please try again.");
+            toast.error("Stworzenie profilu nie powiodło się");
         } finally {
             setAssigning(false);
         }
@@ -79,7 +79,7 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-semibold mb-4 text-center">User Profile Schemas</h1>
+            <h1 className="text-2xl font-semibold mb-4 text-center">Szablony profilów alergicznych</h1>
 
             <button
                 onClick={onBack}
@@ -161,7 +161,7 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
             {modalOpen && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-                        <h2 className="text-xl font-semibold mb-6 text-center">Select Intensity Level</h2>
+                        <h2 className="text-xl font-semibold mb-6 text-center">Wybierz poziom intensywności alergenów</h2>
 
                         <div className="flex flex-col gap-4">
                             {/* Low Intensity */}
@@ -170,16 +170,16 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
                                 onClick={() => handleIntensitySelection("low")}
                             >
                                 <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-yellow-500 rounded-b-full"></div>
-                                <div className="py-6 text-lg font-bold">Low</div>
+                                <div className="py-6 text-lg font-bold">Niska</div>
                             </div>
 
                             {/* Medium Intensity */}
                             <div
                                 className="relative bg-orange-500 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                                onClick={() => handleIntensitySelection("moderate")}
+                                onClick={() => handleIntensitySelection("medium")}
                             >
                                 <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-orange-600 rounded-b-full"></div>
-                                <div className="py-6 text-lg font-bold">Medium</div>
+                                <div className="py-6 text-lg font-bold">Średnia</div>
                             </div>
 
                             {/* High Intensity */}
@@ -188,7 +188,7 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
                                 onClick={() => handleIntensitySelection("high")}
                             >
                                 <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-red-600 rounded-b-full"></div>
-                                <div className="py-6 text-lg font-bold">High</div>
+                                <div className="py-6 text-lg font-bold">Wysoka</div>
                             </div>
                         </div>
 
@@ -197,7 +197,7 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
                             className="mt-6 bg-gray-300 text-gray-700 px-6 py-2 rounded-full w-full hover:bg-gray-400"
                             onClick={() => setModalOpen(false)}
                         >
-                            Cancel
+                            Anuluj
                         </button>
                     </div>
                 </div>
