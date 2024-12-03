@@ -17,6 +17,7 @@ import AccountsPage from "./pages/AccountsPage.tsx";
 import AccessLevelsPage from "./pages/AccessLevelsPage.tsx";
 import SchemasPage from "./pages/SchemasPage.tsx";
 import SpecialistProductsPage from "./pages/SpecialistProudctsPage.tsx";
+import SafeProductsPage from "./pages/SafeProductsPage.tsx";
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
                                 <Route path="/login" element={<LoginPage />} />
                                 <Route path="/profile" element={<AllergyProfilePage />} />
                                 <Route path="/products" element={<ProductsPage />} />
+                                <Route path="/safe-products" element={<SafeProductsPage />} />
                                 <Route path="/products-specialist" element={<SpecialistProductsPage />} />
                                 <Route path="/scanner" element={<BarcodeScannerPage />} />
                                 <Route path="/my-account" element={<MyAccountPage />} />

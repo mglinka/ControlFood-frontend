@@ -13,6 +13,12 @@ export const SidebarData: SidebarItem[] = [
         role: ['ROLE_USER'],
     },
     {
+        title: 'Bezpieczne produkty',
+        path: '/safe-products',
+        icon: <AiOutlineFolder />,
+        role: ['ROLE_USER'],
+    },
+    {
         title: 'Produkty',
         path: '/products-specialist',
         icon: <AiOutlineFolder />,

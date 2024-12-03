@@ -1,24 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import axiosInstance from "../api/axiosConfig";
-import { authService } from "../utils/authService";
-import { ToastContainer, toast } from "react-toastify";
+import {authService} from "../utils/authService";
+import {toast, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getAllAllergens } from "../api/api";
+import {getAllAllergens} from "../api/api";
 import {ArrowLeftIcon, XCircleIcon} from "@heroicons/react/16/solid";
 import axios from "axios";
-import { FaPen, FaPlus } from 'react-icons/fa';
+import {FaPen, FaPlus} from 'react-icons/fa';
 import {FiCheckCircle} from "react-icons/fi";
 import {components} from "../controlfood-backend-schema";
-
-
+interface CustomProfileProps {onBack: () => void;}
 type Allergy = components["schemas"]["GetAllergenDTO"];
 type GetAllergenIntensityDTO = components["schemas"]["GetAllergenIntensityDTO"];
 
 
 
-interface CustomProfileProps {
-    onBack: () => void; // Funkcja przekazana z nadrzędnego komponentu
-}
+
+
 const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
     const [allergies, setAllergies] = useState<Allergy[]>([]);
     const [selectedAllergies, setSelectedAllergies] = useState<GetAllergenIntensityDTO[]>([]);
@@ -30,7 +28,6 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isCreating, setIsCreating] = useState<boolean>(false);
 
-    // Fetch allergens and allergy profile
     const fetchAllergies = async () => {
         setLoading(true);
         try {
@@ -113,29 +110,24 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
 
 
-
     const handleAddAllergy = (allergy: Allergy, intensity: string) => {
-        // Sprawdź, czy allergy.name i allergy.allergen_id są zdefiniowane
         if (!allergy.name || !allergy.allergen_id) {
             console.error("Allergy name or allergen_id is undefined");
             return;
         }
 
-        // Sprawdź, czy wybrany alergen już jest na liście
         if (selectedAllergies.some((a) => a.allergen_id === allergy.allergen_id)) return;
 
         const allergenToAdd: GetAllergenIntensityDTO = {
             allergen_id: allergy.allergen_id,
             name: allergy.name,
-            intensity, // Zakładamy, że intensity jest prawidłowe
-            type: allergy.allergenType ?? "ALLERGEN", // Domyślna wartość lub rzutowanie na poprawny typ
+            intensity,
+            type: allergy.allergenType ?? "ALLERGEN",
         };
 
 
-        // Dodajemy alergen do listy
         setSelectedAllergies((prev) => [...prev, allergenToAdd]);
 
-        // Usuwamy alergen z listy dostępnych
         setAllergies((prev) => prev.filter((a) => a.allergen_id !== allergy.allergen_id));
 
         if (!isCreating) {
@@ -145,15 +137,30 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
 
     const handleRemoveAllergy = (id: string) => {
+        // Znajdź usunięty alergen w liście wybranych alergii
         const removedAllergy = selectedAllergies.find((allergy) => allergy.allergen_id === id);
+
         if (removedAllergy) {
-            setSelectedAllergies((prev) => prev.filter((selected) => selected.allergen_id !== id));
+            // Usuń alergen z listy wybranych
+            setSelectedAllergies((prev) =>
+                prev.filter((selected) => selected.allergen_id !== id)
+            );
+
+            // Dodaj alergen z powrotem do odpowiedniej kategorii
             setAllergies((prev) => [
                 ...prev,
-                { allergen_id: removedAllergy.allergen_id, name: removedAllergy.name },
+                {
+                    allergen_id: removedAllergy.allergen_id,
+                    name: removedAllergy.name,
+                    allergenType: removedAllergy.type === "ALLERGEN" ? "ALLERGEN" : "INTOLERANT_INGREDIENT",
+                },
             ]);
         }
     };
+
+
+
+
 
     const handleSaveProfile = async () => {
         try {
@@ -201,13 +208,13 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
     const intensityToBackgroundColor = (intensity: string) => {
         switch (intensity) {
             case "low":
-                return "#ffd100"; // Jasno-żółty
+                return "#ffd100";
             case "medium":
-                return "#ea6f0d"; // Pomarańczowy
+                return "#ea6f0d";
             case "high":
-                return "#EF4444"; // Czerwony
+                return "#EF4444";
             default:
-                return "#FFFFFF"; // Domyślnie biały
+                return "#FFFFFF";
         }
     };
 
@@ -225,7 +232,9 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
         );
     };
 
+// Użyj dynamicznego podziału w renderowaniu:
     const { allergens: allergenList, intolerantIngredients: intolerantList } = allergensByType(allergies);
+
 
     const splitSelectedAllergiesByType = (allergies: GetAllergenIntensityDTO[]) => {
         const allergenList = allergies.filter(allergy => allergy.type === "ALLERGEN");
@@ -233,15 +242,16 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
         return { allergenList, intolerantList };
     };
 
-    // Podział wybranych alergenów na dwie kategorie
-    const { allergenList: selectedAllergenList, intolerantList: selectedIntolerantList } = splitSelectedAllergiesByType(selectedAllergies);
+    const {
+        allergenList: selectedAllergenList,
+        intolerantList: selectedIntolerantList } = splitSelectedAllergiesByType(selectedAllergies);
+
+
 
 
 
     return (
         <div className="w-full p-6 md:p-10 bg-gray-100 rounded-lg shadow-lg max-w-5xl mx-auto">
-
-
             <div className="mt-4 mb-6 space-x-4 flex">
                 {isEditing || isCreating ? (
                     <div className="flex justify-between items-center w-full">

@@ -53,6 +53,16 @@ export const getAllProducts = async (page = 0, size = 15, searchQuery="") => {
         throw new Error("Failed to fetch products");
     }
 };
+export const getAllProductsWithoutPagination = async () => {
+    try {
+        const response = await axiosInstance.get("/products/withoutPagination");
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products with pagination:", error);
+        throw new Error("Failed to fetch products");
+    }
+};
 
 
 export const getAllUnits = async () =>{
