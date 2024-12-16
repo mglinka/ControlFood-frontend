@@ -23,73 +23,45 @@ const SafeProductsPage: React.FC = () => {
 
     const fetchAndFilterProducts = async () => {
         setLoading(true);
-
-
         try {
             let data;
-
             if (selectedCategory) {
-                // Pobieranie produktów na podstawie kategorii
                 data = await getProductsByCategory(selectedCategory);
-
-                // Filtrowanie produktów lokalnie po nazwie w ramach kategorii
-                if (searchQuery) {
-                    const lowerCaseQuery = searchQuery.toLowerCase();
-                    data = data.filter((product: components["schemas"]["GetProductDTO"]) =>
-                        product.productName?.toLowerCase().includes(lowerCaseQuery)
-                    );
-                }
             } else {
-                // Pobieranie wszystkich produktów z paginacją i wyszukiwanie globalne
                 data = await getAllProducts(0, 140, searchQuery);
             }
 
-            setProducts(data); // Ustawienie wszystkich produktów
-            setFilteredProducts(data); // Na początku filtrujemy tylko po kategorii i zapytaniu wyszukiwania
+            // Filtruj produkty na podstawie zapytania
+            if (searchQuery) {
+                const lowerCaseQuery = searchQuery.toLowerCase();
+                data = data.filter((product: components['schemas']['GetProductDTO']) =>
+                    product.productName?.toLowerCase().includes(lowerCaseQuery)
+                );
+            }
 
-            // Teraz po załadowaniu produktów wykonujemy filtrowanie na podstawie `filterMode`
-            const filtered = data.filter((product:components['schemas']['GetProductDTO'])=> {
-                if (!product.labelDTO?.allergens) return true; // Jeśli brak alergenów, zawsze wyświetlamy produkt
+            // Filtruj produkty na podstawie profilu alergii
+            const filtered = data.filter((product: components['schemas']['GetProductDTO']) => {
+                if (!product.labelDTO?.allergens) return true;
 
                 const productAllergens = product.labelDTO?.allergens
                     .split(',')
                     .map(allergen => allergen.trim().toLowerCase());
 
-                // Filtracja dla trybu "no-allergens"
                 if (filterMode === 'no-allergens') {
-                    return !productAllergens.some((allergen :string)=> {
-                        // Szukamy alergenu w profilu użytkownika
-                        const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen.toLowerCase());
-
-                        // Jeśli alergen znajduje się w profilu, produkt jest odrzucany
+                    return !productAllergens.some((allergen: string) => {
+                        const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen);
                         return profileAllergen !== undefined;
                     });
                 }
 
-                // Filtracja dla trybu "allow-low" - dopuszczamy tylko alergeny o niskiej intensywności
-                const matches = productAllergens.map((allergen:string) => {
-                    // Znajdujemy alergen w profilu użytkownika
-                    const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen.toLowerCase());
-
-                    // Jeśli alergen z produktu nie znajduje się w profilu, produkt przechodzi dalej
-                    if (!profileAllergen) return true;  // Produkt może przejść, bo brak tego alergenu w profilu
-                    console.log(";;;;;;;;;;;;;;;;;;;;;;;;;")
-                    console.log(profileAllergen.intensity)
-                    console.log(profileAllergen.name)
-                    // Sprawdzamy intensywność alergenu w profilu użytkownika
-                    if (profileAllergen.intensity.toLowerCase() === 'low') {
-                        return true;  // Produkt przechodzi, jeśli intensywność to 'low'
-                    } else {
-                        return false;  // Produkt odpada, jeśli intensywność to 'medium' lub 'high'
-                    }
+                return productAllergens.every((allergen: string) => {
+                    const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen);
+                    return !profileAllergen || profileAllergen.intensity.toLowerCase() === 'low';
                 });
-
-                // Jeśli dla wszystkich alergenów w produkcie sprawdzenie zakończyło się pozytywnie, produkt przechodzi
-                return matches.every(match => match);
             });
 
-            setFilteredProducts(filtered); // Aktualizacja przefiltrowanych produktów
-
+            setProducts(data);
+            setFilteredProducts(filtered);
         } catch (error) {
             setError('Błąd podczas pobierania produktów.');
             console.error('Error:', error);
@@ -98,51 +70,33 @@ const SafeProductsPage: React.FC = () => {
         }
     };
 
-    // Fetch categories and allergens profile
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchInitialData = async () => {
             setLoading(true);
             try {
-                const response = await getCategories();  // Assuming you have a category endpoint
-                setCategories(response);
+                const accountId = authService.getAccountId();
+                if (accountId) {
+                    const profileData = await getAllergyProfileByAccountId(accountId);
+                    setAllergenProfile(profileData.allergens);
+                }
+                const categoriesData = await getCategories();
+                setCategories(categoriesData);
             } catch (error) {
-                console.error('Error fetching categories:', error, products);
-                setError('Error fetching categories. Please try again later.');
+                console.error('Error fetching initial data:', error, products, error);
+                setError('Error fetching initial data. Please try again later.');
             } finally {
                 setLoading(false);
             }
         };
 
-        const fetchAllergyProfile = async () => {
-            try {
-                const accountId = authService.getAccountId();
-                if (!accountId) return;
-                const profileData = await getAllergyProfileByAccountId(accountId);
-                console.log("Tutaj", profileData)
-                setAllergenProfile(profileData.allergens);
-            } catch (error) {
-                console.error('Error fetching allergy profile:', error);
-            }
-        };
-
-        console.log("Profile1", allergenProfile)
-        fetchCategories();
-        fetchAllergyProfile();
-        fetchAndFilterProducts();
-        console.log("Profile", allergenProfile)
-        setTimeout(()=> console.log("nie", allergenProfile), 3000);
+        fetchInitialData();
     }, []);
 
     useEffect(() => {
-
-        fetchAndFilterProducts()
-        console.log("Profil", allergenProfile)
-        console.log("Profil", allergenProfile.map(allergen=> console.log(allergen)));
-
-
-    }, [selectedCategory, searchQuery, filterMode, allergenProfile]); // Re-render w przypadku zmiany tych zmiennych
-
-
+        if (allergenProfile.length > 0) {
+            fetchAndFilterProducts();
+        }
+    }, [allergenProfile, selectedCategory, searchQuery, filterMode]);
 
 
 
@@ -153,7 +107,6 @@ const SafeProductsPage: React.FC = () => {
 
 
     const closeModal = () => setSelectedProduct(null);
-    // Search filter logic
     const searchFilteredProducts = filteredProducts.filter(product =>
         product.productName.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -164,7 +117,7 @@ const SafeProductsPage: React.FC = () => {
                 <div className="relative w-1/2">
                     <input
                         onChange={(event) => {
-                            setSearchQuery(event.target.value);  // Update the search query on user input
+                            setSearchQuery(event.target.value);
                         }}
                         value={searchQuery}
                         className="w-full px-6 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black placeholder-gray-400 pl-12"
@@ -179,7 +132,7 @@ const SafeProductsPage: React.FC = () => {
                 <div className="relative w-1/4 ml-4">
                     <select
                         onChange={(event) => {
-                            setSelectedCategory(event.target.value);  // Update selected category
+                            setSelectedCategory(event.target.value);
                             setSearchQuery("")
                         }}
                         className="w-full px-4 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black appearance-none cursor-pointer"
@@ -214,7 +167,7 @@ const SafeProductsPage: React.FC = () => {
             ) : error ? (
                 <div>{error}</div>
             ) : searchFilteredProducts.length === 0 ? (
-                <p>No products found</p>
+                <p></p>
             ) : (
                 <div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

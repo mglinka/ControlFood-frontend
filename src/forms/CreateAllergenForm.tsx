@@ -186,13 +186,13 @@ export function CreateAllergenForm() {
                     )}
                 </div>
 
-                <h3 className="text-xl font-semibold mb-4 text-orange-600 mt-8">Nietolerowane składniki</h3>
+                <h3 className="text-xl font-semibold mb-4 text-blue-500 mt-8">Nietolerowane składniki</h3>
                 <div className="flex flex-wrap gap-4">
                     {allergensType2.length > 0 ? (
                         allergensType2.map((allergen) => (
                             <div
                                 key={allergen.allergen_id}
-                                className="cursor-pointer bg-white text-black border border-orange-600 px-6 py-2 rounded-full hover:scale-110 transition-all duration-300 ease-in-out"
+                                className="cursor-pointer bg-white text-black border border-blue-600 px-6 py-2 rounded-full hover:scale-110 transition-all duration-300 ease-in-out"
                                 onClick={() => handleSelectAllergen(allergen)}
                             >
                                 {allergen.name}

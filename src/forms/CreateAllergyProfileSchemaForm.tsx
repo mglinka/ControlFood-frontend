@@ -21,8 +21,7 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
         e.preventDefault();
         setLoading(true);
         setError(null);
-        console.log(error);
-
+        console.log(error)
         if (!name || selectedAllergens.length === 0) {
             setError("Please provide a profile name and select at least one allergen.");
             setLoading(false);
@@ -49,14 +48,21 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
             setSelectedAllergens([]);
 
             onClose(); // Close the form after submission
-        } catch (error) {
-            setError("Error creating allergy profile. Please try again.");
-            toast.error("Stworzenie szablonu nie powiodło się");
+        } catch (error: any) {
+            if (error?.response?.status === 400) {
+                // Check for a 400 status error, likely due to a conflict (e.g., profile name already exists)
+                setError("Szablon o takiej nazwie już istnieje.");
+                toast.error("Szablon o takiej nazwie już istnieje.");
+            } else {
+                setError("Error creating allergy profile. Please try again.");
+                toast.error("Stworzenie szablonu nie powiodło się");
+            }
             console.error("Error:", error);
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleAllergenChange = (allergenId: string) => {
         setSelectedAllergens((prev) =>
@@ -66,58 +72,109 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
         );
     };
 
-    return (
-        <form
-            onSubmit={handleSubmit}
-            className="space-y-6 max-w-full sm:max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg overflow-y-auto"
-        >
-            {/* Profile name input */}
-            <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Wpisz nazwę szablonu"
-                className="p-3 border rounded-full w-full shadow-md"
-                required
-            />
+    // Split allergens into categories
+    const allergensList = allergens.reduce(
+        (acc, allergen) => {
+            if (allergen.allergenType === "ALLERGEN") {
+                acc.allergens.push(allergen);
+            } else if (allergen.allergenType === "INTOLERANT_INGREDIENT") {
+                acc.intolerants.push(allergen);
+            }
+            return acc;
+        },
+        { allergens: [] as components["schemas"]["GetAllergenDTO"][], intolerants: [] as components["schemas"]["GetAllergenDTO"][] }
+    );
 
-            {/* Allergens selection */}
-            <div>
-                <h3 className="font-semibold text-lg mb-4">Wybierz alergeny:</h3>
-                <div
-                    className="flex flex-wrap gap-2 sm:gap-4 overflow-y-auto max-h-80 p-2 border rounded-lg"
-                    style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db #f9fafb" }} // Opcjonalne dla przewijania
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative">
+                <button
+                    className="absolute top-2 right-2 text-gray-500 text-xl"
+                    onClick={onClose}
                 >
-                    {allergens.map((allergen) => (
-                        <div
-                            key={allergen.allergen_id}
-                            onClick={() => handleAllergenChange(allergen.allergen_id as string)}
-                            className={`cursor-pointer px-4 py-2 text-sm sm:text-base rounded-full border-2 transition-all duration-200 
-                ${selectedAllergens.includes(allergen.allergen_id as string)
-                                ? "bg-orange-500 text-white border-orange-500"
-                                : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-orange-100"}`}
-                        >
-                            {allergen.name}
+                    &times;
+                </button>
+                <h2 className="text-2xl font-semibold text-center mb-6">Tworzenie nowego szablonu profilu alergicznego</h2>
+
+                <div className="relative space-y-6">
+                    {/* Profile name input */}
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 mb-6"
+                        placeholder="Nazwa szablonu"
+                    />
+
+                    {/* Allergens and Intolerants selection */}
+                    <div className="grid grid-cols-2 gap-8">
+                        {/* Column: Allergens */}
+                        <div className="flex flex-col">
+                            <h3 className="font-semibold text-lg text-orange-500 mb-4 text-center">Alergeny</h3>
+                            <div
+                                className="flex flex-wrap gap-2 p-4 border rounded-md overflow-y-auto max-h-96 bg-gray-50"
+                                style={{
+                                    scrollbarWidth: "thin",
+                                    scrollbarColor: "#d1d5db #f9fafb",
+                                }}
+                            >
+                                {allergensList.allergens.map((allergen) => (
+                                    <button
+                                        key={allergen.allergen_id}
+                                        onClick={() => handleAllergenChange(allergen.allergen_id as string)}
+                                        className={`px-4 py-2 rounded-full text-sm border 
+                                        ${selectedAllergens.includes(allergen.allergen_id as string)
+                                            ? "bg-orange-500 text-white border-orange-500"
+                                            : "bg-gray-200 border-gray-300"}`}
+                                    >
+                                        {allergen.name}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    ))}
+
+                        {/* Column: Intolerant Ingredients */}
+                        <div className="flex flex-col">
+                            <h3 className="font-semibold text-lg text-blue-500 mb-4 text-center">Składniki nietolerowane</h3>
+                            <div
+                                className="flex flex-wrap gap-2 p-4 border rounded-md overflow-y-auto max-h-96 bg-gray-50"
+                                style={{
+                                    scrollbarWidth: "thin",
+                                    scrollbarColor: "#d1d5db #f9fafb",
+                                }}
+                            >
+                                {allergensList.intolerants.map((allergen) => (
+                                    <button
+                                        key={allergen.allergen_id}
+                                        onClick={() => handleAllergenChange(allergen.allergen_id as string)}
+                                        className={`px-4 py-2 rounded-full text-sm border 
+                                        ${selectedAllergens.includes(allergen.allergen_id as string)
+                                            ? "bg-blue-500 text-white border-blue-500"
+                                            : "bg-gray-200 border-gray-300"}`}
+                                    >
+                                        {allergen.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end mt-6">
+                        <button
+                            onClick={handleSubmit}
+                            className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transform transition-all duration-300 hover:scale-110"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <FiLoader className="animate-spin text-xl"/>
+                            ) : (
+                                <FiCheckCircle className="text-2xl"/>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            {/* Submit button */}
-            <div className="flex justify-end mt-4">
-                <button
-                    type="submit"
-                    className="bg-orange-500 text-white px-4 py-3 rounded-full flex items-center justify-center shadow-md"
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <FiLoader className="animate-spin text-xl"/>
-                    ) : (
-                        <FiCheckCircle className="text-xl"/>
-                    )}
-                </button>
-            </div>
-
-        </form>
+        </div>
     );
 };

@@ -164,13 +164,13 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
                         <h2 className="text-xl font-semibold mb-6 text-center">Wybierz poziom intensywności alergenów</h2>
 
                         <div className="flex flex-col gap-4">
-                            {/* Low Intensity */}
+                            {/* High Intensity */}
                             <div
-                                className="relative bg-yellow-400 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                                onClick={() => handleIntensitySelection("low")}
+                                className="relative bg-red-500 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                                onClick={() => handleIntensitySelection("high")}
                             >
-                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-yellow-500 rounded-b-full"></div>
-                                <div className="py-6 text-lg font-bold">Niska</div>
+                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-red-600 rounded-b-full"></div>
+                                <div className="py-6 text-lg font-bold">Wysoka</div>
                             </div>
 
                             {/* Medium Intensity */}
@@ -181,15 +181,15 @@ const UserProfileSchemas: React.FC<UserProfileSchemasProps> = ({ onBack, onProfi
                                 <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-orange-600 rounded-b-full"></div>
                                 <div className="py-6 text-lg font-bold">Średnia</div>
                             </div>
-
-                            {/* High Intensity */}
+                            {/* Low Intensity */}
                             <div
-                                className="relative bg-red-500 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                                onClick={() => handleIntensitySelection("high")}
+                                className="relative bg-yellow-400 text-white text-center rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                                onClick={() => handleIntensitySelection("low")}
                             >
-                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-red-600 rounded-b-full"></div>
-                                <div className="py-6 text-lg font-bold">Wysoka</div>
+                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 w-20 h-10 bg-yellow-500 rounded-b-full"></div>
+                                <div className="py-6 text-lg font-bold">Niska</div>
                             </div>
+
                         </div>
 
                         {/* Cancel Button */}

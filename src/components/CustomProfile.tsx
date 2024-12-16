@@ -304,7 +304,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                 <div className="md:w-1/2 w-full mb-6 md:mb-0">
                     <h2 className="text-2xl font-semibold text-black mb-4 text-center">Alergeny</h2>
                     {/* Allergen type categories */}
-                    <h3 className="text-xl font-semibold mb-4">Alergeny</h3>
+                    <h3 className="text-xl font-semibold  mt-2 mb-6">Alergeny</h3>
                     <div className="flex flex-wrap gap-6 justify-center">
                         {allergenList.map((allergy) => (
                             <div key={allergy.allergen_id}
@@ -324,7 +324,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                         ))}
                     </div>
 
-                    <h3 className="text-xl font-semibold mb-4 mt-6">Składniki nietolerancyjne</h3>
+                    <h3 className="text-xl font-semibold mb-4 mt-12">Składniki nietolerowane</h3>
                     <div className="flex flex-wrap gap-6 justify-center">
                         {intolerantList.map((allergy) => (
                             <div key={allergy.allergen_id}
@@ -350,7 +350,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                     <h2 className="text-2xl font-semibold text-black mb-4 text-center">Wybrane alergeny</h2>
 
                     {/* Sekcja Alergeny */}
-                    <h3 className="text-xl font-semibold mb-4">Alergeny</h3>
+                    <h3 className="text-xl font-semibold mt-2 mb-6">Alergeny</h3>
                     <div className="flex flex-wrap gap-6 justify-center">
                         {selectedAllergenList.map(({ allergen_id, name, intensity }) => (
                             <div key={allergen_id}
@@ -368,7 +368,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                     </div>
 
                     {/* Sekcja Składniki nietolerowane */}
-                    <h3 className="text-xl font-semibold mb-4 mt-6">Składniki nietolerowane</h3>
+                    <h3 className="text-xl font-semibold mb-6 mt-12">Składniki nietolerowane</h3>
                     <div className="flex flex-wrap gap-6 justify-center">
                         {selectedIntolerantList.map(({ allergen_id, name, intensity }) => (
                             <div key={allergen_id}

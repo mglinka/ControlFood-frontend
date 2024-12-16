@@ -131,10 +131,16 @@ const SchemasPage: React.FC = () => {
             });
 
             setIsEditModalOpen(false); // Close the edit modal
-        } catch (error) {
-            toast.error("Edycja szablonu nie powiodłą się");
+        } catch (error: any) {
+            if (error?.response?.status === 400) {
+                // Check if the error is due to a conflict (e.g., profile name already exists)
+                toast.error("Szablon o tej nazwie już istnieje.");
+            } else {
+                toast.error("Edycja szablonu nie powiodła się");
+            }
         }
     };
+
 
     const toggleAllergenSelection = (allergen_id: string) => {
         const newSelectedAllergens = new Set(editAllergens);
@@ -211,31 +217,71 @@ const SchemasPage: React.FC = () => {
                             <h2 className="text-xl font-semibold text-center">{selectedSchema.name}</h2>
                         </div>
 
-                        {/* Sekcja z alergenami */}
                         <div className="mb-6">
-                            <h3 className="font-semibold text-lg mb-2">Alergeny:</h3>
-                            <div className="flex flex-wrap gap-4">
-                                {selectedSchema.allergens?.map((allergen, index) => {
-                                    const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
-                                    return allergenDetails ? (
-                                        <span
-                                            key={index}
-                                            className="inline-block px-6 py-3 rounded-full bg-white border-2 border-orange-500 text-black text-lg font-semibold"
-                                        >
-                                {allergenDetails.name}, {allergenDetails.allergenType}
-                            </span>
 
-                                    ) : (
-                                        <span
-                                            key={index}
-                                            className="inline-block px-6 py-3 rounded-full bg-white border-2 border-orange-500 text-black text-lg font-semibold"
-                                        >
-                                alergen nieznany
+                            {/* Sekcja: Alergeny */}
+                            <div className="mb-4">
+                                <h4 className="font-semibold text-md text-orange-500 mb-2">Alergeny:</h4>
+                                <div className="flex flex-wrap gap-4">
+                                    {selectedSchema.allergens &&
+                                        selectedSchema.allergens
+                                            .filter((allergen) => {
+                                                const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
+                                                return allergenDetails?.allergenType === "ALLERGEN";
+                                            })
+                                            .map((allergen) => {
+                                                const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
+                                                return allergenDetails ? (
+                                                    <span
+                                                        key={allergenDetails.allergen_id!}
+                                                        className="inline-block px-6 py-3 rounded-full bg-white border-2 border-orange-500 text-black text-lg font-semibold"
+                                                    >
+                                {allergenDetails.name}
                             </span>
-                                    );
-                                })}
+                                                ) : (
+                                                    <span
+                                                        key={allergen?.allergen_id || Math.random()} // Obsłuż brak klucza
+                                                        className="inline-block px-6 py-3 rounded-full bg-gray-200 border-2 text-black text-lg font-semibold"
+                                                    >
+                                Nieznany alergen
+                            </span>
+                                                );
+                                            })}
+                                </div>
+                            </div>
+
+                            {/* Sekcja: Składniki nietolerowane */}
+                            <div>
+                                <h4 className="font-semibold text-md text-blue-500 mb-2">Składniki nietolerowane:</h4>
+                                <div className="flex flex-wrap gap-4">
+                                    {selectedSchema.allergens &&
+                                        selectedSchema.allergens
+                                            .filter((allergen) => {
+                                                const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
+                                                return allergenDetails?.allergenType === "INTOLERANT_INGREDIENT";
+                                            })
+                                            .map((allergen) => {
+                                                const allergenDetails = allergens.find((a) => a.allergen_id === allergen.allergen_id);
+                                                return allergenDetails ? (
+                                                    <span
+                                                        key={allergenDetails.allergen_id!}
+                                                        className="inline-block px-6 py-3 rounded-full bg-white border-2 border-blue-500 text-black text-lg font-semibold"
+                                                    >
+                                {allergenDetails.name}
+                            </span>
+                                                ) : (
+                                                    <span
+                                                        key={allergen?.allergen_id || Math.random()} // Obsłuż brak klucza
+                                                        className="inline-block px-6 py-3 rounded-full bg-gray-200 border-2 text-black text-lg font-semibold"
+                                                    >
+                                Nieznany składnik
+                            </span>
+                                                );
+                                            })}
+                                </div>
                             </div>
                         </div>
+
 
                         {/* Sekcja z przyciskami */}
                         <div className="flex justify-end gap-4 mt-6">
@@ -259,52 +305,84 @@ const SchemasPage: React.FC = () => {
 
             {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative">
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative">
                         <button
                             className="absolute top-2 right-2 text-gray-500 text-xl"
                             onClick={() => setIsEditModalOpen(false)}
                         >
                             &times;
                         </button>
-                        <h2 className="text-xl font-semibold text-center mb-4">Edytuj szablon profilu alergicznego</h2>
+                        <h2 className="text-2xl font-semibold text-center mb-6">Edytuj szablon profilu alergicznego</h2>
 
-                        <div className="relative flex flex-col space-y-4">
+                        <div className="relative space-y-6">
                             {/* Pole nazwy */}
                             <input
                                 type="text"
                                 value={editSchemaName}
                                 onChange={(e) => setEditSchemaName(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                                placeholder="Schema Name"
+                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 mb-6"
+                                placeholder="Nazwa szablonu"
                             />
 
-                            {/* Sekcja z alergenami */}
-                            <div>
-                                <h3 className="font-semibold mb-2">Wybierz alergeny</h3>
-                                <div
-                                    className="flex flex-wrap gap-2 p-2 border rounded-md overflow-y-auto max-h-60"
-                                    style={{
-                                        scrollbarWidth: "thin",
-                                        scrollbarColor: "#d1d5db #f9fafb"
-                                    }} // Opcjonalne przewijanie
-                                >
-                                    {allergens.map((allergen) => (
-                                        <button
-                                            key={allergen.allergen_id}
-                                            onClick={() => toggleAllergenSelection(allergen.allergen_id as string)}
-                                            className={`px-4 py-2 rounded-full text-sm border 
-                        ${editAllergens.has(allergen.allergen_id as string)
-                                                ? "bg-orange-500 text-white border-orange-500"
-                                                : "bg-gray-200 border-gray-300"}`}
-                                        >
-                                            {allergen.name}
-                                        </button>
-                                    ))}
+                            {/* Sekcja alergenów i składników nietolerowanych */}
+                            <div className="grid grid-cols-2 gap-8">
+                                {/* Kolumna: Alergeny */}
+                                <div className="flex flex-col">
+                                    <h3 className="font-semibold text-lg text-orange-500 mb-4 text-center">Alergeny</h3>
+                                    <div
+                                        className="flex flex-wrap gap-2 p-4 border rounded-md overflow-y-auto max-h-96 bg-gray-50"
+                                        style={{
+                                            scrollbarWidth: "thin",
+                                            scrollbarColor: "#d1d5db #f9fafb",
+                                        }}
+                                    >
+                                        {allergens
+                                            .filter((allergen) => allergen.allergenType === "ALLERGEN")
+                                            .map((allergen) => (
+                                                <button
+                                                    key={allergen.allergen_id}
+                                                    onClick={() => toggleAllergenSelection(allergen.allergen_id as string)}
+                                                    className={`px-4 py-2 rounded-full text-sm border 
+                                            ${editAllergens.has(allergen.allergen_id as string)
+                                                        ? "bg-orange-500 text-white border-orange-500"
+                                                        : "bg-gray-200 border-gray-300"}`}
+                                                >
+                                                    {allergen.name}
+                                                </button>
+                                            ))}
+                                    </div>
+                                </div>
+
+                                {/* Kolumna: Składniki nietolerowane */}
+                                <div className="flex flex-col">
+                                    <h3 className="font-semibold text-lg text-blue-500 mb-4 text-center">Składniki nietolerowane</h3>
+                                    <div
+                                        className="flex flex-wrap gap-2 p-4 border rounded-md overflow-y-auto max-h-96 bg-gray-50"
+                                        style={{
+                                            scrollbarWidth: "thin",
+                                            scrollbarColor: "#d1d5db #f9fafb",
+                                        }}
+                                    >
+                                        {allergens
+                                            .filter((allergen) => allergen.allergenType === "INTOLERANT_INGREDIENT")
+                                            .map((allergen) => (
+                                                <button
+                                                    key={allergen.allergen_id}
+                                                    onClick={() => toggleAllergenSelection(allergen.allergen_id as string)}
+                                                    className={`px-4 py-2 rounded-full text-sm border 
+                                            ${editAllergens.has(allergen.allergen_id as string)
+                                                        ? "bg-blue-500 text-white border-blue-500"
+                                                        : "bg-gray-200 border-gray-300"}`}
+                                                >
+                                                    {allergen.name}
+                                                </button>
+                                            ))}
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Przyciski akcji */}
-                            <div className="flex justify-end mt-4">
+                            <div className="flex justify-end mt-6">
                                 <button
                                     onClick={handleEditSubmit}
                                     className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transform transition-all duration-300 hover:scale-110"
@@ -313,11 +391,10 @@ const SchemasPage: React.FC = () => {
                                 </button>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             )}
+
 
             <ToastContainer/>
         </div>
