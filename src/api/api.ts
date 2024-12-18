@@ -102,7 +102,7 @@ export const getAllAllergens = async () => {
     return response.data;
 };
 
-export const changePassword = async (payload: { currentPassword: string; newPassword: string; confirmationPassword: string }) => {
+export const changePassword = async (payload: {  newPassword: string; confirmationPassword: string }) => {
     const response = await axiosInstance.post("/me/change-password", payload);
     return response.data;
 };

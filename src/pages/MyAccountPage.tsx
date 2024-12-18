@@ -13,7 +13,6 @@ type GetAccountDTO = components["schemas"]["GetAccountDTO"];
 const MyAccountPage: React.FC = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [currentPassword, setCurrentPassword] = useState('');
     const [accountInfo, setAccountInfo] = useState<GetAccountDTO | null>(null);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [firstName, setFirstName] = useState('');
@@ -63,14 +62,12 @@ const MyAccountPage: React.FC = () => {
 
         try {
             await changePassword({
-                currentPassword,
                 newPassword,
                 confirmationPassword: confirmPassword,
             });
             toast.success('Zmiana hasła powiodła się');
             setNewPassword('');
             setConfirmPassword('');
-            setCurrentPassword('');
         } catch (err: any) {
             console.error('Password change error:', err);
             toast.error(err.response?.data?.message || 'An error occurred while changing the password.');
@@ -170,18 +167,7 @@ const MyAccountPage: React.FC = () => {
                     Zmień hasło
                 </h2>
                 <form className="space-y-6">
-                    <div>
-                        <label htmlFor="current-password" className="block text-sm font-medium leading-6 text-gray-900">
-                            Obecne hasło
-                        </label>
-                        <input
-                            id="current-password"
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-black sm:text-sm"
-                        />
-                    </div>
+
                     <div>
                         <label htmlFor="new-password" className="block text-sm font-medium leading-6 text-gray-900">
                             Nowe hasło

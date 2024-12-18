@@ -13,6 +13,7 @@ import {useAuth} from "../utils/AuthContext.tsx";
 import {jwtDecode} from "jwt-decode";
 import {AmazonLoginButton} from "./AmazonLoginButton.tsx";
 
+
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string()
@@ -119,7 +120,7 @@ export function LoginForm() {
         }
     };
 
-    const handleGoogleFailure = () => {
+    const handleGoogleFailure = ():any => {
         toast.error('Logowanie przez Google nie powiodło się');
     };
 
@@ -195,6 +196,7 @@ export function LoginForm() {
 
                 <div className="mt-6">
                     <GoogleLogin
+
                         onSuccess={handleGoogleSuccess}
                         onError={handleGoogleFailure}
                         theme="outline"

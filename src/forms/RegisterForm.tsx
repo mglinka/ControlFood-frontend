@@ -1,21 +1,25 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import {Link, useNavigate} from "react-router-dom";
-import {useState} from "react";
-import {components} from "../controlfood-backend-schema";
+import React, {useState} from "react";
 import axiosInstance from "../api/axiosConfig.ts";
-
+import {jwtDecode} from "jwt-decode";
+import {toast} from "react-toastify";
+import {useAuth} from "../utils/AuthContext.tsx";
+import {GoogleLogin} from "@react-oauth/google";
+import {AmazonLoginButton} from "./AmazonLoginButton.tsx";
 export function RegisterForm() {
+    const {login} = useAuth();
 
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [registerRequest, setRegisterRequest] = useState<components["schemas"]["RegisterRequest"]>({firstName: '',
+    const [registerRequest, setRegisterRequest] = useState({
+        firstName: '',
         lastName: '',
         email: '',
         password: ''
-    })
-
+    });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -30,13 +34,38 @@ export function RegisterForm() {
             await axiosInstance.post('/auth/register', registerRequest);
             navigate('/login');
         } catch (error: any) {
-            // Handle error appropriately
             setErrorMessage(error.response?.data?.message || 'Registration failed. Please try again.');
             console.error('Registration error:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        try {
+            const token = credentialResponse.credential;
+            console.log("Bartek", token);
+            const userInfo: any = jwtDecode(token);
+
+            console.log("Bart", userInfo);
+            const response = await axiosInstance.post('/auth/google/redirect', token);
+            console.log("Bartini", response);
+            console.log("B", response.data.token)
+            login(response.data.token)
+
+            // login(backendToken);
+            toast.success('Logowanie przez Google powiodło się');
+            setTimeout(() => navigate('/main-page'), 700);
+        } catch (error: any) {
+            console.error('Google Login Error:', error);
+            toast.error('Logowanie przez Google nie powiodło się');
+        }
+    };
+
+    const handleGoogleFailure = ():any => {
+        toast.error('Logowanie przez Google nie powiodło się');
+    };
+
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center py-12 lg:px-8">
@@ -56,7 +85,8 @@ export function RegisterForm() {
                     <div className="mt-10">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
-                                <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
+                                <label htmlFor="firstName"
+                                       className="block text-sm font-medium leading-6 text-gray-900">
                                     First Name
                                 </label>
                                 <div className="mt-2">
@@ -132,11 +162,26 @@ export function RegisterForm() {
                                     {loading ? 'Creating Account...' : 'Create Account'}
                                 </button>
                             </div>
+
+                            <div className="mt-6">
+                                <GoogleLogin
+                                    text={"signup_with"}
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={handleGoogleFailure}
+                                    theme="outline"
+                                    size="large"
+                                    width="100%"
+                                />
+                            </div>
+                            <div className="mt-6">
+                                <AmazonLoginButton/>
+                            </div>
                         </form>
 
                         <p className="mt-10 text-center text-sm text-gray-500">
-                            Already have an account?{' '}
-                            <Link to="/login" className="font-semibold leading-6 text-orange-600 hover:text-orange-500">Sign in</Link>
+                        Already have an account?{' '}
+                            <Link to="/login" className="font-semibold leading-6 text-orange-600 hover:text-orange-500">Sign
+                                in</Link>
                         </p>
                     </div>
                 </div>
