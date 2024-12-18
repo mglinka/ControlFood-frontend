@@ -8,6 +8,20 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="amazon-root"></div>
+    <script type="text/javascript">
+
+      window.onAmazonLoginReady = function() {
+        amazon.Login.setClientId('amzn1.application-oa2-client.70cb54ea58c6464c9fda2b5ab7693e9e');
+      };
+      (function(d) {
+        var a = d.createElement('script'); a.type = 'text/javascript';
+        a.async = true; a.id = 'amazon-login-sdk';
+        a.src = 'https://assets.loginwithamazon.com/sdk/na/login1.js';
+        d.getElementById('amazon-root').appendChild(a);
+      })(document);
+
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

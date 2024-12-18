@@ -18,10 +18,14 @@ import AccessLevelsPage from "./pages/AccessLevelsPage.tsx";
 import SchemasPage from "./pages/SchemasPage.tsx";
 import SpecialistProductsPage from "./pages/SpecialistProudctsPage.tsx";
 import SafeProductsPage from "./pages/SafeProductsPage.tsx";
+import {GoogleOAuthProvider} from "@react-oauth/google";
+
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function App() {
 
     return (
+        <GoogleOAuthProvider clientId={clientId}>
         <AuthProvider>
                 <Router>
                     <div className="relative">
@@ -50,6 +54,7 @@ function App() {
                     </div>
                 </Router>
         </AuthProvider>
+            </GoogleOAuthProvider>
     );
 }
 export default App;
