@@ -15,12 +15,12 @@ import {AmazonLoginButton} from "./AmazonLoginButton.tsx";
 
 
 const loginSchema = z.object({
-    email: z.string().email("Invalid email address"),
+    email: z.string().email("Niepoprawny adres email"),
     password: z.string()
-        .min(8, "Password must be at least 8 characters long")
-        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Password must contain at least one digit")
-        .regex(/[\W_]/, "Password must contain at least one special character") // Matches any non-word character
+        .min(8, "Hasło musi mieć co najmniej 8 znaków")
+        .regex(/[A-Z]/, "Hasło musi zawierać co najmniej jedną wielką literę")
+        .regex(/[0-9]/, "Hasło musi zawierać co najmniej jedną cyfrę")
+        .regex(/[\W_]/, "Hasło musi zawierać co najmniej jeden znak specjalny")
 });
 
 export function LoginForm() {
