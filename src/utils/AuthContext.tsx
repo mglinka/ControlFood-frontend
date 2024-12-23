@@ -9,6 +9,7 @@ interface AuthContextType {
     login: (token: string) => void;
     logout: () => void;
     refreshToken: () => Promise<string | null>;
+    isInitialized:boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,6 +17,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [role, setRole] = useState<string | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    useEffect(() => {
+        const initializeAuth = async () => {
+            const storedToken = localStorage.getItem('token');
+
+            if (storedToken) {
+                try {
+                    const decoded = authService.decodeToken(storedToken);
+                    if (decoded && decoded.role) {
+                        setRole(decoded.role[0]); // Ustaw rolę
+                    }
+                    setToken(storedToken);
+                } catch (error) {
+                    console.error('Failed to decode token:', error);
+                    localStorage.removeItem('token');
+                }
+            }
+            setIsInitialized(true);
+        };
+
+        initializeAuth();
+    }, []);
+
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token');
+
+        if (storedToken) {
+            try {
+                const decoded = authService.decodeToken(storedToken);  // Assuming decodeToken is a function in authService
+
+                if (decoded && decoded.role) {
+                    setRole('ols');
+                }
+
+                setToken(storedToken);  // Set the token even if role is not available
+            } catch (error) {
+                console.error('Failed to decode token:', error);
+                localStorage.removeItem('token');
+            }
+        }
+    }, []);  // Only run this effect once on mount
 
     useEffect(() => {
         if (token) {
@@ -28,11 +71,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = (token: string) => {
         const decoded = authService.decodeToken(token);
-        console.log("Martaola" , role );
+        console.log("Martaola1" , role );
         if (decoded) {
             setRole(decoded.role[0]);
+
         }
-        console.log("Martaola", role)
+        console.log("Rola ustawiana", role)
         setToken(token);
         localStorage.setItem('token', token);
     };
@@ -59,12 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     };
 
-
-
-
-
     return (
-        <AuthContext.Provider value={{ token, role, login, logout, refreshToken }}>
+        <AuthContext.Provider value={{ token, role, login, logout, refreshToken , isInitialized}}>
             {children}
         </AuthContext.Provider>
     );

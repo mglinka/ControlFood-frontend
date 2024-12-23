@@ -3,6 +3,7 @@ import {getAllProducts, getCategories, getProductsByCategory} from '../api/api.t
 import { components } from "../controlfood-backend-schema";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faSearch, faSpinner} from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 const placeholderImage = '/default-placeholder.png';
 
@@ -192,15 +193,15 @@ const SpecialistProductsPage: React.FC = () => {
                                 disabled={page === 0}
                                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
                             >
-                                Previous
+                                <FontAwesomeIcon icon={faArrowLeft} className="w-6 h-6" />
                             </button>
-                            <span className="self-center text-gray-700">Page {page + 1} of {totalPages}</span>
+                            <span className="self-center text-gray-700">Strona {page + 1} z {totalPages}</span>
                             <button
                                 onClick={handleNextPage}
                                 disabled={page >= totalPages - 1}
                                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
                             >
-                                Next
+                                <FontAwesomeIcon icon={faArrowRight} className="w-6 h-6" />
                             </button>
                         </div>
                     )}

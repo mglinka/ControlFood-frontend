@@ -312,7 +312,7 @@ const SchemasPage: React.FC = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-semibold text-center mb-6">Edytuj szablon profilu alergicznego</h2>
+                        <h2 className="text-2xl font-semibold text-center mb-6 rounded-full">Edytuj szablon profilu alergicznego</h2>
 
                         <div className="relative space-y-6">
                             {/* Pole nazwy */}

@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
     const [accountMenu, setAccountMenu] = useState(false);
     const location = useLocation();
     const { role, logout } = useAuth();
-    const noSidebarPaths = ['/', '/register', '/login'];
+    const noSidebarPaths = ['/', '/register', '/login', '/no-access'];
     const showSidebar = !noSidebarPaths.includes(location.pathname);
 
     const toggleSidebar = () => {

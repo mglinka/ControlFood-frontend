@@ -6,7 +6,7 @@ const Breadcrumbs: React.FC = () => {
     const location = useLocation();
     const pathnames = location.pathname.split("/").filter((x) => x);
 
-    const excludedPaths = ["/login", "/register", "/"];
+    const excludedPaths = ["/login", "/register", "/", "/no-access"];
 
     if (excludedPaths.includes(location.pathname)) {
         return null;

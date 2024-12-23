@@ -7,7 +7,7 @@ import {jwtDecode} from "jwt-decode";
 import {toast} from "react-toastify";
 import {useAuth} from "../utils/AuthContext.tsx";
 import {GoogleLogin} from "@react-oauth/google";
-import {AmazonLoginButton} from "./AmazonLoginButton.tsx";
+import {AmazonRegisterButton} from "./AmazonRegisterButton.tsx";
 export function RegisterForm() {
     const {login} = useAuth();
 
@@ -75,7 +75,7 @@ export function RegisterForm() {
                         <FontAwesomeIcon icon={faUserCircle} size="3x" className="text-red-500" />
                     </div>
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                        Create an account
+                        Stwórz konto
                     </h2>
 
                     {errorMessage && (
@@ -87,7 +87,7 @@ export function RegisterForm() {
                             <div>
                                 <label htmlFor="firstName"
                                        className="block text-sm font-medium leading-6 text-gray-900">
-                                    First Name
+                                    Imię
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -104,7 +104,7 @@ export function RegisterForm() {
 
                             <div>
                                 <label htmlFor="lastName" className="block text-sm font-medium leading-6 text-gray-900">
-                                    Last Name
+                                    Nazwisko
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -121,7 +121,7 @@ export function RegisterForm() {
 
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                                    Email address
+                                    Email
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -138,7 +138,7 @@ export function RegisterForm() {
 
                             <div>
                                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                                    Password
+                                    Hasło
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -159,7 +159,7 @@ export function RegisterForm() {
                                     disabled={loading}
                                     className={`flex w-full justify-center rounded-md ${loading ? 'bg-gray-500' : 'bg-orange-600'} px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600`}
                                 >
-                                    {loading ? 'Creating Account...' : 'Create Account'}
+                                    {loading ? 'Creating Account...' : 'Stwórz konto'}
                                 </button>
                             </div>
 
@@ -174,14 +174,13 @@ export function RegisterForm() {
                                 />
                             </div>
                             <div className="mt-6">
-                                <AmazonLoginButton/>
+                                <AmazonRegisterButton/>
                             </div>
                         </form>
 
                         <p className="mt-10 text-center text-sm text-gray-500">
-                        Already have an account?{' '}
-                            <Link to="/login" className="font-semibold leading-6 text-orange-600 hover:text-orange-500">Sign
-                                in</Link>
+                        Już posiadasz konto?{' '}
+                            <Link to="/login" className="font-semibold leading-6 text-orange-600 hover:text-orange-500">Zaloguj się</Link>
                         </p>
                     </div>
                 </div>
