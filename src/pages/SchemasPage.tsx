@@ -191,7 +191,7 @@ const SchemasPage: React.FC = () => {
                     {allergyProfileSchemas.map((allergyProfileSchema) => (
                         <div
                             key={allergyProfileSchema.schema_id}
-                            className="border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col cursor-pointer"
+                            className="border border-gray-300 p-4 rounded-full shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col cursor-pointer"
                             onClick={() => setSelectedSchema(allergyProfileSchema)}
                         >
                             <h2 className="font-semibold text-lg text-center">
@@ -305,7 +305,7 @@ const SchemasPage: React.FC = () => {
 
             {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative">
+                    <div className="bg-white p-8 rounded-full shadow-lg max-w-4xl w-full relative">
                         <button
                             className="absolute top-2 right-2 text-gray-500 text-xl"
                             onClick={() => setIsEditModalOpen(false)}

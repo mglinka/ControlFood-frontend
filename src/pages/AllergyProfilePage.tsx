@@ -4,6 +4,8 @@ import axiosInstance from "../api/axiosConfig.ts";
 import { ToastContainer } from "react-toastify";
 import UserProfileSchemas from "../components/UserProfileSchemas.tsx";
 import CustomProfile from "../components/CustomProfile.tsx";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const AllergyProfilePage: React.FC = () => {
     const [hasProfile, setHasProfile] = useState<boolean>(false);
@@ -70,8 +72,8 @@ const AllergyProfilePage: React.FC = () => {
             {loading && (
                 <div className="text-center">
                     <p className="text-xl mb-4">Loading allergy profile...</p>
-                    <div className="spinner-border" role="status">
-                        <span className="sr-only">Loading...</span>
+                    <div className="flex justify-center items-center">
+                        <FontAwesomeIcon icon={faSpinner} spin size="3x" className="text-gray-600"/>
                     </div>
                 </div>
             )}
