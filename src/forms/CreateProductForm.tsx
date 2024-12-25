@@ -50,6 +50,16 @@ interface ValidationErrors {
     name?: string; // For the ingredient name field
 }
 
+type SelectOption = {
+    label: string;
+    value: string;
+};
+
+type PackageOption = {
+    label: string;
+    value: string;
+};
+
 
 export function CreateProductForm() {
     const [loading, setLoading] = useState<boolean>(false);
@@ -60,14 +70,20 @@ export function CreateProductForm() {
     const [nutritionalValueGroups, setNutritionalValueGroups] = useState<NutritionalValueGroupDTO[]>([]);
     const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
+    const [selectedPackageType, setSelectedPackageType] = useState<string | null>(null);
+
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedUnit, setSelectedUnit] = useState(null);
+    const [selectedPortionUnit, setSelectedPortionUnit] = useState(null);
+
 
     const ProducerSchema = z.object({
         name: z.string().min(2, "Producer name cannot be blank").max(100, "Producer name must be 100 characters or less"),
         address: z.string().min(2, "Address cannot be blank").max(255, "Address must be 255 characters or less"),
         countryCode: z.number().min(1, "Country code must be a positive integer").max(999, "Country code must be a valid ISO country code (1-999)"),
-        contact: z.string().email("Contact must be a valid email format").optional(),
+        contact: z.string().email("Contact must be a valid email format"),
         nip: z.string().length(10, "NIP must be exactly 10 digits"),
-        rmsd: z.number().positive("RMSD must be a positive integer"),
+        rmsd: z.number().min(0).max(3),
     });
 
     const LabelSchema = z.object({
@@ -83,15 +99,18 @@ export function CreateProductForm() {
 
     const CreateProductSchema = z.object({
         ean: z.string().length(13, "Kod EAN musi mieć dokładnie 13 cyfr").regex(/^\d+$/, "Kod EAN musi zawierać tylko cyfry"),
-        producerDTO: ProducerSchema.optional(),
+        producerDTO: ProducerSchema,
         productName: z.string().min(1, "Nazwa produktu nie może być pusta").max(100, "Nazwa produktu musi mieć od 1 do 100 znaków"),
         productDescription: z.string().max(255, "Opis produktu nie może przekraczać 255 znaków").optional(),
         productQuantity: z.number().min(1, "Ilość produktu musi wynosić co najmniej 1").optional(),
         country: z.string().nonempty("Kraj nie może być pusty").optional(),
         labelDTO: LabelSchema.optional(),
         portionDTO: z.object({
-            portionQuantity: z.number().optional(),
+            portionQuantity: z.number(),
         }),
+        // category: z.object({
+        //     name: z.string().nonempty("Nazwa kategorii nie może być pusta"), // Dodatkowa walidacja, jeśli jest dostępna
+        // }),
         ingredientDTO: IngredientSchema.optional(),
     });
 
@@ -613,42 +632,6 @@ export function CreateProductForm() {
     };
 
 
-    const handleUnitChange = (selectedOption: any) => {
-        if (selectedOption) {
-            setCreateProduct((prev) => ({
-                ...prev,
-                unitDTO: {
-                    name: selectedOption.label,
-                },
-            }));
-        }
-    };
-
-
-    const handlePackageTypeChange = (selectedOption:any) => {
-        if (selectedOption) {
-            setCreateProduct((prev) => ({
-                ...prev,
-                packageTypeDTO: {
-                    name: selectedOption.label,
-                },
-            }));
-        }
-    };
-
-    const handleCategoryChange = (selectedOption: { label: string; value: string } | null) => {
-        if (selectedOption) {
-            setCreateProduct((prev: CreateProductDTO) => ({
-                ...prev,
-                category: {  // Zmieniamy z CategoryDTO na category, aby pasowało do CreateProductDTO
-                    name: selectedOption.label,  // Przechowuje nazwę kategorii
-                    id: selectedOption.value,    // Przechowuje id kategorii
-                },
-            }));
-        }
-    };
-
-
     const unitOptions = units.map((unit) => ({
         label: unit.name,
         value: unit.name,
@@ -776,27 +759,36 @@ export function CreateProductForm() {
             // Walidacja danych za pomocą schematu Zod
             CreateProductSchema.parse(createProduct);
 
+            console.log("ggg", selectedPackageType, createProduct.packageTypeDTO.name)
             // Jeśli walidacja zakończy się sukcesem, wykonaj akcję API
             await axiosInstance.post('/products/add', createProduct);
-
+            alert("dodany")
+            console.log("Dodany", createProduct)
             toast.success('Stworzenie produktu powiodło się');
 
             // Resetowanie stanu formularza po udanym przesłaniu
-            setCreateProduct({
+            setCreateProduct(prevState => ({
+                ...prevState,
                 ean: "",
                 producerDTO: { name: "", address: "", countryCode: 0, contact: "", nip: "", rmsd: 0 },
                 productName: "",
-                category: { name: "" },
                 productDescription: "",
                 productQuantity: undefined,
-                unitDTO: { name: "" },
-                packageTypeDTO: { name: "" },
                 country: "",
                 labelDTO: { storage: "", durability: "", instructionsAfterOpening: "", preparation: "", allergens: "", image: "" },
                 portionDTO: { portionQuantity: undefined, unitDTO: { name: "" } },
                 compositionDTO: { ingredientDTOS: [], additionDTOS: [], flavourDTO: { name: "" } },
                 nutritionalValueDTOS: [],
-            });
+                category: { name: "" }, // Resetowanie kategorii
+                unitDTO: { name: "" }, // Resetowanie jednostki
+                packageTypeDTO: { name: "" }, // Resetowanie opakowania
+            }));
+
+            setSelectedPackageType(null);
+            setSelectedCategory(null);
+            setSelectedUnit(null);
+            setSelectedPortionUnit(null);
+
 
             setLoading(false); // Stop loading on success
         } catch (error) {
@@ -814,8 +806,25 @@ export function CreateProductForm() {
                 // Ustawienie stanu z błędami
                 setValidationErrors(validationErrors);
 
+                if (selectedCategory == null) {
+                    toast.error("Wypełnij kategorię produktu")
+                }
+                else if (selectedPackageType==null){
+                    toast.error("Wypełnij typ opakowania")
+                }
+                else if (selectedUnit==null){
+                    toast.error("Wypełnij jednostkę")
+                }
+                else if (selectedPortionUnit==null) {
+                    toast.error("Wypełnij jednostkę porcji")
+                }
+
+                else {
+
+                console.log("TTT", createProduct, error, selectedCategory)
                 // Wyświetlanie ogólnego komunikatu o błędzie
-                toast.error(`Validation Error: ${error.errors.map((e) => e.message).join(", ")}`);
+                toast.error("Wypełnij poprawnie wszystkie pola w formularzu");
+            }
             } else {
                 console.error("Error creating product: ", error);
                 if (axios.isAxiosError(error) && error.response) {
@@ -829,6 +838,62 @@ export function CreateProductForm() {
         }
     };
 
+
+    const handlePackageTypeChange = (selectedOption: { label: string; value: string } | null) => {
+        setSelectedPackageType(selectedOption ? selectedOption.value : null);
+
+        console.log("Handle", selectedPackageType)
+        // Aktualizuj również `createProduct`
+        setCreateProduct((prevState) => ({
+            ...prevState,
+            packageTypeDTO: {
+                name: selectedOption ? selectedOption.label : "", // Zapisz nazwę pakietu
+            },
+        }));
+        console.log("aa", createProduct)
+    };
+
+
+    const handleCategoryChange = (selectedOption: any) => {
+        const categoryId = selectedOption ? selectedOption.value : null;
+        const categoryName = selectedOption ? selectedOption.label : "";
+
+        setSelectedCategory(categoryId); // Aktualizuj stan lokalny
+        setCreateProduct((prev) => ({
+            ...prev,
+            category: { id: categoryId, name: categoryName }, // Ustaw odpowiednie pola w obiekcie
+        }));
+    };
+
+    const handleUnitChange = (selectedOption: any) => {
+        const unitName = selectedOption ? selectedOption.value : null;
+
+        setSelectedUnit(unitName); // Aktualizuj stan lokalny
+        setCreateProduct((prev) => ({
+            ...prev,
+            unitDTO: { name: unitName }, // Aktualizuj obiekt
+        }));
+    };
+
+    const handlePortionUnitChange = (selectedOption: any) => {
+        const portionUnitName = selectedOption ? selectedOption.value : null;
+
+        setSelectedPortionUnit(portionUnitName); // Aktualizuj stan lokalny
+        setCreateProduct((prev) => ({
+            ...prev,
+            portionDTO: {
+                ...prev.portionDTO,
+                unitDTO: { name: portionUnitName }, // Aktualizuj jednostkę porcji w obiekcie
+            },
+        }));
+    };
+
+    const handlePackageTypes = (packageTypes: any[]): PackageOption[] => {
+        return packageTypes.map((type) => ({
+            label: type.name || "Unknown",  // Jeśli name jest undefined, ustawiamy "Unknown"
+            value: type.name || "",         // Jeśli name jest undefined, ustawiamy ""
+        }));
+    };
 
 
 
@@ -891,16 +956,23 @@ export function CreateProductForm() {
                         Kategoria
                         <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
                     </label>
-                    <Select
+                    <Select<SelectOption>
                         options={categories.map((category) => ({
-                            label: category.name || "Unknown", // Fallback to 'Unknown' if name is undefined
-                            value: category.id || "",          // Fallback to empty string if id is undefined
+                            label: category.name || "Unknown", // Wyświetlaj nazwę kategorii
+                            value: category.id || "",         // Przechowuj id jako wartość
                         }))}
+                        value={selectedCategory
+                            ? {
+                                label: categories.find((category) => category.id === selectedCategory)?.name || "Unknown",
+                                value: selectedCategory,
+                            }
+                            : null} // Jeśli selectedCategory jest null, Select będzie pusty
                         onChange={handleCategoryChange}
                         placeholder="wybierz"
                         className="react-select-container"
                         classNamePrefix="react-select"
                     />
+
                 </div>
 
 
@@ -943,32 +1015,38 @@ export function CreateProductForm() {
                     <label className="block mb-1 text-xl font-semibold text-gray-600">
                         Jednostka
                         <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
-
                     </label>
                     <Select
                         options={unitOptions}
+                        value={unitOptions.find((option) => option.value === selectedUnit) || null} // Znajdź obiekt na podstawie value (id)
                         onChange={handleUnitChange}
                         placeholder="wybierz"
-                        className="rounded-full"  // Zaokrąglenie kontenera zewnętrznego
+                        className="rounded-full" // Zaokrąglony kontener
                     />
+
                 </div>
+
 
                 <div className="mb-6">
                     <label className="block mb-1 text-xl font-semibold text-gray-600">
                         Opakowanie
                         <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
-
                     </label>
-                    <Select
-                        options={packageTypes.map((type) => ({
-                            label: type.name,
-                        }))}
+                    <Select<PackageOption>
+                        options={handlePackageTypes(packageTypes)}  // Przetworzenie danych
+                        value={selectedPackageType
+                            ? { label: selectedPackageType, value: selectedPackageType }
+                            : null}
                         onChange={handlePackageTypeChange}
                         placeholder="wybierz"
                         className="react-select-container"
                         classNamePrefix="react-select"
                     />
+
+
+
                 </div>
+
 
                 <div className="mb-6">
                     <label className="block mb-1 text-xl font-semibold text-gray-600">
@@ -1094,17 +1172,12 @@ export function CreateProductForm() {
                         </label>
                         <input
                             type="number"
-                            name="producerDTO.rmsd"
-                            min="0"
+                            name="productQuantity"
+                            min="1"
                             max="3"
                             step="1"
-                            value={createProduct.producerDTO?.rmsd !== undefined ? createProduct.producerDTO.rmsd : ""}
-                            onChange={(e) => {
-                                const value = parseFloat(e.target.value);
-                                if (value >= 0 && value <= 4) {
-                                    handleChange(e);
-                                }
-                            }}
+                            value={createProduct.productQuantity || ""}
+                            onChange={handleChange}
                             className={`border rounded-full p-3 w-full ${validationErrors?.producerDTO?.rmsd ? 'border-red-500' : ''}`}
                         />
                         {validationErrors?.producerDTO?.rmsd && (
@@ -1222,15 +1295,17 @@ export function CreateProductForm() {
                         <label className="block mb-1 text-xl font-semibold text-gray-600">
                             Jednostka porcji
                             <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
-
                         </label>
                         <Select
                             options={unitOptions}
-                            onChange={handleUnitChange}
+                            value={unitOptions.find((option) => option.value === selectedPortionUnit) || null} // Znajdź obiekt na podstawie value (id)
+                            onChange={handlePortionUnitChange} // Obsługuje zmianę jednostki porcji
                             placeholder="wybierz"
-                            className="rounded-full"  // Zaokrąglenie kontenera zewnętrznego
+                            className="rounded-full" // Zaokrąglony kontener
                         />
+
                     </div>
+
                 </div>
                 <div className="mb-6">
                     <label className="block mb-1 text-xl font-semibold text-gray-600">
@@ -1292,7 +1367,6 @@ export function CreateProductForm() {
                         <div key={index} className="nutritional-value-input border rounded-lg p-4 mb-4">
                             <label className="block mb-1 text-xl font-semibold text-gray-600">
                                 Nazwa wartości odżywczej
-                                <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                             </label>
                             <select
@@ -1311,7 +1385,6 @@ export function CreateProductForm() {
 
                             <label className="block mb-1 text-xl font-semibold text-gray-600">
                                 Nazwa grupy wartości odżywczej
-                                <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                             </label>
 
@@ -1335,7 +1408,6 @@ export function CreateProductForm() {
 
                             <label className="block mb-1 text-xl font-semibold text-gray-600">
                                 Ilość
-                                <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                             </label>
                             <input
@@ -1348,7 +1420,6 @@ export function CreateProductForm() {
 
                             <label className="block mb-1 text-xl font-semibold text-gray-600">
                                 Jednostka
-                                <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                             </label>
                             <select
@@ -1369,7 +1440,6 @@ export function CreateProductForm() {
 
                             <label className="block mb-1 text-xl font-semibold text-gray-600">
                                 NRV
-                                <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                             </label>
                             <input
