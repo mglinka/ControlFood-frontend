@@ -756,17 +756,14 @@ export function CreateProductForm() {
         setLoading(true); // Start loading
 
         try {
-            // Walidacja danych za pomocą schematu Zod
             CreateProductSchema.parse(createProduct);
 
             console.log("ggg", selectedPackageType, createProduct.packageTypeDTO.name)
-            // Jeśli walidacja zakończy się sukcesem, wykonaj akcję API
             await axiosInstance.post('/products/add', createProduct);
             alert("dodany")
             console.log("Dodany", createProduct)
             toast.success('Stworzenie produktu powiodło się');
 
-            // Resetowanie stanu formularza po udanym przesłaniu
             setCreateProduct(prevState => ({
                 ...prevState,
                 ean: "",

@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../utils/toastify.css";
 import { z } from "zod";
-import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
+import { FaPlus, FaPen, FaTrash, FaSpinner } from "react-icons/fa";
 import { FiCheckCircle } from "react-icons/fi";
 
 type CreateAllergenDTO = components["schemas"]["CreateAllergenDTO"];
@@ -19,7 +19,6 @@ export function CreateAllergenForm() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [confirmAction, setConfirmAction] = useState<"edit" | "delete" | null>(null);
 
-    // Dodanie osobnych pól stanu dla nazwy alergenu do tworzenia i edytowania
     const [createAllergenName, setCreateAllergenName] = useState<string>("");
     const [editAllergenName, setEditAllergenName] = useState<string>("");
 
@@ -31,13 +30,14 @@ export function CreateAllergenForm() {
     const createAllergenSchema = z.object({
         name: z
             .string()
-            .min(1, { message: "Allergen name is required." })
-            .max(50, { message: "Allergen name cannot exceed 50 characters." })
-            .regex(/^[A-Za-ząćęłńóśżźĄĆĘŁŃÓŚŻŹ\s]+$/, { message: "Allergen name can only contain letters (including Polish characters) and spaces." }),
+            .min(1, { message: "Nazwa alergenu jest wymagana." })
+            .max(50, { message: "Nazwa alergenu nie może przekroczyć 50 znaków." })
+            .regex(/^[A-Za-ząćęłńóśżźĄĆĘŁŃÓŚŻŹ\s]+$/, { message: "Nazwa alergenu może zawierać tylko litery i spacje." }),
         type: z.enum(["ALLERGEN", "INTOLERANT_INGREDIENT"], {
-            errorMap: () => ({ message: "Invalid allergen type." }),
+            errorMap: () => ({ message: "Nieprawidłowy typ alergenu." }),
         }),
     });
+
 
     useEffect(() => {
         fetchAllergens();
@@ -56,12 +56,10 @@ export function CreateAllergenForm() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
-        // Jeśli zmienia się 'name' w formularzu tworzenia alergenu
         if (name === "createName") {
             setCreateAllergenName(value);
         }
 
-        // Jeśli zmienia się 'name' w formularzu edytowania alergenu
         if (name === "editName") {
             setEditAllergenName(value);
         }
@@ -77,10 +75,8 @@ export function CreateAllergenForm() {
         setLoading(true);
 
         try {
-            // Walidacja danych
             createAllergenSchema.parse({ name: createAllergenName, type: createAllergen.type });
 
-            // Wysłanie danych na backend
             await axiosInstance.post("/allergens/add", {
                 name: createAllergenName,
                 type: createAllergen.type,
@@ -154,11 +150,15 @@ export function CreateAllergenForm() {
         setSelectedAllergen(null);
     };
 
+
+
     const allergensType1 = allergens.filter((allergen) => allergen.allergenType === "ALLERGEN");
     const allergensType2 = allergens.filter((allergen) => allergen.allergenType === "INTOLERANT_INGREDIENT");
 
     return (
-        <div className="flex w-full p-6">
+        <div className="relative">
+
+            <div className="flex w-full p-6">
             <div className="pr-28 mb-6">
                 <button
                     onClick={() => setShowCreateModal(true)}
@@ -182,7 +182,7 @@ export function CreateAllergenForm() {
                             </div>
                         ))
                     ) : (
-                        <p>Brak dostępnych alergenów</p>
+                        <FaSpinner className="text-orange-600 text-4xl animate-spin mx-auto mt-4" />
                     )}
                 </div>
 
@@ -199,7 +199,7 @@ export function CreateAllergenForm() {
                             </div>
                         ))
                     ) : (
-                        <p>Brak dostępnych nietolerowanych składników</p>
+                        <FaSpinner className="text-orange-600 text-4xl animate-spin mx-auto mt-4" />
                     )}
                 </div>
             </div>
@@ -304,6 +304,7 @@ export function CreateAllergenForm() {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     );
 }

@@ -276,6 +276,11 @@ const SpecialistProductsPage: React.FC = () => {
                                     <h3 className="font-semibold">Opis produktu:</h3>
                                     <p>{selectedProduct.productDescription || "No description available."}</p>
                                 </div>
+
+                                <div className="mt-2 text-center text-gray-700">
+                                    <h3 className="font-semibold">Kategoria:</h3>
+                                    <p>{selectedProduct.categoryDTO?.name || "No category available."}</p>
+                                </div>
                             </div>
 
                             {/* Right Column - Nutritional Values Table */}

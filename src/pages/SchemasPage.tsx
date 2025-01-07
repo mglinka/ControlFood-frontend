@@ -9,7 +9,7 @@ import {
 import { CreateAllergyProfileSchemaForm } from "../forms/CreateAllergyProfileSchemaForm";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaPen, FaTrash, FaPlus } from 'react-icons/fa';
+import {FaPen, FaTrash, FaPlus, FaSpinner} from 'react-icons/fa';
 import {FiCheckCircle} from "react-icons/fi"; // Added FaTimes for chip close icon
 
 const SchemasPage: React.FC = () => {
@@ -91,14 +91,11 @@ const SchemasPage: React.FC = () => {
     };
 
     const handleEditSchema = (schemaId: string, name: string, allergens: components["schemas"]["GetAllergenDTO"][]) => {
-        // Zamyka modal z informacjami o szablonie
         setSelectedSchema(null);
 
-        // Ustawia dane do edycji
         setEditSchemaId(schemaId);
         setEditSchemaName(name);
 
-        // Set the selected allergens as a Set for easier management
         const selectedAllergens = new Set(allergens
             .map((allergen) => allergen.allergen_id)
             .filter((id): id is string => id !== undefined) // Ensure id is a string, not undefined
@@ -119,10 +116,8 @@ const SchemasPage: React.FC = () => {
             await editAllergyProfileSchema(payload); // Make the API request to update the schema
             toast.success("Edycja szablonu powiodła się");
 
-            // Re-fetch the allergy profile schemas to get the updated information
             await fetchAllergyProfileSchemas(); // Refresh the list of schemas
 
-            // Update selected schema to reflect the changes immediately in the modal
             setSelectedSchema((prev) => {
                 if (prev && prev.schema_id === editSchemaId) {
                     return { ...prev, name: editSchemaName, allergens: Array.from(editAllergens).map((id) => ({ allergen_id: id })) };
@@ -133,7 +128,6 @@ const SchemasPage: React.FC = () => {
             setIsEditModalOpen(false); // Close the edit modal
         } catch (error: any) {
             if (error?.response?.status === 400) {
-                // Check if the error is due to a conflict (e.g., profile name already exists)
                 toast.error("Szablon o tej nazwie już istnieje.");
             } else {
                 toast.error("Edycja szablonu nie powiodła się");
@@ -156,8 +150,11 @@ const SchemasPage: React.FC = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-semibold mb-6 text-center">Szablony profili alergicznych</h1>
 
-            {loading && <div className="text-center text-xl text-blue-600">Ładowanie...</div>}
-            {error && <div className="text-center text-red-600">{error}</div>}
+            {loading && (
+                <div className="fixed inset-0 flex items-center justify-center">
+                    <FaSpinner className="text-orange-600 text-3xl animate-spin" />
+                </div>
+            )}
 
             <div className="text-left mb-6">
                 <button
@@ -305,7 +302,7 @@ const SchemasPage: React.FC = () => {
 
             {isEditModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-8 rounded-full shadow-lg max-w-4xl w-full relative">
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative">
                         <button
                             className="absolute top-2 right-2 text-gray-500 text-xl"
                             onClick={() => setIsEditModalOpen(false)}

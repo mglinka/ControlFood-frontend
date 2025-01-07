@@ -13,7 +13,6 @@ const AllergyProfilePage: React.FC = () => {
     const [isSchemaView, setIsSchemaView] = useState<boolean>(false); // Control schema view
     const [isCustomProfileView, setIsCustomProfileView] = useState<boolean>(false); // Control custom profile view
 
-    // Fetch allergy profile data
     const fetchAllergyProfile = async () => {
         try {
             const accountId = authService.getAccountId();
@@ -78,7 +77,6 @@ const AllergyProfilePage: React.FC = () => {
                 </div>
             )}
 
-            {/* Show buttons if no profile and data is loaded */}
             {!loading && !hasProfile && !isSchemaView && !isCustomProfileView && (
                 <div className="text-center py-10 px-4">
                     <p className="text-xl md:text-2xl mb-6 font-semibold text-gray-700">

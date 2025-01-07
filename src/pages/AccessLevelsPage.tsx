@@ -3,6 +3,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { changeRole, getAllAccounts, getRoles } from "../api/api.ts";
 import { components } from "../controlfood-backend-schema";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 
 type GetAccount = components["schemas"]["GetAccountDTO"];
 type Role = components["schemas"]["RoleDTO"];
@@ -97,52 +99,56 @@ const AccessLevelsPage: React.FC = () => {
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md max-w-5xl mx-auto">
-            <h1 className="text-2xl font-bold text-center mb-6">Manage Access Levels</h1>
+            <h1 className="text-2xl font-bold text-center mb-6">Zarządzaj poziomami dostępu</h1>
 
             {loading ? (
-                <p className="text-center text-gray-500">Loading data...</p>
+                <div className="flex justify-center py-6">
+                    <FontAwesomeIcon icon={faSpinner} spin size="2x"/>
+                </div>
             ) : error ? (
                 <p className="text-center text-red-500">{error}</p>
             ) : (
                 <>
                     {accounts && accounts.length > 0 ? (
-                        <table className="min-w-full bg-white rounded-lg shadow mb-6">
+                        <table className="w-full bg-white rounded-lg shadow-md overflow-hidden text-sm sm:text-base">
                             <thead>
-                            <tr className="bg-gray-800 text-white">
-                                <th className="py-2 px-4 text-left">Account Name</th>
-                                <th className="py-2 px-4 text-left">Current Role</th>
-                                <th className="py-2 px-4 text-center">Actions</th>
+                            <tr className="bg-gray-600 text-white rounded-md">
+                                <th className="py-2 px-4 text-left rounded-tl-lg">Konto</th>
+                                <th className="py-2 px-4 text-left">Obecna rola</th>
+                                <th className="py-2 px-4 text-center rounded-tr-lg">Akcje</th>
                             </tr>
                             </thead>
                             <tbody>
                             {accounts.map((account) => (
                                 <tr key={account.id} className="border-b">
                                     <td className="py-2 px-4">{account.firstName} {account.lastName}</td>
-                                    <td className="py-2 px-4">{account.role}</td> {/* Show role name */}
+                                    <td className="py-3 px-4">
+                                        {account.role === 'USER' ? 'Użytkownik' : account.role === 'SPECIALIST' ? 'Specjalista' : account.role === 'ADMIN' ? 'Administrator' : account.role}
+                                    </td>
                                     <td className="py-2 px-4 text-center">
                                         <button
-                                            className="text-black py-1 px-3 rounded-md border-2 border-red-600"
+                                            className="text-red-600 py-1 px-3 rounded-full border-2 border-red-600 hover:border-red-600 hover:bg-gray-100 transition"
                                             onClick={() => handleOpenModal(account.id as string)}
                                         >
-                                            Change Access Level
+                                            Zmień poziom dostępu
                                         </button>
-
                                     </td>
                                 </tr>
                             ))}
                             </tbody>
                         </table>
+
                     ) : (
-                        <p className="text-center text-gray-500">No accounts available.</p>
+                        <p className="text-center text-gray-500">Brak dostępnych kont</p>
                     )}
 
                     {isModalOpen && (
                         <div className="fixed inset-0 flex items-center justify-center z-50">
                             <div className="bg-black opacity-50 absolute inset-0" onClick={handleCloseModal}></div>
                             <div className="bg-white p-6 rounded-lg shadow-md z-10 max-w-md w-full">
-                                <h2 className="text-xl font-bold mb-4">Change Access Level</h2>
+                                <h2 className="text-xl font-bold mb-4">Zmień poziom dostępu</h2>
                                 <div className="mb-4">
-                                    <label className="block text-gray-700 mb-2">Select New Role</label>
+                                    <label className="block text-gray-700 mb-2">Wybierz nową rolę</label>
                                     <div>
                                         {accessLevels.map((level) => (
                                             level.id ? (
@@ -156,7 +162,7 @@ const AccessLevelsPage: React.FC = () => {
                                                             onChange={() => handleRoleSelection(level.id as string)}
                                                             className="mr-2"
                                                         />
-                                                        {level.name}
+                                                        {level.name === 'USER' ? 'Użytkownik' : level.name === 'SPECIALIST' ? 'Specjalista' : level.name === 'ADMIN' ? 'Administrator' : level.name}
                                                     </label>
                                                 </div>
                                             ) : null

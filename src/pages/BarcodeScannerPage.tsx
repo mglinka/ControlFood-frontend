@@ -2,10 +2,17 @@ import BarcodeScanner from "react-qr-barcode-scanner";
 import { useEffect, useState } from "react";
 import { components } from "../controlfood-backend-schema";
 import { getProductByEan } from "../api/api.ts";
+import {getAllergyProfileByAccountId} from '../api/api.ts';
+import {authService} from "../utils/authService.ts";
 
 const BarcodeScannerPage: React.FC = () => {
     const [product, setProduct] = useState<components["schemas"]["GetProductDTO"] | null>(null);
     const [data, setData] = useState<string>("");
+    const [allergenProfile, setAllergenProfile] = useState<{
+        allergen_id: string;
+        name: string;
+        intensity: string
+    }[]>([]);
 
     const fetchProductInfo = async (ean: string) => {
         console.log("Before sending:", ean);
@@ -13,6 +20,28 @@ const BarcodeScannerPage: React.FC = () => {
         console.log("Received product data:", productData);
         setProduct(productData);
     };
+
+    const getAllergenIntensity = (allergen: string) => {
+        const profileAllergen = allergenProfile.find(a => a.name.toLowerCase() === allergen.toLowerCase());
+        return profileAllergen ? profileAllergen.intensity.toLowerCase() : 'unknown';
+    };
+
+    useEffect(() => {
+        const fetchAllergyProfile = async () => {
+            try {
+                const accountId = authService.getAccountId();
+                if (accountId === null) {
+                    return;
+                }
+                const profileData = await getAllergyProfileByAccountId(accountId);
+                setAllergenProfile(profileData.allergens);
+                console.log("Bartek", profileData)
+            } catch (error) {
+                console.error('Error fetching allergy profile:', error);
+            }
+        };
+        fetchAllergyProfile();
+    }, []);
 
     useEffect(() => {
         console.log("Product state updated:", product, data);
@@ -42,6 +71,7 @@ const BarcodeScannerPage: React.FC = () => {
                         <h2 className="text-2xl font-bold mb-4">Informacje o produkcie</h2>
                         <p><strong>Nazwa produktu:</strong> {product.productName}</p>
                         <p><strong>Opis:</strong> {product.productDescription}</p>
+                        <p><strong>Kategoria:</strong> {product.categoryDTO?.name}</p>
                         <p><strong>EAN:</strong> {product.ean}</p>
                         <p><strong>Kraj:</strong> {product.country}</p>
                         <p><strong>Data ważności:</strong> {product.labelDTO?.durability}</p>
@@ -57,9 +87,54 @@ const BarcodeScannerPage: React.FC = () => {
                                     alt={product.productName}
                                     className="w-full h-48 object-contain mb-4"
                                 />
-                                <p><strong>Alergeny:</strong> {product.labelDTO.allergens}</p>
+
+                                <h4 className="font-semibold">Alergeny:</h4>
+                                {product.labelDTO.allergens ? (
+                                    <div className="flex flex-wrap gap-2 justify-center">
+                                        {product.labelDTO.allergens.split(',').map(allergen => {
+                                            const allergenTrimmed = allergen.trim();
+                                            const intensity = getAllergenIntensity(allergenTrimmed);
+
+                                            let bgColor = '';
+                                            switch (intensity) {
+                                                case 'low':
+                                                    bgColor = 'bg-yellow-500';
+                                                    break;
+                                                case 'medium':
+                                                    bgColor = 'bg-orange-600';
+                                                    break;
+                                                case 'high':
+                                                    bgColor = 'bg-red-600';
+                                                    break;
+                                                default:
+                                                    bgColor = 'bg-gray-500';
+                                            }
+
+                                            return (
+                                                <div
+                                                    key={allergenTrimmed}
+                                                    className={`relative group flex items-center justify-center px-4 py-2 rounded-full text-white ${bgColor} cursor-pointer hover:scale-105 transform transition duration-200 text-sm`}
+                                                >
+                                                    <span className="font-semibold">{allergenTrimmed}</span>
+
+                                                    {bgColor !== 'bg-gray-500' && (
+                                                        <div
+                                                            className="absolute bottom-full mb-2 w-max max-w-xs bg-gray-700 text-white text-xs rounded-md p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-lg pointer-events-none"
+                                                        >
+                                                            Intensywność {' '}
+                                                            {intensity === 'low' ? 'niska' : intensity === 'medium' ? 'średnia' : 'wysoka'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p>Brak alergenów w produkcie.</p>
+                                )}
                             </div>
                         )}
+
 
                         {/* Ingredients Section */}
                         {product.compositionDTO?.ingredientDTOS && product.compositionDTO.ingredientDTOS.length > 0 && (

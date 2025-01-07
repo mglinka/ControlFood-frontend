@@ -99,7 +99,8 @@ const MyAccountPage: React.FC = () => {
                     <>
                         <p className="text-sm sm:text-base">
                             <strong>Poziom
-                                dostępu:</strong> {role != null ? role.replace(/_/g, ' ').toLowerCase().replace(/^role\s+/i, '') : 'Brak przypisanego poziomu'}
+                                dostępu: </strong>
+                            {role === 'ROLE_USER' ? 'Użytkownik' : role === 'ROLE_SPECIALIST' ? 'Specjalista' : role === 'ROLE_ADMIN' ? 'Administrator' : role}
                         </p>
 
                         <p className="text-sm sm:text-base"><strong>Email:</strong> {accountInfo.email}</p>
@@ -164,7 +165,7 @@ const MyAccountPage: React.FC = () => {
                 </div>
             )}
 
-            <div className="bg-white border border-gray-300 full shadow-lg p-6 sm:p-10 mt-6">
+            <div className="bg-white border border-gray-300 full shadow-lg p-6 sm:p-10 mt-6 rounded-lg">
                 <h2 className="text-2xl font-bold leading-9 tracking-tight text-center text-transparent rounded-full bg-clip-text bg-gradient-to-r from-black to-gray-700 mb-4">
                     Zmień hasło
                 </h2>
@@ -199,7 +200,7 @@ const MyAccountPage: React.FC = () => {
                         <button
                             type="button"
                             onClick={handleChangePassword}
-                            className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-black to-black rounded-fullP shadow-sm hover:from-gray-700 hover:to-gray-700"
+                            className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-black to-black rounded-full shadow-sm hover:from-gray-700 hover:to-gray-700"
                         >
                             Zmień hasło
                         </button>

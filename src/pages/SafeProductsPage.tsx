@@ -292,6 +292,10 @@ const SafeProductsPage: React.FC = () => {
                                     <h3 className="font-semibold">Opis:</h3>
                                     <p>{selectedProduct.productDescription || "No description available."}</p>
                                 </div>
+                                <div>
+                                    <h3 className="font-semibold">Kategoria:</h3>
+                                    <p>{selectedProduct.categoryDTO?.name || "No category available."}</p>
+                                </div>
                             </div>
                         </div>
 

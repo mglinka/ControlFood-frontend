@@ -25,7 +25,6 @@ const loginSchema = z.object({
 
 export function LoginForm() {
     const navigate = useNavigate();
-    const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [authenticationRequest, setAuthenticationRequest] = useState<components["schemas"]["AuthenticationRequest"]>({
         email: '',
@@ -91,7 +90,6 @@ export function LoginForm() {
             setTimeout(() => navigate('/main-page'), 700);
         } catch (error: any) {
             const message = error.response?.data?.message;
-            setErrorMessage(message);
             toast.error(message);
             console.error('Auth error:', error);
         } finally {
@@ -140,7 +138,6 @@ export function LoginForm() {
             </div>
 
             <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-lg border border-gray-300 rounded-lg shadow-lg p-10">
-                {errorMessage && <p className="text-red-500 text-sm text-center">{errorMessage}</p>}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">

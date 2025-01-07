@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {getAllAllergens} from "../api/api";
 import {ArrowLeftIcon, XCircleIcon} from "@heroicons/react/16/solid";
 import axios from "axios";
-import {FaPen, FaPlus} from 'react-icons/fa';
+import {FaPen, FaPlus, FaSpinner} from 'react-icons/fa';
 import {FiCheckCircle} from "react-icons/fi";
 import {components} from "../controlfood-backend-schema";
 interface CustomProfileProps {onBack: () => void;}
@@ -27,6 +27,8 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
     const [hasProfile, setHasProfile] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isCreating, setIsCreating] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const fetchAllergies = async () => {
         setLoading(true);
@@ -163,6 +165,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
 
     const handleSaveProfile = async () => {
+        setIsLoading(true);
         try {
             const accountId = authService.getAccountId();
             if (!accountId) {
@@ -185,6 +188,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                 });
                 setHasProfile(true);
             }
+            setIsLoading(false);
 
             toast.success("Edycja profilu powiodła się");
             setTimeout(async () => {
@@ -264,9 +268,13 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
 
                         <button
                             onClick={handleSaveProfile}
-                            className="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transform hover:scale-110 transition duration-300 ease-in-out shadow-lg hover:shadow-xl"
+                            className="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transform hover:scale-110 transition duration-300 ease-in-out shadow-lg hover:shadow-xl flex items-center justify-center"
                         >
-                            <FiCheckCircle className="text-white text-2xl"/>
+                            {isLoading ? (
+                                <FaSpinner className="text-white text-2xl animate-spin"/>
+                            ) : (
+                                <FiCheckCircle className="text-white text-2xl"/>
+                            )}
                         </button>
 
                     </div>
@@ -277,7 +285,7 @@ const CustomProfile: React.FC<CustomProfileProps> = ({ onBack }) => {
                         onClick={() => setIsEditing(true)}
                         className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transform hover:scale-110 transition duration-300 ease-in-out"
                     >
-                        <FaPen className="w-5 h-5 text-white" />
+                        <FaPen className="w-5 h-5 text-white"/>
                     </button>
 
                 ) : (

@@ -222,7 +222,7 @@ const ProductsPage: React.FC = () => {
                             >
                                 <FontAwesomeIcon icon={faArrowLeft} className="w-6 h-6" />
                             </button>
-                            <span className="self-center text-gray-700">Page {page + 1} of {totalPages}</span>
+                            <span className="self-center text-gray-700">Strona {page + 1} z {totalPages}</span>
                             <button
                                 onClick={handleNextPage}
                                 disabled={page >= totalPages - 1}
@@ -331,6 +331,11 @@ const ProductsPage: React.FC = () => {
                                 <div>
                                     <h3 className="font-semibold">Opis:</h3>
                                     <p>{selectedProduct.productDescription || "No description available."}</p>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Kateegoria:</h3>
+                                    <p>{selectedProduct.categoryDTO?.name || "No category available."}</p>
                                 </div>
                             </div>
                         </div>
