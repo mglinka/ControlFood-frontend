@@ -4,10 +4,10 @@ import React, {useState} from 'react';
 import {components} from '../controlfood-backend-schema';
 import {Link, useNavigate} from 'react-router-dom';
 import {toast, ToastContainer} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Default styles
-import '../utils/toastify.css'; // Your custom styles
+import 'react-toastify/dist/ReactToastify.css';
+import '../utils/toastify.css';
 import {GoogleLogin} from '@react-oauth/google';
-import {z, ZodError} from 'zod'; // Import ZodError from zod
+import {z, ZodError} from 'zod';
 import axiosInstance from "../api/axiosConfig.ts";
 import {useAuth} from "../utils/AuthContext.tsx";
 import {jwtDecode} from "jwt-decode";
@@ -32,27 +32,26 @@ export function LoginForm() {
     });
     const {login} = useAuth();
 
-    // State to hold validation error messages
     const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string }>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setAuthenticationRequest(prev => ({...prev, [name]: value}));
 
-        // Validate field dynamically on input change
+
         if (name === 'email') {
             try {
-                loginSchema.pick({email: true}).parse({email: value}); // Validate email only
+                loginSchema.pick({email: true}).parse({email: value});
                 setValidationErrors(prev => ({...prev, email: undefined}));
             } catch (error) {
                 if (error instanceof ZodError) {
-                    const message = error.errors[0].message; // Get the first validation message
+                    const message = error.errors[0].message;
                     setValidationErrors(prev => ({...prev, email: message}));
                 }
             }
         } else if (name === 'password') {
             try {
-                loginSchema.pick({password: true}).parse({password: value}); // Validate password only
+                loginSchema.pick({password: true}).parse({password: value});
                 setValidationErrors(prev => ({...prev, password: undefined}));
             } catch (error) {
                 if (error instanceof ZodError) {
@@ -66,12 +65,10 @@ export function LoginForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
-        setValidationErrors({}); // Clear previous validation errors
+        setValidationErrors({});
 
-        // Validate entire form data with Zod
         const result = loginSchema.safeParse(authenticationRequest);
         if (!result.success) {
-            // If validation fails, extract and set errors
             const errors = result.error.flatten().fieldErrors;
             setValidationErrors({
                 email: errors.email?.[0],
@@ -109,7 +106,6 @@ export function LoginForm() {
             console.log("B", response.data.token)
             login(response.data.token)
 
-            // login(backendToken);
             toast.success('Logowanie przez Google powiodło się');
             setTimeout(() => navigate('/main-page'), 700);
         } catch (error: any) {

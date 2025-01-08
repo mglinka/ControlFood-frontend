@@ -40,18 +40,26 @@ const MyAccountPage: React.FC = () => {
     };
 
 
-    // Funkcja aktualizująca dane użytkownika
     const handleUpdateProfile = async () => {
-        try {
-            await updateAccountInfo({ firstName, lastName });
-            toast.success('Edycja profilu powiodłą się');
-            setIsEditingProfile(false);
-            await handleGetAccountInfo();
-        } catch (err: any) {
-            console.error('Error updating profile:', err);
-            toast.error(err.response?.data?.message || 'An error occurred while updating the profile.');
+        if (accountInfo) {  // Sprawdzamy, czy mamy dane konta
+            const payload = {
+                firstName,
+                lastName,
+                version: accountInfo.version,  // Dodajemy wersję do payloadu
+            };
+
+            try {
+                await updateAccountInfo(payload);
+                toast.success('Edycja profilu powiodła się');
+                setIsEditingProfile(false);
+                await handleGetAccountInfo();
+            } catch (err: any) {
+                console.error('Error updating profile:', err);
+                toast.error(err.response?.data?.message || 'Wystąpił błąd podczas aktualizacji profilu.');
+            }
         }
     };
+
 
     // Funkcja zmieniająca hasło
     const handleChangePassword = async () => {
@@ -78,6 +86,8 @@ const MyAccountPage: React.FC = () => {
     useEffect(() => {
         handleGetAccountInfo();
     }, []);
+
+
 
     return (
         <div className="p-4 bg-gray-100 rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl mx-auto">

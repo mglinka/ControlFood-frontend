@@ -74,10 +74,8 @@ const ProductsPage: React.FC = () => {
                 let data;
 
                 if (selectedCategory) {
-                    // Pobieranie produktów na podstawie kategorii z uwzględnieniem wyszukiwania
                     data = await getProductsByCategory(selectedCategory);
 
-                    // Filtrowanie produktów po nazwie w ramach wybranej kategorii
                     if (searchQuery) {
                         const lowerCaseQuery = searchQuery.toLowerCase();
                         data = data.filter((product: components["schemas"]["GetProductDTO"]) =>
@@ -85,7 +83,6 @@ const ProductsPage: React.FC = () => {
                         );
                     }
                 } else {
-                    // Pobieranie wszystkich produktów z paginacją i wyszukiwanie globalne
                     data = await getAllProducts(page, size, searchQuery);
                 }
 
@@ -130,7 +127,6 @@ const ProductsPage: React.FC = () => {
     return (
         <div className="p-6">
             <div className="relative w-full my-4 flex items-center">
-                {/* Search Input */}
                 <div className="relative w-3/4">
                     <input
                         onChange={(event) => {
@@ -146,7 +142,6 @@ const ProductsPage: React.FC = () => {
                     </span>
                 </div>
 
-                {/* Category Selector */}
                 <div className="relative w-1/4 ml-4">
                     <select
                         onChange={(event) => {

@@ -113,8 +113,13 @@ export const getAccountInfo = async (id:string)=> {
     return response.data;
 };
 
-export const updateAccountInfo = async (payload:{firstName: string, lastName: string}) => {
+export const updateAccountInfo = async (payload: { firstName: string; lastName: string; version: number | undefined }) => {
     const response = await axiosInstance.put("/me/updateInfo", payload);
+    return response.data;
+};
+
+export const updateAccount = async (payload: { email: string, firstName: string; lastName: string; version: number | undefined }) => {
+    const response = await axiosInstance.put(`/accounts/user-info/{id}`, payload);
     return response.data;
 };
 

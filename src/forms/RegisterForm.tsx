@@ -4,7 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import axiosInstance from '../api/axiosConfig.ts';
 import { jwtDecode } from 'jwt-decode';
-import { toast } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../utils/toastify.css';
 import { useAuth } from '../utils/AuthContext.tsx';
 import { GoogleLogin } from '@react-oauth/google';
 import { AmazonRegisterButton } from './AmazonRegisterButton.tsx';
@@ -32,7 +34,6 @@ export function RegisterForm() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
     const [registerRequest, setRegisterRequest] = useState<RegisterRequest>({
@@ -116,10 +117,11 @@ export function RegisterForm() {
 
         try {
             await axiosInstance.post('/auth/register', registerRequest);
-            navigate('/login');
+            toast.success('Logowanie powiodło się');
+            setTimeout(() => navigate('/login'), 700);
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Registration failed. Please try again.');
-            console.error('Registration error:', error);
+            const message = error.response?.data?.message;
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -156,7 +158,6 @@ export function RegisterForm() {
                         Stwórz konto
                     </h2>
 
-                    {errorMessage && <div className="mt-2 text-red-600 text-center">{errorMessage}</div>}
 
                     <div className="mt-10">
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -267,6 +268,7 @@ export function RegisterForm() {
                     </div>
                 </div>
             </div>
+            <ToastContainer position="bottom-right"/>
         </div>
     );
 }

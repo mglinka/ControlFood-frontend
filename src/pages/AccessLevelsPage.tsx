@@ -55,7 +55,7 @@ const AccessLevelsPage: React.FC = () => {
 
             await fetchAccessLevels();
 
-            toast.success('Access level updated successfully.');
+            toast.success('Poziom dostępu został zmieniony pomyślnie');
             setIsModalOpen(false);
             setSelectedRole(null);
         } catch (err: any) {

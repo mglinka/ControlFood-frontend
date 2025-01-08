@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/user-data": {
+    "/api/v1/user-data/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,7 +12,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["modifyAccountSelf"];
+        put: operations["modifyAccount"];
         post?: never;
         delete?: never;
         options?: never;
@@ -708,22 +708,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/account/{id}/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteAccount"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -731,20 +715,19 @@ export interface components {
         UpdateAccountDataDTO: {
             firstName: string;
             lastName: string;
+            /** Format: int64 */
+            version?: number;
         };
-        GetAccountPersonalDTO: {
+        AccountDTO: {
             /** Format: uuid */
             id?: string;
-            username?: string;
             email?: string;
             role?: components["schemas"]["Role"];
-            active?: boolean;
-            verified?: boolean;
-            nonLocked?: boolean;
             firstName?: string;
             lastName?: string;
-            /** Format: int32 */
-            gender?: number;
+            enabled?: boolean;
+            /** Format: int64 */
+            version?: number;
         };
         Role: {
             /** Format: uuid */
@@ -752,7 +735,7 @@ export interface components {
             /** Format: int64 */
             version?: number;
             /** @enum {string} */
-            name?: "ROLE_ADMIN" | "ROLE_USER" | "ROLE_SPECIALIST";
+            name?: "ROLE_ADMIN" | "ROLE_USER" | "ROLE_SPECIALIST" | "ROLE_ANONYMOUS";
             authority?: string;
             roleName?: string;
         };
@@ -964,6 +947,8 @@ export interface components {
             lastName?: string;
             role?: string;
             enabled?: boolean;
+            /** Format: int64 */
+            version?: number;
         };
     };
     responses: never;
@@ -974,13 +959,13 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    modifyAccountSelf: {
+    modifyAccount: {
         parameters: {
             query?: never;
-            header: {
-                "If-Match": string;
+            header?: never;
+            path: {
+                id: string;
             };
-            path?: never;
             cookie?: never;
         };
         requestBody: {
@@ -995,7 +980,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["GetAccountPersonalDTO"];
+                    "*/*": components["schemas"]["AccountDTO"];
                 };
             };
         };
@@ -1936,28 +1921,6 @@ export interface operations {
         };
     };
     removeAllergen: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": Record<string, never>;
-                };
-            };
-        };
-    };
-    deleteAccount: {
         parameters: {
             query?: never;
             header?: never;
