@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from "../utils/AuthContext.tsx";
 import { authService } from "../utils/authService.ts";
-import { changePassword, updateAccountInfo, getAccountInfo } from "../api/api.ts";
+import { changePassword } from "../api/api.ts";
 import { components } from "../controlfood-backend-schema";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';  // Importujemy spinner
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import axiosInstance from "../api/axiosConfig.ts";  // Importujemy spinner
 
 type GetAccountDTO = components["schemas"]["GetAccountDTO"];
 
@@ -18,6 +19,7 @@ const MyAccountPage: React.FC = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [loading, setLoading] = useState(false); // Stan ładowania
+    const [eTag, setETag] = useState('');
     const { role } = useAuth();
 
     const handleGetAccountInfo = async () => {
@@ -27,10 +29,15 @@ const MyAccountPage: React.FC = () => {
             if (!accountId) {
                 throw new Error("Account ID is not available. User might not be logged in.");
             }
-            const data = await getAccountInfo(accountId);
-            setAccountInfo(data);
-            setFirstName(data.firstName);
-            setLastName(data.lastName);
+
+            const response = await axiosInstance.get(`/account/${accountId}`);
+            console.log('Log', response.headers);
+
+            console.log("dataaa", response.data)
+            setAccountInfo(response.data);
+            setFirstName(response.data.firstName);
+            setLastName(response.data.lastName);
+            setETag(response.headers.etag);
         } catch (err: any) {
             console.error('Error fetching account info:', err);
             toast.error('Błąd podczas ładowania informacji o koncie');
@@ -41,24 +48,34 @@ const MyAccountPage: React.FC = () => {
 
 
     const handleUpdateProfile = async () => {
-        if (accountInfo) {  // Sprawdzamy, czy mamy dane konta
+        if (accountInfo) {  // Ensure account info exists before proceeding
             const payload = {
                 firstName,
                 lastName,
-                version: accountInfo.version,  // Dodajemy wersję do payloadu
+                version: accountInfo.version,  // Include the version to avoid conflicts
             };
 
             try {
-                await updateAccountInfo(payload);
+                const config:any = eTag ? {
+                    headers: {
+                        'If-Match': eTag,  // Use the stored ETag value
+                    }
+                } : {};
+
+                const response = await axiosInstance.put("/me/updateInfo", payload, config);
+
+                console.log(response)
                 toast.success('Edycja profilu powiodła się');
                 setIsEditingProfile(false);
-                await handleGetAccountInfo();
+                await handleGetAccountInfo(); // Refresh account info after the update
+
             } catch (err: any) {
                 console.error('Error updating profile:', err);
                 toast.error(err.response?.data?.message || 'Wystąpił błąd podczas aktualizacji profilu.');
             }
         }
     };
+
 
 
     // Funkcja zmieniająca hasło
@@ -85,6 +102,7 @@ const MyAccountPage: React.FC = () => {
     // Ładowanie danych po załadowaniu komponentu
     useEffect(() => {
         handleGetAccountInfo();
+        console.log("MA")
     }, []);
 
 
@@ -99,28 +117,40 @@ const MyAccountPage: React.FC = () => {
                 <p className="text-gray-500 text-xs sm:text-sm">{authService.getAccountEmail()}</p>
             </div>
 
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow mb-4">
-                <h2 className="text-lg sm:text-xl font-semibold mb-2">Informacje o koncie</h2>
-                {loading ? ( // Używamy FontAwesome spinnera
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-6 max-w-4xl mx-auto">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informacje o koncie</h2>
+
+                {loading ? (
                     <div className="flex justify-center py-6">
-                        <FontAwesomeIcon icon={faSpinner} spin size="3x" color="#000" />
+                        <FontAwesomeIcon icon={faSpinner} spin size="3x" color="#4A90E2"/>
                     </div>
                 ) : accountInfo ? (
                     <>
-                        <p className="text-sm sm:text-base">
-                            <strong>Poziom
-                                dostępu: </strong>
-                            {role === 'ROLE_USER' ? 'Użytkownik' : role === 'ROLE_SPECIALIST' ? 'Specjalista' : role === 'ROLE_ADMIN' ? 'Administrator' : role}
-                        </p>
+                        <div className="space-y-3">
+                            <p className="text-base text-gray-700">
+                                <strong className="font-semibold text-gray-800">Poziom dostępu: </strong>
+                                {role === 'ROLE_USER' ? 'Użytkownik' : role === 'ROLE_SPECIALIST' ? 'Specjalista' : role === 'ROLE_ADMIN' ? 'Administrator' : role}
+                            </p>
 
-                        <p className="text-sm sm:text-base"><strong>Email:</strong> {accountInfo.email}</p>
-                        <p className="text-sm sm:text-base"><strong>Imię:</strong> {accountInfo.firstName}</p>
-                        <p className="text-sm sm:text-base"><strong>Nazwisko:</strong> {accountInfo.lastName}</p>
+                            <p className="text-base text-gray-700">
+                                <strong className="font-semibold text-gray-800">Email:</strong> {accountInfo.email}
+                            </p>
+
+                            <p className="text-base text-gray-700">
+                                <strong className="font-semibold text-gray-800">Imię:</strong> {accountInfo.firstName}
+                            </p>
+
+                            <p className="text-base text-gray-700">
+                                <strong
+                                    className="font-semibold text-gray-800">Nazwisko:</strong> {accountInfo.lastName}
+                            </p>
+                        </div>
                     </>
                 ) : (
-                    <p className="text-sm sm:text-base text-gray-500">Ładowanie...</p>
+                    <p className="text-base text-gray-500"><FontAwesomeIcon icon={faSpinner} spin size="3x" color="#4A90E2"/></p>
                 )}
             </div>
+
 
             {/* Edycja profilu */}
             {isEditingProfile ? (

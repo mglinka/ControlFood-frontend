@@ -12,6 +12,7 @@ import axiosInstance from "../api/axiosConfig.ts";
 import {useAuth} from "../utils/AuthContext.tsx";
 import {jwtDecode} from "jwt-decode";
 import {AmazonLoginButton} from "./AmazonLoginButton.tsx";
+import {FaSpinner} from "react-icons/fa";
 
 
 const loginSchema = z.object({
@@ -97,12 +98,9 @@ export function LoginForm() {
     const handleGoogleSuccess = async (credentialResponse: any) => {
         try {
             const token = credentialResponse.credential;
-            console.log("Bartek", token);
             const userInfo: any = jwtDecode(token);
-
-            console.log("Bart", userInfo);
+            console.log(userInfo)
             const response = await axiosInstance.post('/auth/google/redirect', token);
-            console.log("Bartini", response);
             console.log("B", response.data.token)
             login(response.data.token)
 
@@ -182,7 +180,7 @@ export function LoginForm() {
                             className="flex w-full justify-center rounded-md bg-gradient-to-r from-red-500 to-orange-500 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:from-red-400 hover:to-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                             disabled={loading}
                         >
-                            {loading ? "..." : "Zaloguj się"}
+                            {loading ? <FaSpinner className="animate-spin" /> : "Zaloguj się"}
                         </button>
                     </div>
                 </form>

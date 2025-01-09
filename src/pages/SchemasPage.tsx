@@ -309,7 +309,8 @@ const SchemasPage: React.FC = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-semibold text-center mb-6 rounded-full">Edytuj szablon profilu alergicznego</h2>
+                        <h2 className="text-2xl font-semibold text-center mb-6 rounded-full">Edytuj szablon profilu
+                            alergicznego</h2>
 
                         <div className="relative space-y-6">
                             {/* Pole nazwy */}
@@ -352,7 +353,8 @@ const SchemasPage: React.FC = () => {
 
                                 {/* Kolumna: Składniki nietolerowane */}
                                 <div className="flex flex-col">
-                                    <h3 className="font-semibold text-lg text-blue-500 mb-4 text-center">Składniki nietolerowane</h3>
+                                    <h3 className="font-semibold text-lg text-blue-500 mb-4 text-center">Składniki
+                                        nietolerowane</h3>
                                     <div
                                         className="flex flex-wrap gap-2 p-4 border rounded-md overflow-y-auto max-h-96 bg-gray-50"
                                         style={{

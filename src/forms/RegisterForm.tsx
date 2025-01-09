@@ -11,6 +11,7 @@ import { useAuth } from '../utils/AuthContext.tsx';
 import { GoogleLogin } from '@react-oauth/google';
 import { AmazonRegisterButton } from './AmazonRegisterButton.tsx';
 import { z, ZodError } from 'zod';
+import {FaSpinner} from "react-icons/fa";
 
 const registerSchema = z.object({
     firstName: z.string().min(2, "Imię jest wymagane"),
@@ -241,7 +242,7 @@ export function RegisterForm() {
                                     disabled={loading}
                                     className={`flex w-full justify-center rounded-md ${loading ? 'bg-gray-500' : 'bg-orange-600'} px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600`}
                                 >
-                                    {loading ? 'Creating Account...' : 'Stwórz konto'}
+                                    {loading ? <FaSpinner className="animate-spin" /> : "Stwórz konto"}
                                 </button>
                             </div>
 

@@ -159,7 +159,7 @@ export function CreateAllergenForm() {
         <div className="relative">
 
             <div className="flex w-full p-6">
-            <div className="pr-28 mb-6">
+            <div className="pr-18 mb-6 ">
                 <button
                     onClick={() => setShowCreateModal(true)}
                     className="bg-orange-500 text-white p-4 rounded-full flex items-center justify-center w-full"
@@ -168,7 +168,7 @@ export function CreateAllergenForm() {
                 </button>
             </div>
 
-            <div className="w-[80%]">
+            <div className="pl-10 w-[80%]">
                 <h3 className="text-xl font-semibold mb-4 text-orange-600">Alergeny</h3>
                 <div className="flex flex-wrap gap-4">
                     {allergensType1.length > 0 ? (

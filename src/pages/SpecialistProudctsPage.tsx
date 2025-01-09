@@ -141,7 +141,7 @@ const SpecialistProductsPage: React.FC = () => {
                         }}
                     >
                         <option value="" className="rounded-lg">
-                            Wybierz kategorię
+                            kategoria
                         </option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.id} className="rounded-lg">

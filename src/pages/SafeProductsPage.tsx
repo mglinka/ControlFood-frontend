@@ -137,7 +137,7 @@ const SafeProductsPage: React.FC = () => {
                         }}
                         className="w-full px-4 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black appearance-none cursor-pointer"
                     >
-                        <option value="">Wybierz kategorię</option>
+                        <option value="">kategoria</option>
                         {categories.map(category => (
                             <option key={category.id} value={category.name}>
                                 {category.name}

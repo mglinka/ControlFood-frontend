@@ -110,10 +110,12 @@ export const changePassword = async (payload: {  newPassword: string; confirmati
 
 export const getAccountInfo = async (id:string)=> {
     const response = await axiosInstance.get(`/account/${id}`);
+    console.log('Log', response.headers);
     return response.data;
 };
 
-export const updateAccountInfo = async (payload: { firstName: string; lastName: string; version: number | undefined }) => {
+export const updateAccountInfo = async (payload: { firstName: string; lastName: string; version: number | undefined , eTag: string}) => {
+
     const response = await axiosInstance.put("/me/updateInfo", payload);
     return response.data;
 };

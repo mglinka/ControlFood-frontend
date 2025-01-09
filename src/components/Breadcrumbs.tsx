@@ -26,6 +26,8 @@ const Breadcrumbs: React.FC = () => {
         "my-account": "Moje konto",
         "schemas": "Szablony",
         "safe-products": "Bezpieczne produkty",
+        "access-levels": "Poziomy dostępu",
+        "accounts": "Konta",
     };
 
     const isMainPage = location.pathname === "/main-page";
