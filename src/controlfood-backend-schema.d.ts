@@ -660,6 +660,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/accounts/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["createAccount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/account/{id}": {
         parameters: {
             query?: never;
@@ -950,6 +966,14 @@ export interface components {
             /** Format: int64 */
             version?: number;
         };
+        CreateAccountDTO: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            password: string;
+            /** @enum {string} */
+            role?: "ROLE_ADMIN" | "ROLE_USER" | "ROLE_SPECIALIST" | "ROLE_ANONYMOUS";
+        };
     };
     responses: never;
     parameters: never;
@@ -988,7 +1012,9 @@ export interface operations {
     updateInfo: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "If-Match": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1872,6 +1898,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GetAccountDTO"][];
+                };
+            };
+        };
+    };
+    createAccount: {
+        parameters: {
+            query: {
+                createAccountDTO: components["schemas"]["CreateAccountDTO"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
                 };
             };
         };

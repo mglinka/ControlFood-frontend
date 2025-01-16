@@ -166,7 +166,10 @@ export function RegisterForm() {
                                 <label htmlFor="firstName"
                                        className="block text-sm font-medium leading-6 text-gray-900">
                                     Imię
+                                    <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
+
                                 </label>
+
                                 <div className="mt-2">
                                     <input
                                         id="firstName"
@@ -185,6 +188,8 @@ export function RegisterForm() {
                             <div>
                                 <label htmlFor="lastName" className="block text-sm font-medium leading-6 text-gray-900">
                                     Nazwisko
+                                    <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
+
                                 </label>
                                 <input
                                     id="lastName"
@@ -201,6 +206,8 @@ export function RegisterForm() {
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                                     Email
+                                    <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
+
                                 </label>
                                 <div className="mt-2">
                                     <input
@@ -218,8 +225,9 @@ export function RegisterForm() {
                             </div>
 
                             <div>
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                                    Hasło
+                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 ">
+                                    Hasło<span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
+
                                 </label>
                                 <div className="mt-2">
                                     <input

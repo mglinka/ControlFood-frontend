@@ -1,6 +1,9 @@
 import axiosInstance from "./axiosConfig.ts";
 import {components} from "../controlfood-backend-schema";
 
+
+
+
 type AssignProfileDTO = components["schemas"]["AssignProfileDTO"];
 type UpdateAllergyProfileSchemaDTO = components["schemas"]["UpdateAllergyProfileSchemaDTO"];
 
@@ -199,6 +202,17 @@ export const getProductsByCategory = async (categoryName:string) => {
     return response.data;
 }
 
+type CreateAccountDTO = components['schemas']['CreateAccountDTO'];
+
+export const createAccount = async (accountData: CreateAccountDTO) => {
+    try {
+        const response = await axiosInstance.post('/accounts/create', accountData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating account:', error);
+        throw error;
+    }
+};
 
 
 
