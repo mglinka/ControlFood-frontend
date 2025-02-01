@@ -31,7 +31,6 @@ const SafeProductsPage: React.FC = () => {
                 data = await getAllProducts(0, 140, searchQuery);
             }
 
-            // Filtruj produkty na podstawie zapytania
             if (searchQuery) {
                 const lowerCaseQuery = searchQuery.toLowerCase();
                 data = data.filter((product: components['schemas']['GetProductDTO']) =>
@@ -39,7 +38,6 @@ const SafeProductsPage: React.FC = () => {
                 );
             }
 
-            // Filtruj produkty na podstawie profilu alergii
             const filtered = data.filter((product: components['schemas']['GetProductDTO']) => {
                 if (!product.labelDTO?.allergens) return true;
 
