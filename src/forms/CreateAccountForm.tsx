@@ -144,8 +144,9 @@ const CreateAccountForm: React.FC<Props> = ({ onSubmit }) => {
             {/* First Name */}
             <div className="mb-4">
                 <label htmlFor="firstName" className="block text-gray-700 font-medium mb-2">
-                    Imię
+                    Imię <span className="text-red-500 ml-1 text-2xl">*</span>
                 </label>
+
                 <input
                     type="text"
                     id="firstName"
@@ -160,7 +161,7 @@ const CreateAccountForm: React.FC<Props> = ({ onSubmit }) => {
             {/* Last Name */}
             <div className="mb-4">
                 <label htmlFor="lastName" className="block text-gray-700 font-medium mb-2">
-                    Nazwisko
+                    Nazwisko <span className="text-red-500 ml-1 text-2xl">*</span>
                 </label>
                 <input
                     type="text"
@@ -177,7 +178,7 @@ const CreateAccountForm: React.FC<Props> = ({ onSubmit }) => {
             {/* Email */}
             <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
-                    Email
+                    Email <span className="text-red-500 ml-1 text-2xl">*</span>
                 </label>
                 <input
                     type="email"
@@ -194,7 +195,7 @@ const CreateAccountForm: React.FC<Props> = ({ onSubmit }) => {
             {/* Password */}
             <div className="mb-4">
                 <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
-                    Hasło
+                    Hasło <span className="text-red-500 ml-1 text-2xl">*</span>
                 </label>
                 <input
                     type="password"
@@ -211,7 +212,7 @@ const CreateAccountForm: React.FC<Props> = ({ onSubmit }) => {
             {/* Role */}
             <div className="mb-4">
                 <label htmlFor="role" className="block text-gray-700 font-medium mb-2">
-                    Rola
+                    Rola <span className="text-red-500 ml-1 text-2xl">*</span>
                 </label>
                 <select
                     id="role"

@@ -118,8 +118,8 @@ export function RegisterForm() {
 
         try {
             await axiosInstance.post('/auth/register', registerRequest);
-            toast.success('Logowanie powiodło się');
-            setTimeout(() => navigate('/login'), 700);
+            toast.success('Na Twój adres e-mail został wysłany link aktywacyjny do konta');
+            setTimeout(() => navigate('/login'), 1500);
         } catch (error: any) {
             const message = error.response?.data?.message;
             toast.error(message);

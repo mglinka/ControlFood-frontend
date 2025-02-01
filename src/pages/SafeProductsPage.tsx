@@ -155,7 +155,7 @@ const SafeProductsPage: React.FC = () => {
                         className="w-full px-4 py-2 bg-white text-black rounded-full border-2 border-black focus:outline-none focus:border-black appearance-none cursor-pointer"
                     >
                         <option value="no-allergens">Bez alergenów</option>
-                        <option value="allow-low">Dopuszczaj niską intensywność</option>
+                        <option value="allow-low">Dopuszczaj śladowe ilości</option>
                     </select>
                 </div>
             </div>

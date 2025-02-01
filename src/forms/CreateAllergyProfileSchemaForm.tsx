@@ -135,7 +135,8 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
 
                         {/* Column: Intolerant Ingredients */}
                         <div className="flex flex-col">
-                            <h3 className="font-semibold text-lg text-blue-500 mb-4 text-center">Składniki nietolerowane</h3>
+                            <h3 className="font-semibold text-lg text-blue-500 mb-4 text-center">Składniki
+                                nietolerowane</h3>
                             <div
                                 className="flex flex-wrap gap-2 p-4 border rounded-md overflow-y-auto max-h-96 bg-gray-50"
                                 style={{
@@ -163,7 +164,7 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
                     <div className="flex justify-end mt-6">
                         <button
                             onClick={handleSubmit}
-                            className="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transform transition-all duration-300 hover:scale-110"
+                            className={`bg-orange-500 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-orange-600 transform transition-all duration-300 hover:scale-110`}
                             disabled={loading}
                         >
                             {loading ? (
@@ -173,6 +174,7 @@ export const CreateAllergyProfileSchemaForm: React.FC<Props> = ({ onCreate, alle
                             )}
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>

@@ -991,7 +991,7 @@ export function CreateProductForm() {
 
                 <div className="mb-6">
                     <label className="block mb-1 text-xl font-semibold text-gray-600">
-                        Ilość produktu
+                        Liczba produktów
                         <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                     </label>
@@ -1277,7 +1277,7 @@ export function CreateProductForm() {
                 <div className="mb-6">
                     <h3 className="text-2xl font-semibold mb-3">Informacje o porcji</h3>
                     <label className="block mb-1 text-xl font-semibold text-gray-600">
-                        Ilość porcji
+                        Liczba porcji
                         <span className="text-red-500 ml-1 text-2xl">*</span> {/* Ikona gwiazdki powiększona */}
 
                     </label>

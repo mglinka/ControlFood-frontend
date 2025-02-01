@@ -343,8 +343,8 @@ const ProductsPage: React.FC = () => {
                                     <table className="table-auto border-collapse border border-gray-800 w-full text-sm text-left text-black">
                                         <thead>
                                         <tr className="bg-white text-black text-center">
-                                            <th className="border border-gray-400 px-4 py-2">Grupa wartości odżywczych</th>
-                                            <th className="border border-gray-400 px-4 py-2">Wartość odżywcza</th>
+                                            <th className="border border-gray-400 px-4 py-2">Grupa składników</th>
+                                            <th className="border border-gray-400 px-4 py-2">Składnik</th>
                                             <th className="border border-gray-400 px-4 py-2">100g/ml</th>
                                             <th className="border border-gray-400 px-4 py-2">% NRV</th>
                                         </tr>

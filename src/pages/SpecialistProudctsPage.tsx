@@ -292,9 +292,9 @@ const SpecialistProductsPage: React.FC = () => {
                                         <thead className="bg-gradient-to-r from-orange-600 to-orange-500 text-white">
                                         <tr className="text-center">
                                             <th className="border border-gray-300 px-4 py-3 rounded-tl-lg">Grupa
-                                                wartości odżywczej
+                                                składników
                                             </th>
-                                            <th className="border border-gray-300 px-4 py-3">Wartość odżywcza</th>
+                                            <th className="border border-gray-300 px-4 py-3">Skadnik</th>
                                             <th className="border border-gray-300 px-4 py-3">100g/ml</th>
                                             <th className="border border-gray-300 px-4 py-3 rounded-tr-lg">% NRV</th>
                                         </tr>

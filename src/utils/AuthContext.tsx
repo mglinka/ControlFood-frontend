@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 try {
                     const decoded = authService.decodeToken(storedToken);
                     if (decoded && decoded.role) {
-                        setRole(decoded.role[0]); // Ustaw rolę
+                        setRole(decoded.role[0]);
                     }
                     setToken(storedToken);
                 } catch (error) {
