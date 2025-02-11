@@ -12,13 +12,13 @@ const Header: React.FC = () => {
                     to="/register"
                     className="text-lg sm:text-xl font-semibold transition-colors duration-300 hover:text-yellow-400 sm:ml-6"
                 >
-                    Register
+                    Zarejestruj się
                 </Link>
                 <Link
                     to="/login"
                     className="text-lg sm:text-xl font-semibold transition-colors duration-300 hover:text-yellow-400 sm:ml-6 mt-2 sm:mt-0"
                 >
-                    Login
+                    Zaloguj się
                 </Link>
             </nav>
         </header>

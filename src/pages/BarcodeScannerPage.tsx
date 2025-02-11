@@ -15,9 +15,7 @@ const BarcodeScannerPage: React.FC = () => {
     }[]>([]);
 
     const fetchProductInfo = async (ean: string) => {
-        console.log("Before sending:", ean);
         const productData = await getProductByEan(ean);
-        console.log("Received product data:", productData);
         setProduct(productData);
     };
 
@@ -35,7 +33,6 @@ const BarcodeScannerPage: React.FC = () => {
                 }
                 const profileData = await getAllergyProfileByAccountId(accountId);
                 setAllergenProfile(profileData.allergens);
-                console.log("Bartek", profileData)
             } catch (error) {
                 console.error('Error fetching allergy profile:', error);
             }
@@ -44,7 +41,6 @@ const BarcodeScannerPage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        console.log("Product state updated:", product, data);
     }, [product]);
 
     return (
