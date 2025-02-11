@@ -129,7 +129,7 @@ const MyAccountPage: React.FC = () => {
                         <div className="space-y-3">
                             <p className="text-base text-gray-700">
                                 <strong className="font-semibold text-gray-800">Poziom dostępu: </strong>
-                                {role === 'ROLE_USER' ? 'Użytkownik' : role === 'ROLE_SPECIALIST' ? 'Specjalista' : role === 'ROLE_ADMIN' ? 'Administrator' : role}
+                                {role === 'ROLE_USER' ? 'Klient' : role === 'ROLE_SPECIALIST' ? 'Specjalista' : role === 'ROLE_ADMIN' ? 'Administrator' : role}
                             </p>
 
                             <p className="text-base text-gray-700">
